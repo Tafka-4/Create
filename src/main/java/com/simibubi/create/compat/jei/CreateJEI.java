@@ -77,9 +77,9 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.fabric.constants.FabricTypes;
+import mezz.jei.api.fabric.ingredients.fluids.JeiFluidIngredient;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IPlatformFluidHelper;
-import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.IExtraIngredientRegistration;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
@@ -89,10 +89,10 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.runtime.IIngredientManager;
-import mezz.jei.fabric.ingredients.fluid.JeiFluidIngredient;
 import net.createmod.catnip.config.ConfigBase;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
@@ -117,7 +117,6 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
-import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.RecipeManagerAccessor;
 
 @JeiPlugin
 @SuppressWarnings("unused")
@@ -358,10 +357,10 @@ public class CreateJEI implements IModPlugin {
 		registration.getIngredientManager().removeIngredientsAtRuntime(
 				FabricTypes.FLUID_STACK,
 				List.of(
-						new JeiFluidIngredient(AllFluids.POTION.get().getSource(), 1),
-						new JeiFluidIngredient(AllFluids.POTION.get().getFlowing(), 1),
-						new JeiFluidIngredient(AllFluids.TEA.get().getSource(), 1),
-						new JeiFluidIngredient(AllFluids.TEA.get().getFlowing(), 1)
+						new JeiFluidIngredient(FluidVariant.of(AllFluids.POTION.get().getSource()), 1),
+						new JeiFluidIngredient(FluidVariant.of(AllFluids.POTION.get().getFlowing()), 1),
+						new JeiFluidIngredient(FluidVariant.of(AllFluids.TEA.get().getSource()), 1),
+						new JeiFluidIngredient(FluidVariant.of(AllFluids.TEA.get().getFlowing()), 1)
 				)
 		);
 	}

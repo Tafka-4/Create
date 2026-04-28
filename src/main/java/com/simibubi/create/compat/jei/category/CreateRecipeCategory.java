@@ -2,16 +2,9 @@ package com.simibubi.create.compat.jei.category;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-
-import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
-import mezz.jei.api.gui.ingredient.IRecipeSlotView;
-import mezz.jei.api.neoforge.NeoForgeTypes;
-import mezz.jei.api.recipe.RecipeIngredientRole;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +15,7 @@ import com.simibubi.create.foundation.utility.CreateLang;
 
 import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.fabric.ingredients.fluids.IJeiFluidIngredient;
+import mezz.jei.api.fabric.ingredients.fluids.JeiFluidIngredient;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -36,12 +30,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.material.Fluid;
 
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 
@@ -146,26 +138,11 @@ public abstract class CreateRecipeCategory<T extends Recipe<?>> implements IReci
 	// fabric: don't need potion tooltip stuff, handled by attribute handler
 
 	public static FluidStack fromJei(IJeiFluidIngredient jei) {
-		return new FluidStack(jei.getFluid(), jei.getAmount(), jei.getTag().orElse(null));
+		return new FluidStack(jei.getFluidVariant(), jei.getAmount());
 	}
 
 	public static IJeiFluidIngredient toJei(FluidStack stack) {
-		return new IJeiFluidIngredient() {
-			@Override
-			public Fluid getFluid() {
-				return stack.getFluid();
-			}
-
-			@Override
-			public long getAmount() {
-				return stack.getAmount();
-			}
-
-			@Override
-			public Optional<CompoundTag> getTag() {
-				return Optional.ofNullable(stack.getTag());
-			}
-		};
+		return new JeiFluidIngredient(stack.getVariant(), stack.getAmount());
 	}
 
 	public static List<FluidStack> fromJei(List<IJeiFluidIngredient> stacks) {

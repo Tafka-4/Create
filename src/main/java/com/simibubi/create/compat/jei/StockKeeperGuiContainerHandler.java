@@ -13,7 +13,6 @@ public record StockKeeperGuiContainerHandler(IIngredientManager ingredientManage
 
 	@Override
 	public Optional<IClickableIngredient<?>> getClickableIngredientUnderMouse(StockKeeperRequestScreen containerScreen, double mouseX, double mouseY) {
-		return containerScreen.getHoveredIngredient((int) mouseX, (int) mouseY)
-			.flatMap(pair -> ingredientManager.createClickableIngredient(pair.getFirst(), pair.getSecond(), true));
+		return Optional.empty();
 	}
 }

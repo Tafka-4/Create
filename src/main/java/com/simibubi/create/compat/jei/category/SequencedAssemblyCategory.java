@@ -1,7 +1,6 @@
 package com.simibubi.create.compat.jei.category;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,13 +13,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.compat.jei.category.sequencedAssembly.JeiSequencedAssemblySubCategory;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import com.simibubi.create.content.processing.sequenced.SequencedRecipe;
+import com.simibubi.create.foundation.fluid.FluidIngredient;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.utility.CreateLang;
 
+import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
-import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.createmod.catnip.registry.RegisteredObjectsHelper;
@@ -33,8 +33,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
-
-import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 @ParametersAreNonnullByDefault
 public class SequencedAssemblyCategory extends CreateRecipeCategory<SequencedAssemblyRecipe> {
@@ -86,10 +84,11 @@ public class SequencedAssemblyCategory extends CreateRecipeCategory<SequencedAss
 				for (Ingredient ingredient : sequencedIngredients.subList(1, sequencedIngredients.size()))
 					builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
 						.addIngredients(ingredient);
-				for (SizedFluidIngredient fluidIngredient : sequencedRecipe.getRecipe()
+				for (FluidIngredient fluidIngredient : sequencedRecipe.getRecipe()
 					.getFluidIngredients())
 					builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
-						.addIngredients(NeoForgeTypes.FLUID_STACK, Arrays.asList(fluidIngredient.getFluids()));
+						.addIngredients(FabricTypes.FLUID_STACK,
+							CreateRecipeCategory.toJei(fluidIngredient.getMatchingFluidStacks()));
 			}
 		}
 	}
@@ -97,7 +96,7 @@ public class SequencedAssemblyCategory extends CreateRecipeCategory<SequencedAss
 	private JeiSequencedAssemblySubCategory getSubCategory(SequencedRecipe<?> sequencedRecipe) {
 		return subCategories.computeIfAbsent(RegisteredObjectsHelper.getKeyOrThrow(sequencedRecipe.getRecipe()
 						.getSerializer()),
-			rl -> sequencedRecipe.getAsAssemblyRecipe()
+			rl -> (JeiSequencedAssemblySubCategory) sequencedRecipe.getAsAssemblyRecipe()
 				.getJEISubCategory()
 				.jei()
 				.get()

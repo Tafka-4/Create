@@ -34,7 +34,7 @@ val ccVersion = "1.118.0"
 // for CC - https://modrinth.com/mod/cloth-config/versions
 val clothVersion = "15.0.140+fabric"
 // https://modrinth.com/mod/jei/versions
-val jeiVersion = "19.21.0.247"
+val jeiVersion = "19.27.0.340"
 // https://modrinth.com/mod/rei/versions
 val reiVersion = "16.0.799"
 // https://modrinth.com/mod/emi/versions
@@ -58,7 +58,7 @@ val jmApiVersion = "1.20-1.9-SNAPSHOT"
 
 // dev stuff
 val ccRuntime = false
-val recipeViewer = "emi" // jei, rei, or emi
+val recipeViewer = "jei" // jei, rei, or emi
 
 plugins {
     id("fabric-loom") version "1.16.1"
@@ -100,6 +100,13 @@ repositories {
     maven("https://maven.ftb.dev/releases") // FTB
     maven("https://maven.architectury.dev") // Architectury API
     maven("https://jm.gserv.me/repository/maven-public/") // Journey map
+}
+
+configurations.configureEach {
+    resolutionStrategy.force(
+        "mezz.jei:jei-$minecraftVersion-common-api:$jeiVersion",
+        "mezz.jei:jei-$minecraftVersion-fabric-api:$jeiVersion"
+    )
 }
 
 val ponder = file("Ponder")
