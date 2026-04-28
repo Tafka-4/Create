@@ -65,8 +65,18 @@ public class TransferUtil {
 		return extracted == null ? ItemStack.EMPTY : extracted.resource().toStack(truncateLong(extracted.amount()));
 	}
 
+	public static ItemStack extractAnyItem(Storage<ItemVariant> storage, int amount, TransactionContext ctx) {
+		ResourceAmount<ItemVariant> extracted = extractAny(storage, amount, ctx);
+		return extracted == null ? ItemStack.EMPTY : extracted.resource().toStack(truncateLong(extracted.amount()));
+	}
+
 	public static FluidStack extractAnyFluid(Storage<FluidVariant> storage, long amount) {
 		ResourceAmount<FluidVariant> extracted = extractAny(storage, amount);
+		return FluidStack.of(extracted);
+	}
+
+	public static FluidStack extractAnyFluid(Storage<FluidVariant> storage, long amount, TransactionContext ctx) {
+		ResourceAmount<FluidVariant> extracted = extractAny(storage, amount, ctx);
 		return FluidStack.of(extracted);
 	}
 
@@ -115,6 +125,11 @@ public class TransferUtil {
 	@Nullable
 	public static <T extends TransferVariant<?>> ResourceAmount<T> extractAny(Storage<T> storage, long maxAmount) {
 		return commit(t -> StorageUtil.extractAny(storage, maxAmount, t));
+	}
+
+	@Nullable
+	public static <T extends TransferVariant<?>> ResourceAmount<T> extractAny(Storage<T> storage, long maxAmount, TransactionContext ctx) {
+		return StorageUtil.extractAny(storage, maxAmount, ctx);
 	}
 
 	@Nullable

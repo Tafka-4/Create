@@ -19,6 +19,9 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+
+import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.MutableContainerItemContext;
@@ -39,6 +42,11 @@ public class GenericItemEmptying {
 	}
 
 	public static Pair<FluidStack, ItemStack> emptyItem(Level world, ItemStack stack, boolean simulate) {
+		return emptyItem(world, stack, simulate, null);
+	}
+
+	public static Pair<FluidStack, ItemStack> emptyItem(Level world, ItemStack stack, boolean simulate,
+													   @Nullable TransactionContext transaction) {
 		FluidStack resultingFluid = FluidStack.EMPTY;
 		ItemStack resultingItem = ItemStack.EMPTY;
 
@@ -62,8 +70,8 @@ public class GenericItemEmptying {
 		Storage<FluidVariant> tank = FluidStorage.ITEM.find(split, ctx);
 		if (tank == null)
 			return Pair.of(resultingFluid, resultingItem);
-		try (Transaction t = Transaction.openOuter()) {
-			resultingFluid = TransferUtil.extractAnyFluid(tank, FluidConstants.BUCKET);
+		try (Transaction t = transaction == null ? Transaction.openOuter() : transaction.openNested()) {
+			resultingFluid = TransferUtil.extractAnyFluid(tank, FluidConstants.BUCKET, t);
 			int amount = ctx.getItemVariant().isBlank() ? 0 : (int) ctx.getAmount(); // GH#1622
 			resultingItem = ctx.getItemVariant().toStack(amount);
 			if (!simulate) {
