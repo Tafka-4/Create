@@ -52,6 +52,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 
@@ -347,7 +348,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
 		try (Transaction t = Transaction.openOuter()) {
 			ItemStack stack = armInteractionPoint.extract(t);
 
-			ItemStack remainder = stack.isEmpty() ? stack : simulateInsertion(stack);
+			ItemStack remainder = stack.isEmpty() ? stack : simulateInsertion(stack, t);
 			if (ItemStack.isSameItem(stack, remainder)) {
 				return stack.getCount() - remainder.getCount();
 			} else {
@@ -356,16 +357,14 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
 		}
 	}
 
-	private ItemStack simulateInsertion(ItemStack stack) {
-		try (Transaction t = Transaction.openOuter()) {
-			for (ArmInteractionPoint armInteractionPoint : outputs) {
-				if (armInteractionPoint.isValid())
-					stack = armInteractionPoint.insert(stack, t);
-				if (stack.isEmpty())
-					break;
-			}
-			return stack;
+	private ItemStack simulateInsertion(ItemStack stack, TransactionContext ctx) {
+		for (ArmInteractionPoint armInteractionPoint : outputs) {
+			if (armInteractionPoint.isValid())
+				stack = armInteractionPoint.insert(stack, ctx);
+			if (stack.isEmpty())
+				break;
 		}
+		return stack;
 	}
 
 	protected void depositItem() {
@@ -395,10 +394,10 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
 	protected void collectItem() {
 		ArmInteractionPoint armInteractionPoint = getTargetedInteractionPoint();
 		if (armInteractionPoint != null && armInteractionPoint.isValid()) {
+			int amountExtracted = getDistributableAmount(armInteractionPoint);
+			if (amountExtracted == 0)
+				return;
 			try (Transaction t = Transaction.openOuter()) {
-				int amountExtracted = getDistributableAmount(armInteractionPoint);
-				if (amountExtracted == 0)
-					return;
 				ItemStack prevHeld = heldItem;
 				heldItem = armInteractionPoint.extract(amountExtracted, t);
 				phase = Phase.SEARCH_OUTPUTS;

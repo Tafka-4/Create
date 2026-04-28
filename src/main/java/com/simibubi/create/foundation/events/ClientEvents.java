@@ -454,6 +454,7 @@ public class ClientEvents {
 		ClientPlayConnectionEvents.DISCONNECT.register(ClientEvents::onLeave);
 		DrawSelectionEvents.BLOCK.register(TrackBlockOutline::drawCustomBlockSelection);
 		AttackEntityEvent.EVENT.register(PackageClientInteractionHandler::onPlayerPunchPackage);
+		UseBlockCallback.EVENT.register(ChainConveyorConnectionHandler::onItemUsedOnBlock);
 		WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register(ChainConveyorInteractionHandler::hideVanillaBlockSelection);
 
 		// we need to add our config button after mod menu, so we register our event with a phase that comes later

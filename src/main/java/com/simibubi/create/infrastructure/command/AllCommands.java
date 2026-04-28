@@ -24,8 +24,6 @@ public class AllCommands {
 				.requires(cs -> cs.hasPermission(0))
 				// general purpose
 				.then(new ToggleDebugCommand().register())
-				.then(FabulousWarningCommand.register())
-				.then(OverlayConfigCommand.register())
 				.then(DumpRailwaysCommand.register())
 				//.then(FixLightingCommand.register()) fabric: Forge only command
 				.then(DebugInfoCommand.register())
@@ -40,8 +38,8 @@ public class AllCommands {
 				// utility
 				.then(util);
 
-		if (CatnipServices.PLATFORM.isDevelopmentEnvironment() && CatnipServices.PLATFORM.getEnv().isClient())
-			root.then(CreateTestCommand.register());
+		if (CatnipServices.PLATFORM.getEnv().isClient())
+			ClientCommandRegistration.registerRootCommands(root);
 
 		LiteralCommandNode<CommandSourceStack> createRoot = dispatcher.register(root);
 
@@ -53,14 +51,16 @@ public class AllCommands {
 
 	private static LiteralCommandNode<CommandSourceStack> buildUtilityCommands() {
 
-		return Commands.literal("util")
+		LiteralArgumentBuilder<CommandSourceStack> util = Commands.literal("util")
 				.then(ReplaceInCommandBlocksCommand.register())
-				.then(ClearBufferCacheCommand.register())
-				.then(CameraDistanceCommand.register())
-				.then(CameraAngleCommand.register())
+				.then(CameraAngleCommand.register());
 				//.then(DebugValueCommand.register())
-				//.then(KillTPSCommand.register())
-				.build();
+				//.then(KillTPSCommand.register());
+
+		if (CatnipServices.PLATFORM.getEnv().isClient())
+			ClientCommandRegistration.registerUtilityCommands(util);
+
+		return util.build();
 
 	}
 }

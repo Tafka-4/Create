@@ -7,10 +7,6 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
-
-import com.simibubi.create.infrastructure.fabric.transfer.item.SlottedStackStorage;
-
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
@@ -37,13 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
-import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
 import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
 import com.simibubi.create.infrastructure.fabric.transfer.item.SlottedStackStorage;
 
@@ -203,6 +193,7 @@ public class ItemHelper {
 		int extracted = 0;
 		ItemVariant extracting = null;
 		List<ItemVariant> otherTargets = null;
+		List<ItemVariant> retryTargets = null;
 
 		if (inv.supportsExtraction()) {
 			try (Transaction t = Transaction.openOuter()) {
@@ -250,17 +241,16 @@ public class ItemHelper {
 					// let's try a different target
 					if (otherTargets != null) {
 						t.abort();
-						try (Transaction nested = Transaction.openOuter()) {
-							for (ItemVariant target : otherTargets) {
-								// try again, but now only match the existing matches we've found
-								ItemStack successfulExtraction = extract(inv, target::matches, mode, amount, simulate);
-								if (!successfulExtraction.isEmpty()) {
-									if (!simulate) nested.commit();
-									return successfulExtraction;
-								}
-							}
-						}
+						retryTargets = otherTargets;
 					}
+				}
+			}
+			if (retryTargets != null) {
+				for (ItemVariant target : retryTargets) {
+					// try again, but now only match the existing matches we've found
+					ItemStack successfulExtraction = extract(inv, target::matches, mode, amount, simulate);
+					if (!successfulExtraction.isEmpty())
+						return successfulExtraction;
 				}
 			}
 		}

@@ -384,6 +384,39 @@ fun removeIncompatiblePortingLibExtensionsMixins(jarFile: File) {
 	tempFile.delete()
 }
 
+fun makeFlywheelAvailableOnServer(jarFile: File) {
+	if (!jarFile.isFile)
+		return
+
+	val tempFile = jarFile.resolveSibling("${jarFile.name}.tmp")
+
+	ZipInputStream(FileInputStream(jarFile)).use { input ->
+		ZipOutputStream(FileOutputStream(tempFile)).use { output ->
+			while (true) {
+				val entry = input.nextEntry ?: break
+				val name = entry.name
+				var bytes = input.readBytes()
+
+				if (name == "fabric.mod.json") {
+					@Suppress("UNCHECKED_CAST")
+					val json = JsonSlurper().parseText(bytes.toString(Charsets.UTF_8)) as MutableMap<String, Any?>
+					json["environment"] = "*"
+					bytes = (JsonOutput.prettyPrint(JsonOutput.toJson(json)) + "\n").toByteArray(Charsets.UTF_8)
+				}
+
+				val newEntry = ZipEntry(name)
+				output.putNextEntry(newEntry)
+				output.write(bytes)
+				output.closeEntry()
+				input.closeEntry()
+			}
+		}
+	}
+
+	tempFile.copyTo(jarFile, overwrite = true)
+	tempFile.delete()
+}
+
 fun replaceJarEntry(jarFile: File, entryName: String, replacement: File) {
 	if (!jarFile.isFile || !replacement.isFile)
 		return
@@ -737,6 +770,7 @@ tasks.named("processIncludeJars") {
 			"com/tterrag/registrate/builders/MenuBuilder.class",
 			layout.buildDirectory.file("classes/java/main/com/tterrag/registrate/builders/MenuBuilder.class").get().asFile
 		)
+		makeFlywheelAvailableOnServer(layout.buildDirectory.file("processIncludeJars/flywheel-fabric-$minecraftVersion-$flywheelVersion.jar").get().asFile)
 		removeIncompatibleMilkMixins(layout.buildDirectory.file("processIncludeJars/milk-lib-$milkLibVersion.jar").get().asFile)
 		removeIncompatiblePortingLibExtensionsMixins(layout.buildDirectory.file("processIncludeJars/extensions-$portingLibLegacyVersion.jar").get().asFile)
 	}

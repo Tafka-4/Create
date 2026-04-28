@@ -112,7 +112,7 @@ public class FunnelMovementBehaviour implements MovementBehaviour {
 				ItemStack toInsert = item.getItem();
 				if (toInsert.isEmpty() || (!filter.test(context.world, toInsert)))
 					continue;
-				long inserted = TransferUtil.insert(context.contraption.getStorage().getAllItems(), toInsert);
+				long inserted = TransferUtil.insert(context.contraption.getStorage().getAllItems(), toInsert, t);
 				if (inserted == 0)
 					continue;
 				if (inserted == toInsert.getCount()) {

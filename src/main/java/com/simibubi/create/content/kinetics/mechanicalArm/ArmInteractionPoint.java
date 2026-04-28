@@ -116,7 +116,7 @@ public class ArmInteractionPoint {
 		Storage<ItemVariant> handler = getHandler();
 		if (handler == null)
 			return ItemStack.EMPTY;
-		return TransferUtil.extractAnyItem(handler, amount);
+		return TransferUtil.extractAnyItem(handler, amount, ctx);
 	}
 
 	public ItemStack extract(TransactionContext ctx) {

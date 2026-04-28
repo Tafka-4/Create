@@ -7,7 +7,6 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.simibubi.create.foundation.utility.CameraAngleAnimationService;
 
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.commands.CommandSourceStack;
@@ -16,6 +15,9 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.server.level.ServerPlayer;
 
 public class CameraAngleCommand {
+
+	private static final String MODE_LINEAR = "LINEAR";
+	private static final String MODE_EXPONENTIAL = "EXPONENTIAL";
 
 	public static ArgumentBuilder<CommandSourceStack, ?> register() {
 		return Commands.literal("angle")
@@ -31,14 +33,14 @@ public class CameraAngleCommand {
 					)
 				).then(Commands.literal("mode")
 					.then(Commands.literal("linear")
-						.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.LINEAR.name()))
+						.executes(context -> updateCameraAnimationMode(context, MODE_LINEAR))
 						.then(Commands.argument("speed", FloatArgumentType.floatArg(0))
-							.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.LINEAR.name(), FloatArgumentType.getFloat(context, "speed")))
+							.executes(context -> updateCameraAnimationMode(context, MODE_LINEAR, FloatArgumentType.getFloat(context, "speed")))
 						)
 					).then(Commands.literal("exponential")
-						.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.EXPONENTIAL.name()))
+						.executes(context -> updateCameraAnimationMode(context, MODE_EXPONENTIAL))
 						.then(Commands.argument("speed", FloatArgumentType.floatArg(0))
-							.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.EXPONENTIAL.name(), FloatArgumentType.getFloat(context, "speed")))
+							.executes(context -> updateCameraAnimationMode(context, MODE_EXPONENTIAL, FloatArgumentType.getFloat(context, "speed")))
 						)
 					)
 				)
