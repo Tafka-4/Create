@@ -68,16 +68,12 @@ import com.simibubi.create.content.decoration.TrapdoorCTBehaviour;
 import com.simibubi.create.content.decoration.bracket.BracketBlock;
 import com.simibubi.create.content.decoration.bracket.BracketBlockItem;
 import com.simibubi.create.content.decoration.bracket.BracketGenerator;
-import com.simibubi.create.content.decoration.copycat.CopycatBarsModel;
 import com.simibubi.create.content.decoration.copycat.CopycatPanelBlock;
-import com.simibubi.create.content.decoration.copycat.CopycatPanelModel;
 import com.simibubi.create.content.decoration.copycat.CopycatStepBlock;
-import com.simibubi.create.content.decoration.copycat.CopycatStepModel;
 import com.simibubi.create.content.decoration.copycat.SpecialCopycatPanelBlockState;
 import com.simibubi.create.content.decoration.encasing.CasingBlock;
 import com.simibubi.create.content.decoration.encasing.EncasedCTBehaviour;
 import com.simibubi.create.content.decoration.encasing.EncasingRegistry;
-import com.simibubi.create.content.decoration.girder.ConnectedGirderModel;
 import com.simibubi.create.content.decoration.girder.GirderBlock;
 import com.simibubi.create.content.decoration.girder.GirderBlockStateGenerator;
 import com.simibubi.create.content.decoration.girder.GirderEncasedShaftBlock;
@@ -94,7 +90,6 @@ import com.simibubi.create.content.equipment.clipboard.ClipboardBlock;
 import com.simibubi.create.content.equipment.clipboard.ClipboardBlockItem;
 import com.simibubi.create.content.equipment.clipboard.ClipboardOverrides;
 import com.simibubi.create.content.equipment.toolbox.ToolboxBlock;
-import com.simibubi.create.content.fluids.PipeAttachmentModel;
 import com.simibubi.create.content.fluids.drain.ItemDrainBlock;
 import com.simibubi.create.content.fluids.hosePulley.HosePulleyBlock;
 import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
@@ -108,11 +103,9 @@ import com.simibubi.create.content.fluids.spout.SpoutBlock;
 import com.simibubi.create.content.fluids.tank.FluidTankBlock;
 import com.simibubi.create.content.fluids.tank.FluidTankGenerator;
 import com.simibubi.create.content.fluids.tank.FluidTankItem;
-import com.simibubi.create.content.fluids.tank.FluidTankModel;
 import com.simibubi.create.content.fluids.tank.FluidTankMovementBehavior;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltGenerator;
-import com.simibubi.create.content.kinetics.belt.BeltModel;
 import com.simibubi.create.content.kinetics.chainConveyor.ChainConveyorBlock;
 import com.simibubi.create.content.kinetics.chainDrive.ChainDriveBlock;
 import com.simibubi.create.content.kinetics.chainDrive.ChainDriveGenerator;
@@ -146,7 +139,6 @@ import com.simibubi.create.content.kinetics.press.MechanicalPressBlock;
 import com.simibubi.create.content.kinetics.saw.SawBlock;
 import com.simibubi.create.content.kinetics.saw.SawGenerator;
 import com.simibubi.create.content.kinetics.saw.SawMovementBehaviour;
-import com.simibubi.create.content.kinetics.simpleRelays.BracketedKineticBlockModel;
 import com.simibubi.create.content.kinetics.simpleRelays.CogWheelBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.CogwheelBlockItem;
 import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
@@ -176,7 +168,6 @@ import com.simibubi.create.content.logistics.depot.EjectorItem;
 import com.simibubi.create.content.logistics.depot.MountedDepotInteractionBehaviour;
 import com.simibubi.create.content.logistics.factoryBoard.FactoryPanelBlock;
 import com.simibubi.create.content.logistics.factoryBoard.FactoryPanelBlockItem;
-import com.simibubi.create.content.logistics.factoryBoard.FactoryPanelModel;
 import com.simibubi.create.content.logistics.funnel.AndesiteFunnelBlock;
 import com.simibubi.create.content.logistics.funnel.BeltFunnelBlock;
 import com.simibubi.create.content.logistics.funnel.BeltFunnelGenerator;
@@ -252,7 +243,6 @@ import com.simibubi.create.content.trains.track.TrackBlock;
 import com.simibubi.create.content.trains.track.TrackBlockItem;
 import com.simibubi.create.content.trains.track.TrackBlockStateGenerator;
 import com.simibubi.create.content.trains.track.TrackMaterial;
-import com.simibubi.create.content.trains.track.TrackModel;
 import com.simibubi.create.content.trains.track.TrackTargetingBlockItem;
 import com.simibubi.create.foundation.block.CopperBlockSet;
 import com.simibubi.create.foundation.block.DyedBlockList;
@@ -372,7 +362,7 @@ public class AllBlocks {
 		.transform(CStress.setNoImpact())
 		.transform(pickaxeOnly())
 		.blockstate(BlockStateGen.axisBlockProvider(false))
-		.onRegister(CreateRegistrate.blockModel(() -> BracketedKineticBlockModel::new))
+		.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.kinetics.simpleRelays.BracketedKineticBlockModel"))
 		.simpleItem()
 		.register();
 
@@ -383,7 +373,7 @@ public class AllBlocks {
 		.transform(CStress.setNoImpact())
 		.transform(axeOrPickaxe())
 		.blockstate(BlockStateGen.axisBlockProvider(false))
-		.onRegister(CreateRegistrate.blockModel(() -> BracketedKineticBlockModel::new))
+		.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.kinetics.simpleRelays.BracketedKineticBlockModel"))
 		.item(CogwheelBlockItem::new)
 		.build()
 		.register();
@@ -396,7 +386,7 @@ public class AllBlocks {
 			.transform(axeOrPickaxe())
 			.transform(CStress.setNoImpact())
 			.blockstate(BlockStateGen.axisBlockProvider(false))
-			.onRegister(CreateRegistrate.blockModel(() -> BracketedKineticBlockModel::new))
+			.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.kinetics.simpleRelays.BracketedKineticBlockModel"))
 			.item(CogwheelBlockItem::new)
 			.build()
 			.register();
@@ -536,7 +526,7 @@ public class AllBlocks {
 		.blockstate(new BeltGenerator()::generate)
 		.transform(CStress.setNoImpact())
 		.transform(displaySource(AllDisplaySources.ITEM_NAMES))
-		.onRegister(CreateRegistrate.blockModel(() -> BeltModel::new))
+		.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.kinetics.belt.BeltModel"))
 		.tag(AllBlockTags.HAS_REDUCED_DESTROY_EFFECTS.tag)
 		.register();
 
@@ -886,7 +876,7 @@ public class AllBlocks {
 		.properties(p -> p.forceSolidOff())
 		.transform(pickaxeOnly())
 		.blockstate(BlockStateGen.pipe())
-		.onRegister(CreateRegistrate.blockModel(() -> PipeAttachmentModel::withAO))
+		.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.fluids.PipeAttachmentModel", "withAO"))
 		.item()
 		.transform(customItemModel())
 		.register();
@@ -901,7 +891,7 @@ public class AllBlocks {
 			.onRegister(CreateRegistrate.connectedTextures(() -> new EncasedCTBehaviour(AllSpriteShifts.COPPER_CASING)))
 			.onRegister(CreateRegistrate.casingConnectivity((block, cc) -> cc.make(block, AllSpriteShifts.COPPER_CASING,
 				(s, f) -> !s.getValue(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(f)))))
-			.onRegister(CreateRegistrate.blockModel(() -> PipeAttachmentModel::withAO))
+			.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.fluids.PipeAttachmentModel", "withAO"))
 			.loot((p, b) -> p.dropOther(b, FLUID_PIPE.get()))
 			.transform(EncasingRegistry.addVariantTo(AllBlocks.FLUID_PIPE))
 			.register();
@@ -925,7 +915,7 @@ public class AllBlocks {
 							.build();
 					}, BlockStateProperties.WATERLOGGED);
 			})
-			.onRegister(CreateRegistrate.blockModel(() -> PipeAttachmentModel::withAO))
+			.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.fluids.PipeAttachmentModel", "withAO"))
 			.loot((p, b) -> p.dropOther(b, FLUID_PIPE.get()))
 			.register();
 
@@ -934,7 +924,7 @@ public class AllBlocks {
 		.properties(p -> p.mapColor(MapColor.STONE))
 		.transform(pickaxeOnly())
 		.blockstate(BlockStateGen.directionalBlockProviderIgnoresWaterlogged(true))
-		.onRegister(CreateRegistrate.blockModel(() -> PipeAttachmentModel::withAO))
+		.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.fluids.PipeAttachmentModel", "withAO"))
 		.transform(CStress.setImpact(4.0))
 		.item()
 		.transform(customItemModel())
@@ -946,7 +936,7 @@ public class AllBlocks {
 			.properties(p -> p.mapColor(MapColor.TERRACOTTA_YELLOW))
 			.transform(pickaxeOnly())
 			.blockstate(new SmartFluidPipeGenerator()::generate)
-			.onRegister(CreateRegistrate.blockModel(() -> PipeAttachmentModel::withAO))
+			.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.fluids.PipeAttachmentModel", "withAO"))
 			.item()
 			.transform(customItemModel())
 			.register();
@@ -958,7 +948,7 @@ public class AllBlocks {
 		.blockstate((c, p) -> BlockStateGen.directionalAxisBlock(c, p,
 			(state, vertical) -> AssetLookup.partialBaseModel(c, p, vertical ? "vertical" : "horizontal",
 				state.getValue(FluidValveBlock.ENABLED) ? "open" : "closed")))
-		.onRegister(CreateRegistrate.blockModel(() -> PipeAttachmentModel::withAO))
+		.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.fluids.PipeAttachmentModel", "withAO"))
 		.item()
 		.transform(customItemModel())
 		.register();
@@ -990,7 +980,7 @@ public class AllBlocks {
 			.isRedstoneConductor((p1, p2, p3) -> true))
 		.transform(pickaxeOnly())
 		.blockstate(new FluidTankGenerator()::generate)
-		.onRegister(CreateRegistrate.blockModel(() -> FluidTankModel::standard))
+		.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.fluids.tank.FluidTankModel", "standard"))
 		.transform(displaySource(AllDisplaySources.BOILER))
 		.transform(mountedFluidStorage(AllMountedStorageTypes.FLUID_TANK))
 		.onRegister(movementBehaviour(new FluidTankMovementBehavior()))
@@ -1008,7 +998,7 @@ public class AllBlocks {
 			.transform(pickaxeOnly())
 			.tag(AllBlockTags.SAFE_NBT.tag)
 			.blockstate(new FluidTankGenerator("creative_")::generate)
-			.onRegister(CreateRegistrate.blockModel(() -> FluidTankModel::creative))
+			.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.fluids.tank.FluidTankModel", "creative"))
 			.transform(mountedFluidStorage(AllMountedStorageTypes.CREATIVE_FLUID_TANK))
 			.addLayer(() -> RenderType::cutoutMipped)
 			.item(FluidTankItem::new)
@@ -1622,7 +1612,7 @@ public class AllBlocks {
 		.addLayer(() -> RenderType::cutoutMipped)
 		.transform(pickaxeOnly())
 		.tag(AllBlockTags.HAS_REDUCED_DESTROY_EFFECTS.tag)
-		.onRegister(CreateRegistrate.blockModel(() -> TrackModel::new))
+		.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.trains.track.TrackModel"))
 		.blockstate(new TrackBlockStateGenerator()::generate)
 		.tag(AllBlockTags.RELOCATION_NOT_SUPPORTED.tag)
 		.tag(AllBlockTags.TRACKS.tag)
@@ -1972,7 +1962,7 @@ public class AllBlocks {
 			.properties(p -> p.forceSolidOn())
 			.transform(pickaxeOnly())
 			.blockstate((c, p) -> p.horizontalFaceBlock(c.get(), AssetLookup.partialBaseModel(c, p)))
-			.onRegister(CreateRegistrate.blockModel(() -> FactoryPanelModel::new))
+			.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.logistics.factoryBoard.FactoryPanelModel"))
 			.transform(displaySource(AllDisplaySources.GAUGE_STATUS))
 			.item(FactoryPanelBlockItem::new)
 			.model(AssetLookup::customItemModel)
@@ -2337,7 +2327,7 @@ public class AllBlocks {
 			.sound(SoundType.NETHERITE_BLOCK))
 		.transform(pickaxeOnly())
 		.blockstate(GirderBlockStateGenerator::blockState)
-		.onRegister(CreateRegistrate.blockModel(() -> ConnectedGirderModel::new))
+		.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.decoration.girder.ConnectedGirderModel"))
 		.item()
 		.transform(customItemModel())
 		.register();
@@ -2353,7 +2343,7 @@ public class AllBlocks {
 				.withPool(p.applyExplosionCondition(SHAFT.get(), LootPool.lootPool()
 					.setRolls(ConstantValue.exactly(1.0F))
 					.add(LootItem.lootTableItem(SHAFT.get()))))))
-			.onRegister(CreateRegistrate.blockModel(() -> ConnectedGirderModel::new))
+			.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.decoration.girder.ConnectedGirderModel"))
 			.register();
 
 	public static final BlockEntry<Block> COPYCAT_BASE = REGISTRATE.block("copycat_base", Block::new)
@@ -2369,7 +2359,7 @@ public class AllBlocks {
 		REGISTRATE.block("copycat_step", CopycatStepBlock::new)
 			.properties(p -> p.forceSolidOn())
 			.transform(BuilderTransformers.copycat())
-			.onRegister(CreateRegistrate.blockModel(() -> CopycatStepModel::new))
+			.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.decoration.copycat.CopycatStepModel"))
 			.item()
 			.recipe((c, p) -> p.stonecutting(DataIngredient.tag(AllTags.commonItemTag("ingots/zinc")),
 				RecipeCategory.BUILDING_BLOCKS, c::get, 4))
@@ -2379,7 +2369,7 @@ public class AllBlocks {
 	public static final BlockEntry<CopycatPanelBlock> COPYCAT_PANEL =
 		REGISTRATE.block("copycat_panel", CopycatPanelBlock::new)
 			.transform(BuilderTransformers.copycat())
-			.onRegister(CreateRegistrate.blockModel(() -> CopycatPanelModel::new))
+			.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.decoration.copycat.CopycatPanelModel"))
 			.item()
 			.recipe((c, p) -> p.stonecutting(DataIngredient.tag(AllTags.commonItemTag("ingots/zinc")),
 				RecipeCategory.BUILDING_BLOCKS, c::get, 4))
@@ -2389,7 +2379,7 @@ public class AllBlocks {
 	public static final BlockEntry<WrenchableDirectionalBlock> COPYCAT_BARS =
 		REGISTRATE.block("copycat_bars", WrenchableDirectionalBlock::new)
 			.blockstate(new SpecialCopycatPanelBlockState("bars")::generate)
-			.onRegister(CreateRegistrate.blockModel(() -> CopycatBarsModel::new))
+			.onRegister(CreateRegistrate.blockModel("com.simibubi.create.content.decoration.copycat.CopycatBarsModel"))
 			.register();
 
 	public static final DyedBlockList<SeatBlock> SEATS = new DyedBlockList<>(colour -> {
