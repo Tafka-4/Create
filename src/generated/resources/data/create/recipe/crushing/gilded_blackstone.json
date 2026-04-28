@@ -9,21 +9,15 @@
   "results": [
     {
       "count": 18,
-      "item": {
-        "id": "minecraft:gold_nugget"
-      }
+      "id": "minecraft:gold_nugget"
     },
     {
       "chance": 0.75,
-      "item": {
-        "id": "create:experience_nugget"
-      }
+      "id": "create:experience_nugget"
     },
     {
       "chance": 0.125,
-      "item": {
-        "id": "minecraft:blackstone"
-      }
+      "id": "minecraft:blackstone"
     }
   ]
 }

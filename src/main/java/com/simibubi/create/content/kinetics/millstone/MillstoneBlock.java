@@ -73,11 +73,11 @@ public class MillstoneBlock extends KineticBlock implements IBE<MillstoneBlockEn
 			}
 
 			if (emptyOutput) {
-				inv = millstone.inputInv;
-				for (int slot = 0; slot < inv.getSlotCount(); slot++) {
+				var inputInv = millstone.inputInv;
+				for (int slot = 0; slot < inputInv.getSlotCount(); slot++) {
 					player.getInventory()
-						.placeItemBackInInventory(inv.getStackInSlot(slot));
-					inv.setStackInSlot(slot, ItemStack.EMPTY);
+						.placeItemBackInInventory(inputInv.getStackInSlot(slot));
+					inputInv.setStackInSlot(slot, ItemStack.EMPTY);
 				}
 			}
 
@@ -116,7 +116,7 @@ public class MillstoneBlock extends KineticBlock implements IBE<MillstoneBlockEn
 			long inserted = handler.insert(ItemVariant.of(inEntity), inEntity.getCount(), t);
 			if (inserted == inEntity.getCount())
 				itemEntity.discard();
-			else itemEntity.setItem(ItemHandlerHelper.copyStackWithSize(inEntity, (int) (inEntity.getCount() - inserted)));
+			else itemEntity.setItem(inEntity.copyWithCount((int) (inEntity.getCount() - inserted)));
 			t.commit();
 		}
 	}

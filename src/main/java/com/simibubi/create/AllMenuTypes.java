@@ -35,7 +35,10 @@ import com.tterrag.registrate.util.nullness.NonNullSupplier;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 
 public class AllMenuTypes {
 
@@ -81,10 +84,15 @@ public class AllMenuTypes {
 	public static final MenuEntry<FactoryPanelSetItemMenu> FACTORY_PANEL_SET_ITEM =
 		register("factory_panel_set_item", FactoryPanelSetItemMenu::new, () -> FactoryPanelSetItemScreen::new);
 
+	@FunctionalInterface
+	private interface CreateMenuFactory<C extends AbstractContainerMenu> {
+		C create(MenuType<?> type, int id, Inventory inventory, RegistryFriendlyByteBuf extraData);
+	}
+
 	private static <C extends AbstractContainerMenu, S extends Screen & MenuAccess<C>> MenuEntry<C> register(
-			String name, MenuBuilder.ForgeMenuFactory<C> factory, NonNullSupplier<ScreenFactory<C, S>> screenFactory) {
+			String name, CreateMenuFactory<C> factory, NonNullSupplier<ScreenFactory<C, S>> screenFactory) {
 		return Create.registrate()
-			.menu(name, factory, screenFactory)
+			.menu(name, (type, id, inventory, extraData) -> factory.create(type, id, inventory, (RegistryFriendlyByteBuf) extraData), screenFactory)
 			.register();
 	}
 

@@ -41,7 +41,6 @@ import com.simibubi.create.foundation.gui.widget.ScrollInput;
 import com.simibubi.create.foundation.utility.CreateLang;
 
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import me.pepperbell.simplenetworking.SimpleChannel;
 import net.createmod.catnip.animation.AnimationTickHolder;
 import net.createmod.catnip.animation.LerpedFloat;
 import net.createmod.catnip.animation.LerpedFloat.Chaser;
@@ -454,7 +453,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 		LivingEntity keeper = stockKeeper.get();
 		BlazeBurnerBlockEntity blazeKeeper = blaze.get();
 		if ((keeper == null || !keeper.isAlive()) && (blazeKeeper == null || blazeKeeper.isRemoved()))
-			menu.player.closeContainer();
+			minecraft.setScreen(null);
 	}
 
 	@Override
@@ -1333,8 +1332,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 	@Override
 	public void removed() {
 		BlockPos pos = blockEntity.getBlockPos();
-		CatnipServices.NETWORK.sendToServer(new PackageOrderRequestPacket(pos, new PackageOrder(Collections.emptyList()),
-			addressBox.getValue(), false, PackageOrder.empty()));
+		CatnipServices.NETWORK.sendToServer(new PackageOrderRequestPacket(pos, PackageOrderWithCrafts.empty(),
+			addressBox.getValue(), false));
 		CatnipServices.NETWORK.sendToServer(new StockKeeperCategoryHidingPacket(pos, new ArrayList<>(hiddenCategories)));
 		super.removed();
 	}
@@ -1354,13 +1353,14 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 			forcedEntries.add(toOrder.stack.copy(), -1 - Math.max(0, countOf - toOrder.count));
 		}
 
-		PackageOrder craftingRequest = PackageOrder.empty();
+		PackageOrderWithCrafts order = PackageOrderWithCrafts.simple(itemsToOrder);
 		if (canRequestCraftingPackage && !itemsToOrder.isEmpty() && !recipesToOrder.isEmpty())
 			if (recipesToOrder.get(0).recipe instanceof CraftingRecipe cr)
-				craftingRequest = new PackageOrder(FactoryPanelScreen.convertRecipeToPackageOrderContext(cr, itemsToOrder));
+				order = new PackageOrderWithCrafts(new PackageOrder(itemsToOrder),
+					PackageOrderWithCrafts.singleRecipe(FactoryPanelScreen.convertRecipeToPackageOrderContext(cr, itemsToOrder, false)).orderedCrafts());
 
-		CatnipServices.NETWORK.sendToServer(new PackageOrderRequestPacket(blockEntity.getBlockPos(), new PackageOrder(itemsToOrder),
-				addressBox.getValue(), encodeRequester, craftingRequest));
+		CatnipServices.NETWORK.sendToServer(new PackageOrderRequestPacket(blockEntity.getBlockPos(), order,
+				addressBox.getValue(), encodeRequester));
 
 		itemsToOrder = new ArrayList<>();
 		recipesToOrder = new ArrayList<>();
@@ -1368,7 +1368,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 		successTicks = 1;
 
 		if (isSchematicListMode())
-			menu.player.closeContainer();
+			minecraft.setScreen(null);
 	}
 
 	@Override

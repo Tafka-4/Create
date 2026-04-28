@@ -9,28 +9,18 @@ import com.simibubi.create.foundation.item.ItemHelper.ExtractionCountMode;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
-public class SmartChuteBlockEntity extends ChuteBlockEntity {
 
+public class SmartChuteBlockEntity extends ChuteBlockEntity implements Clearable {
 	FilteringBehaviour filtering;
 
 	public SmartChuteBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.ItemHandler.BLOCK,
-				AllBlockEntityTypes.SMART_CHUTE.get(),
-				(be, context) -> be.itemHandler
-		);
-	}
-
 	@Override
 	protected boolean canAcceptItem(ItemStack stack) {
 		return super.canAcceptItem(stack) && canActivate() && filtering.test(stack);
@@ -61,11 +51,15 @@ public class SmartChuteBlockEntity extends ChuteBlockEntity {
 		super.addBehaviours(behaviours);
 	}
 
+	@Override
+	public void clearContent() {
+		filtering.setFilter(ItemStack.EMPTY);
+	}
+
 	private boolean isExtracting() {
 		boolean up = getItemMotion() < 0;
 		BlockPos chutePos = worldPosition.relative(up ? Direction.UP : Direction.DOWN);
 		BlockState blockState = level.getBlockState(chutePos);
 		return !AbstractChuteBlock.isChute(blockState) && !blockState.canBeReplaced();
 	}
-
 }

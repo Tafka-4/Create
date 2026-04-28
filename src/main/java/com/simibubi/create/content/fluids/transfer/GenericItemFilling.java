@@ -63,7 +63,7 @@ public class GenericItemFilling {
 		Storage<FluidVariant> tank = FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
 		if (tank == null)
 			return false;
-		if (!isFluidHandlerValid(stack, capability))
+		if (!isFluidHandlerValid(stack, tank))
 			return false;
 		return tank.supportsInsertion();
 	}

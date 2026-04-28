@@ -3,6 +3,8 @@ package com.simibubi.create.content.equipment.armor;
 import java.util.Locale;
 import java.util.function.Supplier;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.foundation.item.LayeredArmorItem;
 

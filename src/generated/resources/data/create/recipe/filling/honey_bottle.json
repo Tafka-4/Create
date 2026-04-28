@@ -5,13 +5,14 @@
       "item": "minecraft:glass_bottle"
     },
     {
-      "amount": 20250,
-      "fluidTag": "c:honey"
+      "type": "neoforge:tag",
+      "amount": 250,
+      "tag": "c:honey"
     }
   ],
   "results": [
     {
-      "item": "minecraft:honey_bottle"
+      "id": "minecraft:honey_bottle"
     }
   ]
 }

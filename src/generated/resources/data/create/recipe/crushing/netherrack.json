@@ -1,12 +1,10 @@
 {
-  "fabric:load_conditions": [
+  "neoforge:conditions": [
     {
-      "condition": "fabric:not",
+      "type": "neoforge:not",
       "value": {
-        "condition": "fabric:all_mods_loaded",
-        "values": [
-          "exnihilosequentia"
-        ]
+        "type": "neoforge:mod_loaded",
+        "modid": "exnihilosequentia"
       }
     }
   ],
@@ -16,14 +14,14 @@
       "item": "minecraft:netherrack"
     }
   ],
-  "processingTime": 250,
+  "processing_time": 250,
   "results": [
     {
-      "item": "create:cinder_flour"
+      "id": "create:cinder_flour"
     },
     {
       "chance": 0.5,
-      "item": "create:cinder_flour"
+      "id": "create:cinder_flour"
     }
   ]
 }

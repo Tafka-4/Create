@@ -29,7 +29,7 @@ public record LimbSwingUpdatePacket(int entityId, Vec3 position, float limbSwing
 		Entity entity = player.clientLevel.getEntity(entityId);
 		if (entity == null)
 			return;
-		CompoundTag data = entity.getPersistentData();
+		CompoundTag data = entity.getCustomData();
 		data.putInt("LastOverrideLimbSwingUpdate", 0);
 		data.putFloat("OverrideLimbSwing", limbSwing);
 		entity.lerpTo(position.x, position.y, position.z, entity.getYRot(),

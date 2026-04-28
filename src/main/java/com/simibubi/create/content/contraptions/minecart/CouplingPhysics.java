@@ -8,6 +8,7 @@ import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
@@ -17,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.phys.Vec3;
 
-import io.github.fabricators_of_create.porting_lib.util.MinecartAndRailUtil;
+import io.github.fabricators_of_create.porting_lib.blocks.util.MinecartAndRailUtil;
 
 public class CouplingPhysics {
 
@@ -27,6 +28,12 @@ public class CouplingPhysics {
 
 	public static void tickCoupling(Level world, Couple<MinecartController> c) {
 		Couple<AbstractMinecart> carts = c.map(MinecartController::cart);
+
+		TickRateManager trm = world.tickRateManager();
+		if (trm.isEntityFrozen(carts.getFirst()) && trm.isEntityFrozen(carts.getSecond())) {
+			return;
+		}
+
 		float couplingLength = c.getFirst()
 			.getCouplingLength(true);
 		softCollisionStep(world, carts, couplingLength);
@@ -57,8 +64,8 @@ public class CouplingPhysics {
 			BlockPos railPosition = cart.getCurrentRailPos();
 			BlockState railState = world.getBlockState(railPosition.above());
 
-			if (railState.getBlock() instanceof BaseRailBlock block) {
-				shape = MinecartAndRailUtil.getDirectionOfRail(railState, world, railPosition, block);
+			if (railState.getBlock() instanceof BaseRailBlock) {
+				shape = MinecartAndRailUtil.getDirectionOfRail(railState, world, railPosition, cart);
 			}
 
 			Vec3 correction = Vec3.ZERO;
@@ -110,9 +117,9 @@ public class CouplingPhysics {
 			if (minecart.level().getBlockState(pos).is(BlockTags.RAILS)) pos = pos.below();
 			BlockPos railPosition = pos;
 			BlockState railState = world.getBlockState(railPosition.above());
-			if (!(railState.getBlock() instanceof BaseRailBlock block))
+			if (!(railState.getBlock() instanceof BaseRailBlock))
 				return null;
-			return MinecartAndRailUtil.getDirectionOfRail(railState, world, railPosition, block);
+			return MinecartAndRailUtil.getDirectionOfRail(railState, world, railPosition, minecart);
 		});
 
 		float futureStress = (float) (couplingLength - nextPositions.getFirst()

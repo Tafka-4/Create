@@ -8,7 +8,7 @@ import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.Create;
 
@@ -34,10 +34,9 @@ import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
  * Processing for structures exported on Forge to allow using the same ones on Forge and Fabric.
  */
 public class FabricStructureProcessing {
-	public static final Codec<Processor> PROCESSOR_CODEC = ResourceLocation.CODEC
+	public static final MapCodec<Processor> PROCESSOR_CODEC = ResourceLocation.CODEC
 			.fieldOf("structureId")
-			.xmap(Processor::new, processor -> processor.structureId)
-			.codec();
+			.xmap(Processor::new, processor -> processor.structureId);
 
 	public static final StructureProcessorType<Processor> PROCESSOR_TYPE = Registry.register(
 			BuiltInRegistries.STRUCTURE_PROCESSOR,

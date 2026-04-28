@@ -4,15 +4,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import net.minecraft.core.Registry;
-
-import org.jetbrains.annotations.ApiStatus.Internal;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.simibubi.create.compat.rei.ConversionRecipe;
+import com.simibubi.create.compat.recipeViewerCommon.ConversionRecipe;
 import com.simibubi.create.content.equipment.sandPaper.SandPaperPolishingRecipe;
 import com.simibubi.create.content.equipment.toolbox.ToolboxDyeingRecipe;
 import com.simibubi.create.content.fluids.transfer.EmptyingRecipe;
@@ -21,6 +14,7 @@ import com.simibubi.create.content.kinetics.crafter.MechanicalCraftingRecipe;
 import com.simibubi.create.content.kinetics.crusher.CrushingRecipe;
 import com.simibubi.create.content.kinetics.deployer.DeployerApplicationRecipe;
 import com.simibubi.create.content.kinetics.deployer.ItemApplicationRecipe;
+import com.simibubi.create.content.kinetics.deployer.ItemApplicationRecipeParams;
 import com.simibubi.create.content.kinetics.deployer.ManualApplicationRecipe;
 import com.simibubi.create.content.kinetics.fan.processing.HauntingRecipe;
 import com.simibubi.create.content.kinetics.fan.processing.SplashingRecipe;
@@ -31,13 +25,14 @@ import com.simibubi.create.content.kinetics.press.PressingRecipe;
 import com.simibubi.create.content.kinetics.saw.CuttingRecipe;
 import com.simibubi.create.content.processing.basin.BasinRecipe;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipe;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder.ProcessingRecipeFactory;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipeSerializer;
+import com.simibubi.create.content.processing.recipe.StandardProcessingRecipe;
+import com.simibubi.create.content.processing.recipe.StandardProcessingRecipe.Serializer;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipeSerializer;
 import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
 import com.simibubi.create.foundation.recipe.ItemCopyingRecipe;
 
 import net.createmod.catnip.lang.Lang;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
@@ -46,8 +41,13 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraft.world.level.Level;
+
+import org.jetbrains.annotations.ApiStatus.Internal;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public enum AllRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
 
@@ -74,15 +74,13 @@ public enum AllRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
 	ITEM_COPYING(() -> new SimpleCraftingRecipeSerializer<>(ItemCopyingRecipe::new), () -> RecipeType.CRAFTING, false);
 
 	public static final Predicate<RecipeHolder<?>> CAN_BE_AUTOMATED = r -> !r.id()
-			.getPath()
-			.endsWith("_manual_only");
+		.getPath()
+		.endsWith("_manual_only");
 
 	private final ResourceLocation id;
 	private final RecipeSerializer<?> serializerObject;
 	@Nullable
 	private final RecipeType<?> typeObject;
-
-	private boolean isProcessingRecipe;
 
 	public static final Codec<AllRecipeTypes> CODEC = StringRepresentable.fromEnum(AllRecipeTypes::values);
 
@@ -91,31 +89,34 @@ public enum AllRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
 		id = Create.asResource(name);
 		serializerObject = Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, id, serializerSupplier.get());
 		if (registerType) {
-			typeObject = typeSupplier.get();
-			Registry.register(BuiltInRegistries.RECIPE_TYPE, id, typeObject);
+			typeObject = Registry.register(BuiltInRegistries.RECIPE_TYPE, id, typeSupplier.get());
 		} else {
 			typeObject = typeSupplier.get();
 		}
-		isProcessingRecipe = false;
 	}
 
 	AllRecipeTypes(Supplier<RecipeSerializer<?>> serializerSupplier) {
 		String name = Lang.asId(name());
 		id = Create.asResource(name);
 		serializerObject = Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, id, serializerSupplier.get());
-		typeObject = Registry.register(BuiltInRegistries.RECIPE_TYPE, id, createType(id));
-		isProcessingRecipe = false;
+		typeObject = Registry.register(BuiltInRegistries.RECIPE_TYPE, id, new RecipeType<>() {
+			@Override
+			public String toString() {
+				return id.toString();
+			}
+		});
 	}
 
-	AllRecipeTypes(ProcessingRecipeFactory<?> processingFactory) {
-		this(() -> new ProcessingRecipeSerializer<>(processingFactory));
-		isProcessingRecipe = true;
+	AllRecipeTypes(StandardProcessingRecipe.Factory<?> processingFactory) {
+		this(() -> new Serializer<>(processingFactory));
+	}
+
+	AllRecipeTypes(ProcessingRecipe.Factory<ItemApplicationRecipeParams, ? extends ItemApplicationRecipe> itemApplicationFactory) {
+		this(() -> new ItemApplicationRecipe.Serializer<>(itemApplicationFactory));
 	}
 
 	@Internal
 	public static void register() {
-		ShapedRecipeUtil.setCraftingSize(9, 9);
-		// fabric: just load the class
 	}
 
 	@Override
@@ -132,7 +133,7 @@ public enum AllRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <I extends RecipeInput, R extends Recipe<I>> RecipeType<R> getType() {
-		return (RecipeType<R>) this.typeObject;
+		return (RecipeType<R>) typeObject;
 	}
 
 	public <I extends RecipeInput, R extends Recipe<I>> Optional<RecipeHolder<R>> find(I inv, Level world) {
@@ -150,23 +151,5 @@ public enum AllRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
 	@Override
 	public @NotNull String getSerializedName() {
 		return id.toString();
-	}
-
-	private static <T extends Recipe<?>> RecipeType<T> createType(ResourceLocation id) {
-		String string = id.toString();
-		return new RecipeType<T>() {
-			@Override
-			public String toString() {
-				return string;
-			}
-		};
-	}
-
-	public <T extends ProcessingRecipe<?>> MapCodec<T> processingCodec() {
-		if (!isProcessingRecipe)
-			throw new AssertionError("AllRecipeTypes#processingCodec called on " + name() + ", which is not a processing recipe");
-		if (this == DEPLOYING || this == ITEM_APPLICATION)
-			return ItemApplicationRecipe.codec(this);
-		return ProcessingRecipeSerializer.codec(this);
 	}
 }

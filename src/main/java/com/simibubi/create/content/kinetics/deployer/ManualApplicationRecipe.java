@@ -6,8 +6,6 @@ import java.util.Optional;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.content.processing.recipe.ProcessingOutput;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder.ProcessingRecipeParams;
 import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.advancement.CreateAdvancement;
 import com.simibubi.create.foundation.utility.AdventureUtil;
@@ -27,6 +25,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -49,8 +48,8 @@ public class ManualApplicationRecipe extends ItemApplicationRecipe {
 		if (blockState.isAir())
 			return InteractionResult.PASS;
 
-		RecipeType<Recipe<Container>> type = AllRecipeTypes.ITEM_APPLICATION.getType();
-		Optional<RecipeHolder<Recipe<Container>>> foundRecipe = level.getRecipeManager()
+		RecipeType<Recipe<RecipeInput>> type = AllRecipeTypes.ITEM_APPLICATION.getType();
+		Optional<RecipeHolder<Recipe<RecipeInput>>> foundRecipe = level.getRecipeManager()
 			.getAllRecipesFor(type)
 			.stream()
 			.filter(r -> {
@@ -111,15 +110,15 @@ public class ManualApplicationRecipe extends ItemApplicationRecipe {
 		advancement.awardTo(player);
 	}
 
-	public ManualApplicationRecipe(ProcessingRecipeParams params) {
+	public ManualApplicationRecipe(ItemApplicationRecipeParams params) {
 		super(AllRecipeTypes.ITEM_APPLICATION, params);
 	}
 
 	public static RecipeHolder<DeployerApplicationRecipe> asDeploying(RecipeHolder<?> recipe) {
 		ManualApplicationRecipe mar = (ManualApplicationRecipe) recipe.value();
-		ResourceLocation id = ResourceLocation.fromNamespaceAndPath(mar.id.getNamespace(), mar.id.getPath() + "_using_deployer");
-		ProcessingRecipeBuilder<DeployerApplicationRecipe> builder =
-			new ProcessingRecipeBuilder<>(DeployerApplicationRecipe::new, id)
+		ResourceLocation id = ResourceLocation.fromNamespaceAndPath(recipe.id().getNamespace(), recipe.id().getPath() + "_using_deployer");
+		ItemApplicationRecipe.Builder<DeployerApplicationRecipe> builder =
+			new ItemApplicationRecipe.Builder<>(DeployerApplicationRecipe::new, id)
 					.require(mar.ingredients.get(0))
 					.require(mar.ingredients.get(1));
 		for (ProcessingOutput output : mar.results)
@@ -137,7 +136,7 @@ public class ManualApplicationRecipe extends ItemApplicationRecipe {
 
 	public BlockState transformBlock(BlockState in) {
 		ProcessingOutput mainOutput = results.get(0);
-		ItemStack output = mainOutput.rollOutput();
+		ItemStack output = mainOutput.rollOutput(net.minecraft.util.RandomSource.create());
 		if (output.getItem() instanceof BlockItem bi)
 			return BlockHelper.copyProperties(in, bi.getBlock()
 				.defaultBlockState());

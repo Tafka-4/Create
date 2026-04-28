@@ -22,8 +22,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
-import io.github.fabricators_of_create.porting_lib.util.ParticleHelper;
-
 public class CubeParticle extends Particle {
 
 	public static final Vec3[] CUBE = {
@@ -101,7 +99,7 @@ public class CubeParticle extends Particle {
 		if (this.hot && this.age > 0) {
 			if (this.yo == this.y) {
 				billowing = true;
-				ParticleHelper.setStoppedByCollision(this, false); // Prevent motion being ignored due to vertical collision
+				this.stoppedByCollision = false; // Prevent motion being ignored due to vertical collision
 				if (this.xd == 0 && this.zd == 0) {
 					Vec3 diff = Vec3.atLowerCornerOf(BlockPos.containing(x, y, z))
 						.add(0.5, 0.5, 0.5)

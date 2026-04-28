@@ -52,7 +52,8 @@ public class TankManipulationBehaviour extends CapManipulationBehaviourBase<Flui
 					long extracted = view.extract(view.getResource(), view.getAmount(), t);
 					if (extracted != 0) {
 						if (!simulateNext) t.commit();
-						return stack.setAmount(extracted);
+						stack.setAmount(extracted);
+						return stack;
 					}
 				}
 			}

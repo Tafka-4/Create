@@ -9,6 +9,7 @@ import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.foundation.item.ItemHandlerWrapper;
 import com.simibubi.create.foundation.utility.fabric.ListeningStorageView;
 import com.simibubi.create.infrastructure.fabric.ProcessingIterator;
+import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -32,15 +33,6 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
 		super(type, pos, state);
 		capability = createEmptyHandler();
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.ItemHandler.BLOCK,
-				AllBlockEntityTypes.PORTABLE_STORAGE_INTERFACE.get(),
-				(be, context) -> be.capability
-		);
-	}
-
 	@Override
 	public void startTransferringTo(Contraption contraption, float distance) {
 		capability.setWrapped(contraption.getStorage().getAllItems());
@@ -96,7 +88,6 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
 			return inserted;
 		}
 
-		@Override
 		public @Nullable StorageView<ItemVariant> exactView(ItemVariant resource) {
 			return listen(super.exactView(resource));
 		}

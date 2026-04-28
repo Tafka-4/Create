@@ -11,6 +11,7 @@ import com.simibubi.create.content.equipment.potatoCannon.PotatoProjectileEntity
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+// TODO: 1.21.1+ - Move into api package
 public interface PotatoProjectileRenderMode {
 	Codec<PotatoProjectileRenderMode> CODEC = CreateBuiltInRegistries.POTATO_PROJECTILE_RENDER_MODE.byNameCodec()
 		.dispatch(PotatoProjectileRenderMode::codec, Function.identity());

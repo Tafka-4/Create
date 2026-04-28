@@ -10,13 +10,9 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
 
-import net.fabricmc.api.EnvType;
-
-import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
-import io.github.fabricators_of_create.porting_lib.util.ServerLifecycleHooks;
-
 public final class GlobalRegistryAccess {
 	private static Supplier<@Nullable RegistryAccess> supplier;
+	private static MinecraftServer currentServer;
 
 	static {
 		CatnipServices.PLATFORM.executeOnClientOnly(() -> () -> supplier = () -> {
@@ -29,7 +25,7 @@ public final class GlobalRegistryAccess {
 
 		if (supplier == null) {
 			supplier = () -> {
-				MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+				MinecraftServer server = currentServer;
 				if (server == null) {
 					return null;
 				}
@@ -49,5 +45,14 @@ public final class GlobalRegistryAccess {
 			throw new IllegalStateException("Could not get RegistryAccess");
 		}
 		return registryAccess;
+	}
+
+	public static void setCurrentServer(@Nullable MinecraftServer server) {
+		currentServer = server;
+	}
+
+	@Nullable
+	public static MinecraftServer getCurrentServer() {
+		return currentServer;
 	}
 }

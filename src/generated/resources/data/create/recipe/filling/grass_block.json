@@ -5,14 +5,14 @@
       "item": "minecraft:dirt"
     },
     {
-      "amount": 40500,
-      "fluid": "minecraft:water",
-      "nbt": {}
+      "type": "neoforge:single",
+      "amount": 500,
+      "fluid": "minecraft:water"
     }
   ],
   "results": [
     {
-      "item": "minecraft:grass_block"
+      "id": "minecraft:grass_block"
     }
   ]
 }

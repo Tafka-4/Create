@@ -12,17 +12,19 @@ import javax.annotation.Nullable;
 
 import com.simibubi.create.AllBlockEntityTypes;
 import com.simibubi.create.AllSoundEvents;
+import com.simibubi.create.Create;
 import com.simibubi.create.api.equipment.goggles.IHaveHoveringInformation;
+import com.simibubi.create.api.packager.InventoryIdentifier;
 import com.simibubi.create.content.contraptions.actors.seat.SeatEntity;
 import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.content.logistics.filter.FilterItem;
 import com.simibubi.create.content.logistics.filter.FilterItemStack;
 import com.simibubi.create.content.logistics.packager.InventorySummary;
-import com.simibubi.create.content.logistics.packager.fabric.InventoryIdentifier;
 import com.simibubi.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour.RequestType;
 import com.simibubi.create.content.logistics.packagerLink.WiFiParticle;
 import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.item.SmartInventory;
+import com.simibubi.create.foundation.gui.menu.MenuOpeningData;
 import com.simibubi.create.foundation.utility.CreateLang;
 
 import net.createmod.catnip.data.Iterate;
@@ -36,6 +38,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -49,6 +52,7 @@ import net.minecraft.world.phys.Vec3;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
@@ -75,15 +79,6 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
 		categories = new ArrayList<>();
 		hiddenCategoriesByPlayer = new HashMap<>();
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-			Capabilities.ItemHandler.BLOCK,
-			AllBlockEntityTypes.STOCK_TICKER.get(),
-			(be, context) -> be.receivedPayments
-		);
-	}
-
 	public void refreshClientStockSnapshot() {
 		ticksSinceLastUpdate = 0;
 		CatnipServices.NETWORK.sendToServer(new LogisticalStockRequestPacket(worldPosition));
@@ -101,10 +96,14 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
 		return ticksSinceLastUpdate;
 	}
 
+	public SmartInventory getReceivedPaymentsHandler() {
+		return receivedPayments;
+	}
+
 	@Override
-	public boolean broadcastPackageRequest(RequestType type, PackageOrder order, InventoryIdentifier identifier,
-										   String address, @Nullable PackageOrder orderContext) {
-		boolean result = super.broadcastPackageRequest(type, order, identifier, address, orderContext);
+	public boolean broadcastPackageRequest(RequestType type, PackageOrderWithCrafts order, InventoryIdentifier identifier,
+										   String address) {
+		boolean result = super.broadcastPackageRequest(type, order, identifier, address);
 		previouslyUsedAddress = address;
 		notifyUpdate();
 		return result;
@@ -264,7 +263,7 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
 		level.addParticle(new WiFiParticle.Data(), vec3.x, vec3.y, vec3.z, 1, 1, 1);
 	}
 
-	public class CategoryMenuProvider implements MenuProvider {
+	public class CategoryMenuProvider implements MenuProvider, ExtendedScreenHandlerFactory<BlockPos> {
 
 		@Override
 		public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
@@ -276,9 +275,14 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
 			return Component.empty();
 		}
 
+		@Override
+		public BlockPos getScreenOpeningData(ServerPlayer player) {
+			return worldPosition;
+		}
+
 	}
 
-	public class RequestMenuProvider implements MenuProvider {
+	public class RequestMenuProvider implements MenuProvider, ExtendedScreenHandlerFactory<MenuOpeningData> {
 
 		@Override
 		public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
@@ -288,6 +292,18 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
 		@Override
 		public Component getDisplayName() {
 			return Component.empty();
+		}
+
+		@Override
+		public MenuOpeningData getScreenOpeningData(ServerPlayer player) {
+			boolean showLockOption =
+				behaviour.mayAdministrate(player) && Create.LOGISTICS.isLockable(behaviour.freqId);
+			boolean isCurrentlyLocked = Create.LOGISTICS.isLocked(behaviour.freqId);
+			return buffer -> {
+				buffer.writeBoolean(showLockOption);
+				buffer.writeBoolean(isCurrentlyLocked);
+				buffer.writeBlockPos(worldPosition);
+			};
 		}
 
 	}

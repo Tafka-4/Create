@@ -12,6 +12,7 @@ import com.simibubi.create.foundation.ponder.FabricStructureProcessing;
 import com.simibubi.create.foundation.utility.fabric.StructureBlockEntityExtensions;
 
 import net.createmod.catnip.nbt.NBTHelper;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.StructureBlockEntity;
@@ -31,19 +32,19 @@ public abstract class StructureBlockEntityMixin implements StructureBlockEntityE
 	}
 
 	@Inject(method = "saveAdditional", at = @At("TAIL"))
-	private void saveIsGameTest(CompoundTag tag, CallbackInfo ci) {
+	private void saveIsGameTest(CompoundTag tag, HolderLookup.Provider registries, CallbackInfo ci) {
 		if (this.isGameTest) {
 			NBTHelper.putMarker(tag, "create:is_game_test");
 		}
 	}
 
-	@Inject(method = "load", at = @At("TAIL"))
-	private void loadIsGameTest(CompoundTag tag, CallbackInfo ci) {
+	@Inject(method = "loadAdditional", at = @At("TAIL"))
+	private void loadIsGameTest(CompoundTag tag, HolderLookup.Provider registries, CallbackInfo ci) {
 		this.isGameTest = tag.contains("create:is_game_test");
 	}
 
 	@ModifyArg(
-		method = "loadStructure(Lnet/minecraft/server/level/ServerLevel;ZLnet/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate;)Z",
+		method = "placeStructure(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate;)V",
 		at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate;placeInWorld(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructurePlaceSettings;Lnet/minecraft/util/RandomSource;I)Z"

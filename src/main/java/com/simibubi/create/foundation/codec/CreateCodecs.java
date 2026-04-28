@@ -2,11 +2,15 @@ package com.simibubi.create.foundation.codec;
 
 import java.util.function.Function;
 
+import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.simibubi.create.foundation.fluid.FluidIngredient;
 import com.simibubi.create.foundation.item.ItemSlots;
 
-import net.neoforged.neoforge.items.ItemStackHandler;
+import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
 
 public class CreateCodecs {
 	public static final Codec<Long> NON_NEGATIVE_LONG = Codec.LONG.validate(
@@ -24,9 +28,9 @@ public class CreateCodecs {
 		String::valueOf
 	);
 
-	public static final Codec<ItemStackHandler> ITEM_STACK_HANDLER = ItemSlots.CODEC.xmap(
+	public static final Codec<ItemStackHandler> ITEM_STACK_HANDLER = Codec.lazyInitialized(() -> ItemSlots.CODEC.xmap(
 		slots -> slots.toHandler(ItemStackHandler::new), ItemSlots::fromHandler
-	);
+	));
 
 	public static Codec<Integer> boundedIntStr(int min) {
 		return INT_STR.validate(i -> i >= min ? DataResult.success(i) : DataResult.error(() -> "Value under minimum of " + min));
@@ -44,4 +48,10 @@ public class CreateCodecs {
 			)
 		);
 	}
+
+	public static Codec<FluidIngredient> FLAT_SIZED_FLUID_INGREDIENT_WITH_TYPE = FluidIngredient.CODEC;
+
+	@ScheduledForRemoval(inVersion = "1.21.1+ Port")
+	@Deprecated(since = "6.0.7", forRemoval = true)
+	public static Codec<FluidIngredient> SIZED_FLUID_INGREDIENT = FLAT_SIZED_FLUID_INGREDIENT_WITH_TYPE;
 }

@@ -12,7 +12,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 
-import io.github.fabricators_of_create.porting_lib.item.ArmorTextureItem;
+import io.github.fabricators_of_create.porting_lib.item.extensions.ArmorTextureItem;
 
 public class BaseArmorItem extends ArmorItem implements ArmorTextureItem {
 	protected final ResourceLocation textureLoc;

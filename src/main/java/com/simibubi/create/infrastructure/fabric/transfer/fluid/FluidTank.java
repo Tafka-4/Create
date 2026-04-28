@@ -22,6 +22,10 @@ public class FluidTank extends SingleFluidStorage {
 		return this.capacity;
 	}
 
+	public long getCapacity() {
+		return this.capacity;
+	}
+
 	public FluidStack getFluid() {
 		return new FluidStack(this.variant, this.amount);
 	}

@@ -152,6 +152,8 @@ public class BeltTunnelBlockEntity extends SmartBlockEntity implements SidedStor
 			sides.add(direction);
 
 			// Flap might be occluded
+			if (level == null)
+				continue;
 			BlockState nextState = level.getBlockState(worldPosition.relative(direction));
 			if (nextState.getBlock() instanceof BeltTunnelBlock)
 				continue;

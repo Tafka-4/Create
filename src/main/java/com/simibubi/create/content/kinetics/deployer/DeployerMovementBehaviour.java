@@ -168,7 +168,7 @@ public class DeployerMovementBehaviour implements MovementBehaviour {
 			}
 		}
 
-		CompoundTag data = BlockHelper.prepareBlockEntityData(blockState, schematicWorld.getBlockEntity(pos));
+		CompoundTag data = BlockHelper.prepareBlockEntityData(schematicWorld, blockState, schematicWorld.getBlockEntity(pos));
 //		BlockSnapshot blocksnapshot = BlockSnapshot.create(world.dimension(), world, pos);
 		BlockHelper.placeSchematicBlock(world, blockState, pos, contextStack, data);
 

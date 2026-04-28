@@ -16,6 +16,7 @@ import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.content.logistics.filter.AttributeFilterWhitelistMode;
 import com.simibubi.create.content.logistics.filter.FilterItem;
 import com.simibubi.create.content.logistics.filter.FilterItemStack;
+import com.simibubi.create.content.logistics.filter.ListFilterItem;
 import com.simibubi.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.simibubi.create.content.logistics.item.filter.attribute.attributes.InTagAttribute;
 import com.simibubi.create.content.logistics.packager.InventorySummary;
@@ -265,11 +266,12 @@ public class BlueprintOverlayRenderer {
 
 				if (success) {
 					CraftingContainer craftingInventory = new BlueprintCraftingInventory(craftingGrid);
+					var craftingInput = craftingInventory.asCraftInput();
 					if (!recipe.isPresent())
 						recipe = mc.level.getRecipeManager()
-								.getRecipeFor(RecipeType.CRAFTING, craftingInventory, mc.level);
-					ItemStack resultFromRecipe = recipe.filter(r -> r.matches(craftingInventory, mc.level))
-							.map(r -> r.value().assemble(craftingInventory, mc.level.registryAccess()))
+								.getRecipeFor(RecipeType.CRAFTING, craftingInput, mc.level);
+					ItemStack resultFromRecipe = recipe.filter(r -> r.value().matches(craftingInput, mc.level))
+							.map(r -> r.value().assemble(craftingInput, mc.level.registryAccess()))
 							.orElse(ItemStack.EMPTY);
 
 					if (resultFromRecipe.isEmpty()) {
@@ -347,8 +349,7 @@ public class BlueprintOverlayRenderer {
 		int y = guiGraphics.guiHeight() - 100;
 
 		if (shopContext != null) {
-			TooltipRenderUtil.renderTooltipBackground(guiGraphics, x - 2, y + 1, w + 4, 19, 0, 0x55_000000, 0x55_000000, 0,
-				0);
+			TooltipRenderUtil.renderTooltipBackground(guiGraphics, x - 2, y + 1, w + 4, 19, 0);
 
 			AllGuiTextures.TRADE_OVERLAY.render(guiGraphics, guiGraphics.guiWidth() / 2 - 48, y - 19);
 			if (shopContext.purchases() > 0) {
@@ -440,7 +441,7 @@ public class BlueprintOverlayRenderer {
 	private static ItemStack[] getItemsMatchingFilter(ItemStack filter) {
 		return cachedRenderedFilters.computeIfAbsent(filter, itemStack -> {
 			if (AllItems.FILTER.isIn(itemStack) && !itemStack.getOrDefault(AllDataComponents.FILTER_ITEMS_BLACKLIST, false)) {
-				ItemStackHandler filterItems = FilterItem.getFilterItems(itemStack);
+				ItemStackHandler filterItems = ((ListFilterItem) itemStack.getItem()).getFilterItemHandler(itemStack);
 				return ItemHelper.getNonEmptyStacks(filterItems).toArray(ItemStack[]::new);
 			}
 

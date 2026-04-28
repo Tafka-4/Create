@@ -91,9 +91,8 @@ import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SwordItem;
-import net.neoforged.neoforge.common.Tags;
+import io.github.fabricators_of_create.porting_lib.tags.Tags;
 
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 
 public class AllItems {
@@ -215,9 +214,9 @@ public class AllItems {
 			.register();
 
 	public static final ItemEntry<Item>
-		COPPER_NUGGET = taggedIngredient("copper_nugget", commonItemTag("copper_nuggets"), net.neoforged.neoforge.common.Tags.Items.NUGGETS),
-		ZINC_NUGGET = taggedIngredient("zinc_nugget", commonItemTag("zinc_nuggets"), net.neoforged.neoforge.common.Tags.Items.NUGGETS),
-		BRASS_NUGGET = taggedIngredient("brass_nugget", commonItemTag("brass_nuggets"), net.neoforged.neoforge.common.Tags.Items.NUGGETS);
+		COPPER_NUGGET = taggedIngredient("copper_nugget", commonItemTag("copper_nuggets"), io.github.fabricators_of_create.porting_lib.tags.Tags.Items.NUGGETS),
+		ZINC_NUGGET = taggedIngredient("zinc_nugget", commonItemTag("zinc_nuggets"), io.github.fabricators_of_create.porting_lib.tags.Tags.Items.NUGGETS),
+		BRASS_NUGGET = taggedIngredient("brass_nugget", commonItemTag("brass_nuggets"), io.github.fabricators_of_create.porting_lib.tags.Tags.Items.NUGGETS);
 
 	public static final ItemEntry<ExperienceNuggetItem> EXP_NUGGET =
 		REGISTRATE.item("experience_nugget", ExperienceNuggetItem::new)
@@ -262,12 +261,6 @@ public class AllItems {
 
 	public static final ItemEntry<GogglesItem> GOGGLES = REGISTRATE.item("goggles", GogglesItem::new)
 		.properties(p -> p.stacksTo(1))
-		.properties(p -> {
-			if (p instanceof FabricItemSettings fp) {
-				fp.equipmentSlot(GogglesItem::getEquipmentSlot);
-			}
-			return p;
-		})
 		.onRegister(CreateRegistrate.itemModel(() -> GogglesModel::new))
 		.lang("Engineer's Goggles")
 		.register();
@@ -439,7 +432,7 @@ public class AllItems {
 			.properties(p -> p.durability(100))
 			.transform(CreateRegistrate.customRenderedItem(() -> PotatoCannonItemRenderer::new))
 			.model(AssetLookup.itemModelWithPartials())
-			.tag(net.neoforged.neoforge.common.Tags.Items.ENCHANTABLES)
+			.tag(io.github.fabricators_of_create.porting_lib.tags.Tags.Items.ENCHANTABLES)
 			.register();
 
 	public static final ItemEntry<ExtendoGripItem> EXTENDO_GRIP = REGISTRATE.item("extendo_grip", ExtendoGripItem::new)
@@ -485,14 +478,14 @@ public class AllItems {
 		}
 	}
 
-	public static final ItemEntry<FilterItem> FILTER = REGISTRATE.item("filter", FilterItem::regular)
+	public static final ItemEntry<FilterItem> FILTER = REGISTRATE.item("filter", p -> (FilterItem) FilterItem.regular(p))
 		.lang("List Filter")
 		.register(),
 
-	ATTRIBUTE_FILTER = REGISTRATE.item("attribute_filter", FilterItem::attribute)
+	ATTRIBUTE_FILTER = REGISTRATE.item("attribute_filter", p -> (FilterItem) FilterItem.attribute(p))
 		.register(),
 
-	PACKAGE_FILTER = REGISTRATE.item("package_filter", FilterItem::address)
+	PACKAGE_FILTER = REGISTRATE.item("package_filter", p -> (FilterItem) FilterItem.address(p))
 		.register();
 
 	public static final ItemEntry<ScheduleItem> SCHEDULE = REGISTRATE.item("schedule", ScheduleItem::new)

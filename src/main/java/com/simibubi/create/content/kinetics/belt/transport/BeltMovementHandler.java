@@ -7,7 +7,7 @@ import static net.minecraft.world.entity.MoverType.SELF;
 import java.util.List;
 
 import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllItems;
+import com.simibubi.create.content.equipment.armor.CardboardArmorHandler;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import com.simibubi.create.content.kinetics.belt.BeltPart;
@@ -20,7 +20,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.decoration.HangingEntity;
@@ -64,7 +63,7 @@ public class BeltMovementHandler {
 		if (!entity.isAlive())
 			return false;
 		if (entity instanceof Player p && p.isShiftKeyDown()
-			&& !AllItems.CARDBOARD_BOOTS.isIn(p.getItemBySlot(EquipmentSlot.FEET)))
+			&& !CardboardArmorHandler.testForStealth(entity))
 			return false;
 		return true;
 	}
@@ -99,8 +98,8 @@ public class BeltMovementHandler {
 
 		// Lock entities in place
 		boolean isPlayer = entityIn instanceof Player;
-		if (entityIn instanceof LivingEntity && !isPlayer)
-			((LivingEntity) entityIn).addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 1, false, false));
+		if (entityIn instanceof LivingEntity livingEntity && !isPlayer)
+			livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10, 1, false, false));
 
 		final Direction beltFacing = blockState.getValue(BlockStateProperties.HORIZONTAL_FACING);
 		final BeltSlope slope = blockState.getValue(BeltBlock.SLOPE);
@@ -109,7 +108,7 @@ public class BeltMovementHandler {
 		final Direction movementDirection = Direction.get(axis == Axis.X ? NEGATIVE : POSITIVE, axis);
 
 		Vec3i centeringDirection = Direction.get(POSITIVE, beltFacing.getClockWise()
-			.getAxis())
+				.getAxis())
 			.getNormal();
 		Vec3 movement = Vec3.atLowerCornerOf(movementDirection.getNormal())
 			.scale(movementSpeed);
@@ -124,7 +123,7 @@ public class BeltMovementHandler {
 		boolean onSlope = notHorizontal && (part == BeltPart.MIDDLE || part == BeltPart.PULLEY
 			|| part == (slope == BeltSlope.UPWARD ? BeltPart.END : BeltPart.START) && entityIn.getY() - pos.getY() < top
 			|| part == (slope == BeltSlope.UPWARD ? BeltPart.START : BeltPart.END)
-				&& entityIn.getY() - pos.getY() > top);
+			&& entityIn.getY() - pos.getY() > top);
 
 		boolean movingDown = onSlope && slope == (movementFacing == beltFacing ? BeltSlope.DOWNWARD : BeltSlope.UPWARD);
 		boolean movingUp = onSlope && slope == (movementFacing == beltFacing ? BeltSlope.UPWARD : BeltSlope.DOWNWARD);
@@ -142,8 +141,7 @@ public class BeltMovementHandler {
 
 		Vec3 centering = Vec3.atLowerCornerOf(centeringDirection).scale(diffCenter * Math.min(Math.abs(movementSpeed), .1f) * 4);
 
-		if (!(entityIn instanceof LivingEntity)
-			|| ((LivingEntity) entityIn).zza == 0 && ((LivingEntity) entityIn).xxa == 0)
+		if (!(entityIn instanceof LivingEntity livingEntity) || livingEntity.zza == 0 && livingEntity.xxa == 0)
 			movement = movement.add(centering);
 
 		float step = entityIn.maxUpStep();
@@ -192,7 +190,7 @@ public class BeltMovementHandler {
 
 		boolean movedPastEndingSlope = onSlope && (AllBlocks.BELT.has(world.getBlockState(entityIn.blockPosition()))
 			|| AllBlocks.BELT.has(world.getBlockState(entityIn.blockPosition()
-				.below())));
+			.below())));
 
 		if (movedPastEndingSlope && !movingDown && Math.abs(movementSpeed) > 0)
 			entityIn.setPos(entityIn.getX(), entityIn.getY() + movement.y, entityIn.getZ());

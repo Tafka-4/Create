@@ -40,7 +40,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
-import io.github.fabricators_of_create.porting_lib.block.NeighborChangeListeningBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.NeighborChangeListeningBlock;
 import com.simibubi.create.infrastructure.fabric.block.WeakPowerCheckingBlock;
 
 public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<PackagerBlockEntity>, IWrenchable, NeighborChangeListeningBlock, WeakPowerCheckingBlock {
@@ -117,9 +117,14 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
 				if (PackageItem.isPackage(stack)) {
 					if (level.isClientSide())
 						return ItemInteractionResult.SUCCESS;
-					if (!be.unwrapBox(stack.copy(), true))
-						return ItemInteractionResult.SUCCESS;
-					be.unwrapBox(stack.copy(), false);
+					try (Transaction t = Transaction.openOuter()) {
+						if (!be.unwrapBox(stack.copy(), t))
+							return ItemInteractionResult.SUCCESS;
+					}
+					try (Transaction t = Transaction.openOuter()) {
+						be.unwrapBox(stack.copy(), t);
+						t.commit();
+					}
 					be.triggerStockCheck();
 					stack.shrink(1);
 					AllSoundEvents.DEPOT_PLOP.playOnServer(level, pos);

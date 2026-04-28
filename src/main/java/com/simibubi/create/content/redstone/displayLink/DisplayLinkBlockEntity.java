@@ -16,7 +16,6 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 
 import net.createmod.catnip.math.VecHelper;
 import net.createmod.catnip.nbt.NBTHelper;
-import dan200.computercraft.api.peripheral.PeripheralCapability;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -47,17 +46,6 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity {
 		sourceConfig = new CompoundTag();
 		targetLine = 0;
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		if (Mods.COMPUTERCRAFT.isLoaded()) {
-			event.registerBlockEntity(
-					PeripheralCapability.get(),
-					AllBlockEntityTypes.DISPLAY_LINK.get(),
-					(be, context) -> be.computerBehaviour.getPeripheralCapability()
-			);
-		}
-	}
-
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));

@@ -73,6 +73,7 @@ public class CreateGameTestHelper extends GameTestHelper {
 	public static final int TEN_SECONDS = 10 * TICKS_PER_SECOND;
 	public static final int FIFTEEN_SECONDS = 15 * TICKS_PER_SECOND;
 	public static final int TWENTY_SECONDS = 20 * TICKS_PER_SECOND;
+	public static final int THIRTY_SECONDS = 30 * TICKS_PER_SECOND;
 
 	private CreateGameTestHelper(GameTestInfo testInfo) {
 		super(testInfo);
@@ -427,7 +428,7 @@ public class CreateGameTestHelper extends GameTestHelper {
 	 */
 	public void assertContainerContains(BlockPos pos, ItemStack item) {
 		Storage<ItemVariant> storage = itemStorageAt(pos);
-		ItemStack extracted = ItemHelper.extract(storage, stack -> ItemHandlerHelper.canItemStacksStack(stack, item), item.getCount(), true);
+		ItemStack extracted = ItemHelper.extract(storage, stack -> ItemStack.isSameItemSameComponents(stack, item), item.getCount(), true);
 		if (extracted.isEmpty())
 			fail("item not present: " + item);
 	}

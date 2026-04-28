@@ -1,6 +1,7 @@
 package com.simibubi.create.compat.jei.category;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import com.simibubi.create.foundation.utility.CreateLang;
 
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.createmod.catnip.registry.RegisteredObjectsHelper;
@@ -26,9 +28,13 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Ingredient;
+
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 @ParametersAreNonnullByDefault
 public class SequencedAssemblyCategory extends CreateRecipeCategory<SequencedAssemblyRecipe> {
@@ -71,6 +77,20 @@ public class SequencedAssemblyCategory extends CreateRecipeCategory<SequencedAss
 			JeiSequencedAssemblySubCategory subCategory = getSubCategory(sequencedRecipe);
 			subCategory.setRecipe(builder, sequencedRecipe, focuses, x);
 			x += subCategory.getWidth() + margin;
+		}
+
+		for (int i = 1; i < recipe.getLoops(); i++) {
+			for (SequencedRecipe<?> sequencedRecipe : recipe.getSequence()) {
+				NonNullList<Ingredient> sequencedIngredients = sequencedRecipe.getRecipe()
+					.getIngredients();
+				for (Ingredient ingredient : sequencedIngredients.subList(1, sequencedIngredients.size()))
+					builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
+						.addIngredients(ingredient);
+				for (SizedFluidIngredient fluidIngredient : sequencedRecipe.getRecipe()
+					.getFluidIngredients())
+					builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
+						.addIngredients(NeoForgeTypes.FLUID_STACK, Arrays.asList(fluidIngredient.getFluids()));
+			}
 		}
 	}
 

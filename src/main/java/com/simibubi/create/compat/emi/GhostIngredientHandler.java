@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import com.simibubi.create.AllPackets;
 import com.simibubi.create.content.logistics.filter.AttributeFilterScreen;
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
 import com.simibubi.create.foundation.gui.menu.GhostItemMenu;
@@ -13,6 +12,7 @@ import com.simibubi.create.foundation.gui.menu.GhostItemSubmitPacket;
 import dev.emi.emi.api.EmiDragDropHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.inventory.Slot;
@@ -57,13 +57,13 @@ public class GhostIngredientHandler<T extends GhostItemMenu<?>>
 	}
 
 	private void acceptStack(AbstractSimiContainerScreen<T> gui, boolean isAttributeFilter, int slotIndex, ItemStack stack) {
-		stack = ItemHandlerHelper.copyStackWithSize(stack, 1);
+		stack = stack.copyWithCount(1);
 		gui.getMenu().ghostInventory.setStackInSlot(slotIndex, stack);
 
 		if (isAttributeFilter)
 			return;
 
 		// sync new filter contents with server
-		AllPackets.getChannel().sendToServer(new GhostItemSubmitPacket(stack, slotIndex));
+		CatnipServices.NETWORK.sendToServer(new GhostItemSubmitPacket(stack, slotIndex));
 	}
 }

@@ -18,7 +18,6 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollVa
 import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 
-import dan200.computercraft.api.peripheral.PeripheralCapability;
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -38,17 +37,6 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
 		super(type, pos, state);
 		hasBracket = false;
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		if (Mods.COMPUTERCRAFT.isLoaded()) {
-			event.registerBlockEntity(
-					PeripheralCapability.get(),
-					AllBlockEntityTypes.ROTATION_SPEED_CONTROLLER.get(),
-					(be, context) -> be.computerBehaviour.getPeripheralCapability()
-			);
-		}
-	}
-
 	@Override
 	public void lazyTick() {
 		super.lazyTick();

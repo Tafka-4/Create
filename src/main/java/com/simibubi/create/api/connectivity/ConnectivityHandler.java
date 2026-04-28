@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 
@@ -275,7 +275,6 @@ public class ConnectivityHandler {
 			}
 		}
 		be.setExtraData(extraData);
-		be.notifyMultiUpdated();
 		return amount;
 	}
 

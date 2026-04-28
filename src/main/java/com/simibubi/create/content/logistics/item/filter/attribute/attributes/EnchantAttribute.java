@@ -3,7 +3,7 @@ package com.simibubi.create.content.logistics.item.filter.attribute.attributes;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -19,8 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
-
-import javax.annotation.Nullable;
 
 public record EnchantAttribute(@Nullable Holder<Enchantment> enchantment) implements ItemAttribute {
 	public static final MapCodec<EnchantAttribute> CODEC = Enchantment.CODEC

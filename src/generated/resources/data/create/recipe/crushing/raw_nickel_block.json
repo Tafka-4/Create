@@ -18,16 +18,12 @@
   "results": [
     {
       "count": 9,
-      "item": {
-        "id": "create:crushed_raw_nickel"
-      }
+      "id": "create:crushed_raw_nickel"
     },
     {
       "chance": 0.75,
       "count": 9,
-      "item": {
-        "id": "create:experience_nugget"
-      }
+      "id": "create:experience_nugget"
     }
   ]
 }

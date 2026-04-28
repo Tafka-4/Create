@@ -44,6 +44,7 @@ import com.simibubi.create.foundation.block.render.MultiPosDestructionHandler;
 import com.simibubi.create.foundation.utility.CreateLang;
 
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
+import dev.engine_room.flywheel.lib.transform.Affine;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -641,10 +642,8 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public PartialModel prepareTrackOverlay(BlockGetter world, BlockPos pos, BlockState state,
-		BezierTrackPointLocation bezierPoint, AxisDirection direction, PoseStack ms, RenderedTrackOverlayType type) {
-		var msr = TransformStack.of(ms);
-
+	public <Self extends Affine<Self>> PartialModel prepareTrackOverlay(Affine<Self> affine, BlockGetter world, BlockPos pos, BlockState state,
+		BezierTrackPointLocation bezierPoint, AxisDirection direction, RenderedTrackOverlayType type) {
 		Vec3 axis = null;
 		Vec3 diff = null;
 		Vec3 normal = null;
@@ -665,8 +664,8 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
 					.subtract(bc.getPosition(tpre))
 					.normalize();
 
-				msr.translate(offset.subtract(Vec3.atBottomCenterOf(pos)));
-				msr.translate(0, -4 / 16f, 0);
+				affine.translate(offset.subtract(Vec3.atBottomCenterOf(pos)));
+				affine.translate(0, -4 / 16f, 0);
 			} else
 				return null;
 		}
@@ -682,17 +681,17 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
 
 		Vec3 angles = TrackRenderer.getModelAngles(normal, diff);
 
-		msr.center()
+		affine.center()
 			.rotateY((float) angles.y)
 			.rotateX((float) angles.x)
 			.uncenter();
 
 		if (axis != null)
-			msr.translate(0, axis.y != 0 ? 7 / 16f : 0, axis.y != 0 ? direction.getStep() * 2.5f / 16f : 0);
+			affine.translate(0, axis.y != 0 ? 7 / 16f : 0, axis.y != 0 ? direction.getStep() * 2.5f / 16f : 0);
 		else {
-			msr.translate(0, 4 / 16f, 0);
+			affine.translate(0, 4 / 16f, 0);
 			if (direction == AxisDirection.NEGATIVE)
-				msr.rotateCentered(Mth.PI, Direction.UP);
+				affine.rotateCentered(Mth.PI, Direction.UP);
 		}
 
 		if (bezierPoint == null && world.getBlockEntity(pos) instanceof TrackBlockEntity trackTE
@@ -700,7 +699,7 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
 			double yOffset = 0;
 			for (BezierConnection bc : trackTE.connections.values())
 				yOffset += bc.starts.getFirst().y - pos.getY();
-			msr.center()
+			affine.center()
 				.rotateXDegrees((float) (-direction.getStep() * trackTE.tilt.smoothingAngle.get()))
 				.uncenter()
 				.translate(0, yOffset / 2, 0);

@@ -365,10 +365,14 @@ public class ClipboardScreen extends AbstractSimiScreen {
 	}
 
 	private void send() {
-		ClipboardEntry.saveAll(pages, item);
-		ClipboardOverrides.switchTo(ClipboardType.WRITTEN, item);
+		ClipboardContent content = item.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY)
+			.setType(ClipboardType.WRITTEN)
+			.setPages(pages);
+		item.set(AllDataComponents.CLIPBOARD_CONTENT, content);
 
 		if (pages.isEmpty()) {
+			content = null;
+			item.remove(AllDataComponents.CLIPBOARD_CONTENT);
 			item.remove(AllDataComponents.CLIPBOARD_PAGES);
 			item.remove(AllDataComponents.CLIPBOARD_PREVIOUSLY_OPENED_PAGE);
 			item.remove(AllDataComponents.CLIPBOARD_READ_ONLY);
@@ -376,7 +380,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
 			item.remove(AllDataComponents.CLIPBOARD_COPIED_VALUES);
 		}
 
-		CatnipServices.NETWORK.sendToServer(new ClipboardEditPacket(targetSlot, item.getComponentsPatch(), targetedBlock));
+		CatnipServices.NETWORK.sendToServer(new ClipboardEditPacket(targetSlot, content, targetedBlock));
 	}
 
 	@Override

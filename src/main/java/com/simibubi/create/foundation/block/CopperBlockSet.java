@@ -25,6 +25,7 @@ import com.tterrag.registrate.util.nullness.NonNullFunction;
 
 import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.lang.Lang;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -100,11 +101,14 @@ public class CopperBlockSet {
 					entries[index] = entry;
 
 					if (waxed) {
-						CopperRegistries.addWaxable(() -> entries[getIndex(state, false)].get(), () -> entry.get());
+						BlockEntry<?> originalEntry = entries[getIndex(state, false)];
+						CopperRegistries.addWaxable(() -> BuiltInRegistries.BLOCK.wrapAsHolder(originalEntry.get()),
+							() -> BuiltInRegistries.BLOCK.wrapAsHolder(entry.get()));
 					} else if (state != WeatherState.UNAFFECTED) {
+						BlockEntry<?> previousEntry = entries[getIndex(WEATHER_STATES[state.ordinal() - 1], false)];
 						CopperRegistries.addWeathering(
-							() -> entries[getIndex(WEATHER_STATES[state.ordinal() - 1], false)].get(),
-							() -> entry.get());
+							() -> BuiltInRegistries.BLOCK.wrapAsHolder(previousEntry.get()),
+							() -> BuiltInRegistries.BLOCK.wrapAsHolder(entry.get()));
 					}
 				}
 				if (!waxed)

@@ -49,7 +49,7 @@ public class CreateHatArmorLayer<T extends LivingEntity, M extends EntityModel<T
 				ms.pushPose();
 
 				var msr = TransformStack.of(ms);
-				TrainHatInfo info = TrainHatInfoReloadListener.getHatInfoFor(entity.getType());
+				TrainHatInfo info = TrainHatInfoReloadListener.getHatInfoFor(entity);
 				List<ModelPart> partsToHead = new ArrayList<>();
 
 				if (entityModel instanceof AgeableListModel<?> model) {

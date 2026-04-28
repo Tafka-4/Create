@@ -69,7 +69,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.MissingMappingsEvent;
 import net.minecraftforge.registries.MissingMappingsEvent.Mapping;
 
@@ -155,13 +154,13 @@ public class RemapHelper {
 		reMap.put("gabbro_stairs", asResource("polished_cut_dripstone_stairs"));
 		reMap.put("limestone_layers", asResource("layered_limestone"));
 
-		reMap.put("gabbro", new ResourceLocation("minecraft:dripstone_block"));
-		reMap.put("dolomite", new ResourceLocation("minecraft:calcite"));
-		reMap.put("weathered_limestone", new ResourceLocation("minecraft:tuff"));
-		reMap.put("gabbro_cobblestone", new ResourceLocation("minecraft:dripstone_block"));
-		reMap.put("andesite_cobblestone", new ResourceLocation("minecraft:andesite"));
-		reMap.put("diorite_cobblestone", new ResourceLocation("minecraft:diorite"));
-		reMap.put("granite_cobblestone", new ResourceLocation("minecraft:granite"));
+		reMap.put("gabbro", ResourceLocation.parse("minecraft:dripstone_block"));
+		reMap.put("dolomite", ResourceLocation.parse("minecraft:calcite"));
+		reMap.put("weathered_limestone", ResourceLocation.parse("minecraft:tuff"));
+		reMap.put("gabbro_cobblestone", ResourceLocation.parse("minecraft:dripstone_block"));
+		reMap.put("andesite_cobblestone", ResourceLocation.parse("minecraft:andesite"));
+		reMap.put("diorite_cobblestone", ResourceLocation.parse("minecraft:diorite"));
+		reMap.put("granite_cobblestone", ResourceLocation.parse("minecraft:granite"));
 		reMap.put("dark_scoria", asResource("scorchia"));
 
 		// 1.15 palettes
@@ -266,7 +265,7 @@ public class RemapHelper {
 			String path = key.getPath();
 			ResourceLocation remappedId = reMap.get(path);
 			if (remappedId != null) {
-				Item remapped = ForgeRegistries.ITEMS.getValue(remappedId);
+				Item remapped = BuiltInRegistries.ITEM.get(remappedId);
 				if (remapped != null) {
 					Create.LOGGER.warn("Remapping item '{}' to '{}'", key, remappedId);
 					try {

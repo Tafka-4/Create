@@ -1,6 +1,6 @@
 package com.simibubi.create.content.redstone.rail;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.mojang.serialization.MapCodec;
@@ -38,8 +38,8 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.phys.Vec3;
 
-import io.github.fabricators_of_create.porting_lib.block.MinecartPassHandlerBlock;
-import io.github.fabricators_of_create.porting_lib.util.MinecartAndRailUtil;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.MinecartPassHandlerBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.util.MinecartAndRailUtil;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -235,7 +235,7 @@ public class ControllerRailBlock extends BaseRailBlock implements IWrenchable, M
 	}
 
 	private void placeAndNotify(BlockState state, BlockPos pos, Level world) {
-		world.setBlock(pos, state, 3);
+		world.setBlock(pos, state, Block.UPDATE_ALL);
 		world.updateNeighborsAt(pos.below(), this);
 		if (state.getValue(SHAPE)
 			.isAscending())

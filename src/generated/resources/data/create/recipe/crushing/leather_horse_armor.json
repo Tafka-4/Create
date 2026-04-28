@@ -9,16 +9,12 @@
   "results": [
     {
       "count": 2,
-      "item": {
-        "id": "minecraft:leather"
-      }
+      "id": "minecraft:leather"
     },
     {
       "chance": 0.5,
       "count": 2,
-      "item": {
-        "id": "minecraft:leather"
-      }
+      "id": "minecraft:leather"
     }
   ]
 }

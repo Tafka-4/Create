@@ -8,27 +8,19 @@
   "processing_time": 250,
   "results": [
     {
-      "item": {
-        "id": "create:crushed_raw_iron"
-      }
+      "id": "create:crushed_raw_iron"
     },
     {
       "chance": 0.75,
-      "item": {
-        "id": "create:crushed_raw_iron"
-      }
+      "id": "create:crushed_raw_iron"
     },
     {
       "chance": 0.75,
-      "item": {
-        "id": "create:experience_nugget"
-      }
+      "id": "create:experience_nugget"
     },
     {
       "chance": 0.125,
-      "item": {
-        "id": "minecraft:cobblestone"
-      }
+      "id": "minecraft:cobblestone"
     }
   ]
 }

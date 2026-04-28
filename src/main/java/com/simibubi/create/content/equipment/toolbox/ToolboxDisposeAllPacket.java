@@ -44,7 +44,7 @@ public record ToolboxDisposeAllPacket(BlockPos toolboxPos) implements Serverboun
 		if (!(blockEntity instanceof ToolboxBlockEntity toolbox))
 			return;
 
-		CompoundTag compound = player.getPersistentData()
+		CompoundTag compound = player.getCustomData()
 				.getCompound("CreateToolboxData");
 		MutableBoolean sendData = new MutableBoolean(false);
 

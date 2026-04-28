@@ -85,6 +85,10 @@ public enum AllKeys {
 				.getValue();
 	}
 
+	public boolean doesModifierAndCodeMatch(int key) {
+		return getBoundCode() == key;
+	}
+
 	public static boolean isKeyDown(int key) {
 		return InputConstants.isKeyDown(Minecraft.getInstance()
 			.getWindow()

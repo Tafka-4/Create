@@ -3,10 +3,9 @@
   "ingredient": {
     "tag": "c:dusts/obsidian"
   },
-  "loops": 1,
   "results": [
     {
-      "item": "create:sturdy_sheet"
+      "id": "create:sturdy_sheet"
     }
   ],
   "sequence": [
@@ -17,14 +16,14 @@
           "item": "create:unprocessed_obsidian_sheet"
         },
         {
-          "amount": 40500,
-          "fluid": "minecraft:lava",
-          "nbt": {}
+          "type": "neoforge:single",
+          "amount": 500,
+          "fluid": "minecraft:lava"
         }
       ],
       "results": [
         {
-          "item": "create:unprocessed_obsidian_sheet"
+          "id": "create:unprocessed_obsidian_sheet"
         }
       ]
     },
@@ -37,7 +36,7 @@
       ],
       "results": [
         {
-          "item": "create:unprocessed_obsidian_sheet"
+          "id": "create:unprocessed_obsidian_sheet"
         }
       ]
     },
@@ -50,12 +49,12 @@
       ],
       "results": [
         {
-          "item": "create:unprocessed_obsidian_sheet"
+          "id": "create:unprocessed_obsidian_sheet"
         }
       ]
     }
   ],
-  "transitionalItem": {
-    "item": "create:unprocessed_obsidian_sheet"
+  "transitional_item": {
+    "id": "create:unprocessed_obsidian_sheet"
   }
 }

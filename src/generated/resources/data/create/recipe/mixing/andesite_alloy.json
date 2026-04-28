@@ -5,12 +5,12 @@
       "item": "minecraft:andesite"
     },
     {
-      "tag": "c:iron_nuggets"
+      "tag": "c:nuggets/iron"
     }
   ],
   "results": [
     {
-      "item": "create:andesite_alloy"
+      "id": "create:andesite_alloy"
     }
   ]
 }

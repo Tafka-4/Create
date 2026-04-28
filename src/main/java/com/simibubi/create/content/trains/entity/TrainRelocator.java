@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -61,7 +61,7 @@ public class TrainRelocator {
 
 	static WeakReference<CarriageContraptionEntity> hoveredEntity = new WeakReference<>(null);
 	static UUID relocatingTrain;
-	static Vec3 relocatingOrigin;
+	static BlockPos relocatingOrigin;
 	static int relocatingEntityId;
 
 	static BlockPos lastHoveredPos;
@@ -85,8 +85,7 @@ public class TrainRelocator {
 		if (player.isSpectator())
 			return false;
 
-		if (!player.position()
-			.closerThan(relocatingOrigin, 24) || player.isShiftKeyDown()) {
+		if (!player.canInteractWithBlock(relocatingOrigin, 24) || player.isShiftKeyDown()) {
 			relocatingTrain = null;
 			player.displayClientMessage(CreateLang.translateDirect("train.relocate.abort")
 				.withStyle(ChatFormatting.RED), true);
@@ -316,22 +315,22 @@ public class TrainRelocator {
 				return;
 			}
 
-			if (!player.position()
-				.closerThan(relocatingOrigin, 24)) {
+			if (!player.canInteractWithBlock(relocatingOrigin, 24)) {
 				player.displayClientMessage(CreateLang.translateDirect("train.relocate.too_far")
 					.withStyle(ChatFormatting.RED), true);
 				return;
 			}
 
 			Boolean success = relocateClient(relocating, true);
-			if (success == null)
+			if (success == null) {
 				player.displayClientMessage(CreateLang.translateDirect("train.relocate", relocating.name), true);
-			else if (success.booleanValue())
+			} else if (success) {
 				player.displayClientMessage(CreateLang.translateDirect("train.relocate.valid")
 					.withStyle(ChatFormatting.GREEN), true);
-			else
+			} else {
 				player.displayClientMessage(CreateLang.translateDirect("train.relocate.invalid")
 					.withStyle(ChatFormatting.RED), true);
+			}
 			return;
 		}
 
@@ -362,7 +361,7 @@ public class TrainRelocator {
 		Train train = getTrainFromEntity(entity);
 		if (train == null)
 			return false;
-		relocatingOrigin = vec3;
+		relocatingOrigin = BlockPos.containing(vec3);
 		relocatingTrain = train.id;
 		relocatingEntityId = entity.getId();
 		return true;

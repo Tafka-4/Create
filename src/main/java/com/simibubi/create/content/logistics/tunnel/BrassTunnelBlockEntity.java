@@ -124,15 +124,6 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity implements IHa
 		previousOutputIndex = 0;
 		syncedOutputActive = false;
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.ItemHandler.BLOCK,
-				AllBlockEntityTypes.BRASS_TUNNEL.get(),
-				(be, context) -> be.tunnelCapability
-		);
-	}
-
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		super.addBehaviours(behaviours);

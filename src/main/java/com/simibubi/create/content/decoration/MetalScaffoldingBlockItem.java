@@ -1,6 +1,6 @@
 package com.simibubi.create.content.decoration;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;

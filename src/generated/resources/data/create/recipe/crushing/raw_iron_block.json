@@ -9,16 +9,12 @@
   "results": [
     {
       "count": 9,
-      "item": {
-        "id": "create:crushed_raw_iron"
-      }
+      "id": "create:crushed_raw_iron"
     },
     {
       "chance": 0.75,
       "count": 9,
-      "item": {
-        "id": "create:experience_nugget"
-      }
+      "id": "create:experience_nugget"
     }
   ]
 }

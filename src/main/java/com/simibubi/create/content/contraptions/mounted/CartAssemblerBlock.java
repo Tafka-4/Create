@@ -62,8 +62,8 @@ import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import io.github.fabricators_of_create.porting_lib.block.MinecartPassHandlerBlock;
-import io.github.fabricators_of_create.porting_lib.block.SlopeCreationCheckingRailBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.MinecartPassHandlerBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.SlopeCreationCheckingRailBlock;
 
 public class CartAssemblerBlock extends BaseRailBlock
 	implements IBE<CartAssemblerBlockEntity>, IWrenchable, SpecialBlockItemRequirement, SlopeCreationCheckingRailBlock, MinecartPassHandlerBlock {

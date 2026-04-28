@@ -2,12 +2,12 @@
   "type": "create:pressing",
   "ingredients": [
     {
-      "tag": "c:copper_ingots"
+      "tag": "c:ingots/copper"
     }
   ],
   "results": [
     {
-      "item": "create:copper_sheet"
+      "id": "create:copper_sheet"
     }
   ]
 }

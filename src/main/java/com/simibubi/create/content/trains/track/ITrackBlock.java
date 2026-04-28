@@ -14,6 +14,7 @@ import com.simibubi.create.content.trains.graph.TrackNodeLocation.DiscoveredLoca
 import com.simibubi.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
 
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
+import dev.engine_room.flywheel.lib.transform.Affine;
 import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.data.Pair;
 
@@ -163,9 +164,8 @@ public interface ITrackBlock {
 	}
 
 	@Environment(EnvType.CLIENT)
-	public PartialModel prepareTrackOverlay(BlockGetter world, BlockPos pos, BlockState state,
-		BezierTrackPointLocation bezierPoint, AxisDirection direction, PoseStack transform,
-		RenderedTrackOverlayType type);
+	public <Self extends Affine<Self>> PartialModel prepareTrackOverlay(Affine<Self> affine, BlockGetter world, BlockPos pos, BlockState state,
+		BezierTrackPointLocation bezierPoint, AxisDirection direction, RenderedTrackOverlayType type);
 
 	@Environment(EnvType.CLIENT)
 	public PartialModel prepareAssemblyOverlay(BlockGetter world, BlockPos pos, BlockState state, Direction direction,

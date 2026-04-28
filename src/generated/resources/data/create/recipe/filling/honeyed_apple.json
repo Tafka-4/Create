@@ -5,13 +5,14 @@
       "item": "minecraft:apple"
     },
     {
-      "amount": 20250,
-      "fluidTag": "c:honey"
+      "type": "neoforge:tag",
+      "amount": 250,
+      "tag": "c:honey"
     }
   ],
   "results": [
     {
-      "item": "create:honeyed_apple"
+      "id": "create:honeyed_apple"
     }
   ]
 }

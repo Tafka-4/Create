@@ -2,18 +2,18 @@
   "type": "create:mixing",
   "ingredients": [
     {
-      "fabric:type": "create:block_tag_ingredient",
+      "type": "neoforge:block_tag",
       "tag": "minecraft:convertable_to_mud"
     },
     {
-      "amount": 27000,
-      "fluid": "minecraft:water",
-      "nbt": {}
+      "type": "neoforge:single",
+      "amount": 250,
+      "fluid": "minecraft:water"
     }
   ],
   "results": [
     {
-      "item": "minecraft:mud"
+      "id": "minecraft:mud"
     }
   ]
 }

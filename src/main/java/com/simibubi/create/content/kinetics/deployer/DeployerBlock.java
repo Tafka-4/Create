@@ -128,7 +128,7 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
 
 			player.setItemInHand(hand, heldByDeployer);
 			be.player.setItemInHand(InteractionHand.MAIN_HAND, heldByPlayer);
-			be.sendData();
+			be.notifyUpdate();
 		});
 
 		return ItemInteractionResult.SUCCESS;
@@ -152,7 +152,7 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
 
 	@Override
 	public void neighborChanged(BlockState state, Level world, BlockPos pos, Block p_220069_4_, BlockPos p_220069_5_,
-		boolean p_220069_6_) {
+								boolean p_220069_6_) {
 		withBlockEntityDo(world, pos, DeployerBlockEntity::redstoneUpdate);
 	}
 
@@ -184,7 +184,7 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
 
 		@Override
 		public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos,
-			BlockHitResult ray) {
+										 BlockHitResult ray) {
 			List<Direction> directions = IPlacementHelper.orderedByDistanceExceptAxis(pos, ray.getLocation(),
 				state.getValue(FACING)
 					.getAxis(),

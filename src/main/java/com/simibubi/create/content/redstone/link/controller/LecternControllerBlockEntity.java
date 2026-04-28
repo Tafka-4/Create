@@ -10,7 +10,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.fabric.ReachUtil;
 
-import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
+import io.github.fabricators_of_create.porting_lib.common.util.EnvExecutor;
 
 import net.fabricmc.api.EnvType;
 
@@ -39,7 +39,7 @@ import net.minecraft.world.phys.Vec3;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
+import io.github.fabricators_of_create.porting_lib.common.util.EnvExecutor;
 
 public class LecternControllerBlockEntity extends SmartBlockEntity {
 	private ItemContainerContents controllerData = ItemContainerContents.EMPTY;
@@ -58,7 +58,7 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
 	@Override
 	protected void write(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
 		super.write(compound, registries, clientPacket);
-		compound.put("ControllerData", CatnipCodecUtils.encode(ItemContainerContents.CODEC, controllerData).orElseThrow());
+		compound.put("ControllerData", CatnipCodecUtils.encode(ItemContainerContents.CODEC, registries, controllerData).orElseThrow());
 		if (user != null)
 			compound.putUUID("User", user);
 	}
@@ -66,14 +66,14 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
 	@Override
 	public void writeSafe(CompoundTag compound, HolderLookup.Provider registries) {
 		super.writeSafe(compound, registries);
-		compound.put("ControllerData", CatnipCodecUtils.encode(ItemContainerContents.CODEC, controllerData).orElseThrow());
+		compound.put("ControllerData", CatnipCodecUtils.encode(ItemContainerContents.CODEC, registries, controllerData).orElseThrow());
 	}
 
 	@Override
 	protected void read(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
 		super.read(compound, registries, clientPacket);
 
-		controllerData = CatnipCodecUtils.decode(ItemContainerContents.CODEC, compound.getCompound("ControllerData"))
+		controllerData = CatnipCodecUtils.decode(ItemContainerContents.CODEC, registries, compound.get("ControllerData"))
 			.orElse(ItemContainerContents.EMPTY);
 		user = compound.hasUUID("User") ? compound.getUUID("User") : null;
 	}
@@ -174,9 +174,9 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
 	}
 
 	public void dropController(BlockState state) {
-		Entity playerEntity = ((ServerLevel) level).getEntity(user);
-		if (playerEntity instanceof Player)
-			stopUsing((Player) playerEntity);
+		Entity entity = ((ServerLevel) level).getEntity(user);
+		if (entity instanceof Player player)
+			stopUsing(player);
 
 		Direction dir = state.getValue(LecternControllerBlock.FACING);
 		double x = worldPosition.getX() + 0.5 + 0.25 * dir.getStepX();
@@ -191,7 +191,7 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
 	public static boolean playerInRange(Player player, Level world, BlockPos pos) {
 		//double modifier = world.isRemote ? 0 : 1.0;
 		double reach = 0.4 * player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE);// + modifier;
-		return player.distanceToSqr(Vec3.atCenterOf(pos)) < reach * reach;
+		return player.getEyePosition().distanceToSqr(Vec3.atCenterOf(pos)) < reach * reach;
 	}
 
 	private ItemStack createLinkedController() {

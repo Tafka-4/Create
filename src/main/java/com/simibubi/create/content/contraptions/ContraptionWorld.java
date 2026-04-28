@@ -1,6 +1,7 @@
 package com.simibubi.create.content.contraptions;
 
 import net.createmod.catnip.levelWrappers.WrappedLevel;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -11,19 +12,34 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 public class ContraptionWorld extends WrappedLevel {
-    final Contraption contraption;
+	final Contraption contraption;
 	private final int minY;
 	private final int height;
 
 	public ContraptionWorld(Level world, Contraption contraption) {
-        super(world);
+		super(world);
 
-        this.contraption = contraption;
+		this.contraption = contraption;
 
 		// Include 1 block above/below contraption height range to avoid certain edge-case Starlight crashes with
 		// downward-facing mechanical pistons.
 		minY = nextMultipleOf16(contraption.bounds.minY - 1);
 		height = nextMultipleOf16(contraption.bounds.maxY + 1) - minY;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public SnapshotParticipant snapshotParticipant() {
+		if (level instanceof io.github.fabricators_of_create.porting_lib.extensions.common.LevelExtensions extensions)
+			return extensions.snapshotParticipant();
+		if (level instanceof io.github.fabricators_of_create.porting_lib.extensions.extensions.LevelExtensions extensions)
+			return extensions.snapshotParticipant();
+		throw new UnsupportedOperationException("Wrapped level does not expose a Porting Lib snapshot participant");
+	}
+
+	@Override
+	public boolean isAreaLoaded(BlockPos center, int range) {
+		return true;
 	}
 
 	// https://math.stackexchange.com/questions/291468
@@ -32,19 +48,19 @@ public class ContraptionWorld extends WrappedLevel {
 	}
 
 	@Override
-    public BlockState getBlockState(BlockPos pos) {
-        StructureTemplate.StructureBlockInfo blockInfo = contraption.getBlocks().get(pos);
+	public BlockState getBlockState(BlockPos pos) {
+		StructureTemplate.StructureBlockInfo blockInfo = contraption.getBlocks().get(pos);
 
-        if (blockInfo != null)
-            return blockInfo.state();
+		if (blockInfo != null)
+			return blockInfo.state();
 
-        return Blocks.AIR.defaultBlockState();
-    }
+		return Blocks.AIR.defaultBlockState();
+	}
 
-    @Override
-    public void playLocalSound(double x, double y, double z, SoundEvent sound, SoundSource category, float volume, float pitch, boolean distanceDelay) {
-        level.playLocalSound(x, y, z, sound, category, volume, pitch, distanceDelay);
-    }
+	@Override
+	public void playLocalSound(double x, double y, double z, SoundEvent sound, SoundSource category, float volume, float pitch, boolean distanceDelay) {
+		level.playLocalSound(x, y, z, sound, category, volume, pitch, distanceDelay);
+	}
 
 	// Ensure that we provide accurate information about ContraptionWorld height to mods (such as Starlight) which
 	// expect Levels to only have blocks located in chunks within their height range.

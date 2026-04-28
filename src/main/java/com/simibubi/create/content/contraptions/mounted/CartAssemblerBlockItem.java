@@ -1,6 +1,6 @@
 package com.simibubi.create.content.contraptions.mounted;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.redstone.rail.ControllerRailBlock;
@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
 
-import io.github.fabricators_of_create.porting_lib.util.MinecartAndRailUtil;
+import io.github.fabricators_of_create.porting_lib.blocks.util.MinecartAndRailUtil;
 
 public class CartAssemblerBlockItem extends BlockItem {
 
@@ -30,8 +30,8 @@ public class CartAssemblerBlockItem extends BlockItem {
 		super(block, properties);
 	}
 
+	@NotNull
 	@Override
-	@Nonnull
 	public InteractionResult useOn(UseOnContext context) {
 		if (tryPlaceAssembler(context)) {
 			context.getLevel()

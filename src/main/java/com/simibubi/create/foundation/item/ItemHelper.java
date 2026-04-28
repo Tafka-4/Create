@@ -7,8 +7,6 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-import com.simibubi.create.foundation.mixin.accessor.ItemStackHandlerAccessor;
-
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 
 import com.simibubi.create.infrastructure.fabric.transfer.item.SlottedStackStorage;
@@ -124,7 +122,7 @@ public class ItemHelper {
 				}
 				totalSlots++;
 				if (!view.isResourceBlank()) {
-					f += (float) view.getAmount() / (float) Math.min(slotLimit, view.getResource().getItem().getMaxStackSize());
+					f += (float) view.getAmount() / (float) Math.min(slotLimit, view.getResource().toStack().getMaxStackSize());
 					++i;
 				}
 			}
@@ -210,7 +208,7 @@ public class ItemHelper {
 			try (Transaction t = Transaction.openOuter()) {
 				for (StorageView<ItemVariant> view : inv.nonEmptyViews()) {
 					ItemVariant contained = view.getResource();
-					int maxStackSize = contained.getItem().getMaxStackSize();
+					int maxStackSize = contained.toStack().getMaxStackSize();
 					// amount stored, amount needed, or max size, whichever is lowest.
 					int amountToExtractFromThisSlot = Math.min(truncateLong(view.getAmount()), Math.min(amount - extracted, maxStackSize));
 					if (!test.test(contained.toStack(amountToExtractFromThisSlot)))
@@ -343,7 +341,10 @@ public class ItemHelper {
 	}
 
 	public static ItemContainerContents containerContentsFromHandler(ItemStackHandler handler) {
-		return ItemContainerContents.fromItems(((ItemStackHandlerAccessor) handler).create$getStacks());
+		List<ItemStack> stacks = new ArrayList<>(handler.getSlotCount());
+		for (int i = 0; i < handler.getSlotCount(); i++)
+			stacks.add(handler.getStackInSlot(i));
+		return ItemContainerContents.fromItems(stacks);
 	}
 
 	public static ItemStack limitCountToMaxStackSize(ItemStack stack, boolean simulate) {

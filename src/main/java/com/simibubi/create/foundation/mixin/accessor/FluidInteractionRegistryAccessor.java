@@ -6,13 +6,13 @@ import java.util.Map;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.neoforged.neoforge.fluids.FluidInteractionRegistry;
-import net.neoforged.neoforge.fluids.FluidInteractionRegistry.InteractionInformation;
-import net.neoforged.neoforge.fluids.FluidType;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidInteractionRegistry;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidInteractionRegistry.InteractionInformation;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
 
 @Mixin(FluidInteractionRegistry.class)
 public interface FluidInteractionRegistryAccessor {
-	@Accessor(value = "INTERACTIONS", remap = false)
+	@Accessor("INTERACTIONS")
 	static Map<FluidType, List<InteractionInformation>> getInteractions() {
 		throw new AssertionError();
 	}

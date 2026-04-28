@@ -41,13 +41,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -59,7 +59,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 
-import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
+import io.github.fabricators_of_create.porting_lib.common.util.EnvExecutor;
 
 
 public class CrushingWheelControllerBlockEntity extends SmartBlockEntity implements SidedStorageBlockEntity {
@@ -82,15 +82,6 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
 
 		};
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.ItemHandler.BLOCK,
-				AllBlockEntityTypes.CRUSHING_WHEEL_CONTROLLER.get(),
-				(be, context) -> be.inventory
-		);
-	}
-
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		behaviours.add(new DirectBeltInputBehaviour(this).onlyInsertWhen(this::supportsDirectBeltInput));
@@ -309,7 +300,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
 	}
 
 	private void applyRecipe() {
-		Optional<RecipeHolder<ProcessingRecipe<Container>>> recipe = findRecipe();
+		Optional<RecipeHolder<ProcessingRecipe<RecipeInput, ?>>> recipe = findRecipe();
 
 		List<ItemStack> list = new ArrayList<>();
 		if (recipe.isPresent()) {
@@ -331,8 +322,8 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
 
 	}
 
-	public Optional<RecipeHolder<ProcessingRecipe<Container>>> findRecipe() {
-		Optional<RecipeHolder<ProcessingRecipe<Container>>> crushingRecipe = AllRecipeTypes.CRUSHING.find(wrapper, level);
+	public Optional<RecipeHolder<ProcessingRecipe<RecipeInput, ?>>> findRecipe() {
+		Optional<RecipeHolder<ProcessingRecipe<RecipeInput, ?>>> crushingRecipe = AllRecipeTypes.CRUSHING.find(inventory, level);
 		if (!crushingRecipe.isPresent())
 			crushingRecipe = AllRecipeTypes.MILLING.find(inventory, level);
 		return crushingRecipe;
@@ -364,7 +355,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
 	}
 
 	private void itemInserted(ItemStack stack) {
-		Optional<RecipeHolder<ProcessingRecipe<Container>>> recipe = findRecipe();
+		Optional<RecipeHolder<ProcessingRecipe<RecipeInput, ?>>> recipe = findRecipe();
 		inventory.remainingTime = recipe.isPresent() ? recipe.get().value()
 			.getProcessingDuration() : 100;
 		inventory.appliedRecipe = false;

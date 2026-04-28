@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import io.github.fabricators_of_create.porting_lib.block.ChunkUnloadListeningBlockEntity;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.ChunkUnloadListeningBlockEntity;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +30,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import io.github.fabricators_of_create.porting_lib.block.ChunkUnloadListeningBlockEntity;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.ChunkUnloadListeningBlockEntity;
 
 public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity
 	implements PartialSafeNBT, IInteractionChecker, SpecialBlockEntityItemRequirement, VirtualBlockEntity, ChunkUnloadListeningBlockEntity {

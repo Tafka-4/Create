@@ -28,7 +28,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-import io.github.fabricators_of_create.porting_lib.item.UseFirstBehaviorItem;
+import io.github.fabricators_of_create.porting_lib.item.extensions.UseFirstBehaviorItem;
 
 public class CogwheelBlockItem extends BlockItem implements UseFirstBehaviorItem {
 

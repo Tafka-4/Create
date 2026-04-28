@@ -6,14 +6,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
-
-import io.github.fabricators_of_create.porting_lib.util.MinecartAndRailUtil;
+import org.jetbrains.annotations.Nullable;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 
-import com.mojang.serialization.Codec;
 import com.simibubi.create.Create;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.OrientedContraptionEntity;
@@ -21,7 +18,6 @@ import com.simibubi.create.content.contraptions.minecart.CouplingHandler;
 
 import net.createmod.catnip.data.Couple;
 import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.lang.Lang;
 import net.createmod.catnip.math.VecHelper;
 import net.createmod.catnip.nbt.NBTHelper;
 import net.createmod.catnip.platform.CatnipServices;
@@ -32,17 +28,16 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
-import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.PoweredRailBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import io.github.fabricators_of_create.porting_lib.core.util.INBTSerializable;
-import io.github.fabricators_of_create.porting_lib.util.MinecartAndRailUtil;
 
 /**
  * Extended code for Minecarts, this allows for handling stalled carts and
@@ -50,8 +45,6 @@ import io.github.fabricators_of_create.porting_lib.util.MinecartAndRailUtil;
  */
 public class MinecartController implements INBTSerializable<CompoundTag> {
 	public static final MinecartController EMPTY = new MinecartController.Empty();
-
-	public static final IAttachmentSerializer<CompoundTag, MinecartController> SERIALIZER = Type.SERIALIZER;
 
 	private boolean needsEntryRefresh;
 	private WeakReference<AbstractMinecart> weakRef;
@@ -76,12 +69,7 @@ public class MinecartController implements INBTSerializable<CompoundTag> {
 	}
 
 	public final boolean isEmpty() {
-		return getType() == Type.EMPTY;
-	}
-
-	@NotNull
-	protected Type getType() {
-		return Type.NORMAL;
+		return this == EMPTY;
 	}
 
 	public void tick() {
@@ -133,8 +121,7 @@ public class MinecartController implements INBTSerializable<CompoundTag> {
 		BlockState blockstate = world.getBlockState(blockpos);
 		if (blockstate.is(BlockTags.RAILS)
 				&& blockstate.getBlock() instanceof PoweredRailBlock
-				&& (MinecartAndRailUtil.isActivatorRail(
-				blockstate.getBlock()))) {
+				&& blockstate.is(Blocks.ACTIVATOR_RAIL)) {
 			if (cart.isVehicle()) {
 				cart.ejectPassengers();
 			}
@@ -290,6 +277,9 @@ public class MinecartController implements INBTSerializable<CompoundTag> {
 			return;
 
 		@Nullable AbstractMinecart cart = cart();
+		if (cart == null)
+			return;
+
 		if (stall && cart != null) {
 			stallData.set(internal, Optional.of(new StallData(cart)));
 			sendData();
@@ -451,6 +441,101 @@ public class MinecartController implements INBTSerializable<CompoundTag> {
 			stallData.yaw = nbt.getFloat("Yaw");
 			stallData.pitch = nbt.getFloat("Pitch");
 			return stallData;
+		}
+	}
+
+	private static class Empty extends MinecartController {
+
+		private Empty() {
+			super(null);
+		}
+
+		private static void warn() {
+			Create.LOGGER.warn("Method called on EMPTY MinecartController", new Exception());
+		}
+
+		@Override
+		public void tick() {
+			warn();
+		}
+
+		@Override
+		public boolean isFullyCoupled() {
+			warn();
+			return false;
+		}
+
+		@Override
+		public boolean isLeadingCoupling() {
+			warn();
+			return false;
+		}
+
+		@Override
+		public boolean isConnectedToCoupling() {
+			warn();
+			return false;
+		}
+
+		@Override
+		public boolean isCoupledThroughContraption() {
+			warn();
+			return false;
+		}
+
+		@Override
+		public boolean hasContraptionCoupling(boolean current) {
+			warn();
+			return false;
+		}
+
+		@Override
+		public float getCouplingLength(boolean leading) {
+			warn();
+			return 0.0f;
+		}
+
+		@Override
+		public void decouple() {
+			warn();
+		}
+
+		@Override
+		public void removeConnection(boolean main) {
+			warn();
+		}
+
+		@Override
+		public void prepareForCoupling(boolean isLeading) {
+			warn();
+		}
+
+		@Override
+		public void coupleWith(boolean isLeading, UUID coupled, float length, boolean contraption) {
+			warn();
+		}
+
+		@Nullable
+		@Override
+		public UUID getCoupledCart(boolean asMain) {
+			warn();
+			return null;
+		}
+
+		@Override
+		public boolean isStalled() {
+			warn();
+			return false;
+		}
+
+		@Override
+		public void setStalledExternally(boolean stall) {
+			warn();
+		}
+
+		@Override
+		public boolean isPresent() {
+			return false;
 		}
 	}
 }

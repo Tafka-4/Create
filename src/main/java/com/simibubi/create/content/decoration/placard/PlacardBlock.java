@@ -2,6 +2,8 @@ package com.simibubi.create.content.decoration.placard;
 
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.mojang.serialization.MapCodec;
 import com.simibubi.create.AllBlockEntityTypes;
 import com.simibubi.create.AllBlocks;

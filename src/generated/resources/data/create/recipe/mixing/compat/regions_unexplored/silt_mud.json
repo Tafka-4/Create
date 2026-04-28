@@ -16,14 +16,14 @@
       ]
     },
     {
-      "type": "fluid_stack",
+      "type": "neoforge:single",
       "amount": 250,
       "fluid": "minecraft:water"
     }
   ],
   "results": [
     {
-      "item": "regions_unexplored:silt_mud"
+      "id": "regions_unexplored:silt_mud"
     }
   ]
 }

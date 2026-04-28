@@ -105,11 +105,18 @@ public class AllTags {
 		WRENCH_PICKUP,
 		CHEST_MOUNTED_STORAGE,
 		SIMPLE_MOUNTED_STORAGE,
+		FALLBACK_MOUNTED_STORAGE_BLACKLIST,
 		ROOTS,
 		SUGAR_CANE_VARIANTS,
 		NON_HARVESTABLE,
+		SINGLE_BLOCK_INVENTORIES,
+		PLOUGH_WHITELIST,
+		PLOUGH_BLACKLIST,
 
 		HAS_REDUCED_DESTROY_EFFECTS,
+
+		CARDBOARD_STORAGE_BLOCKS(COMMON, "storage_blocks/cardboard"),
+		ANDESITE_ALLOY_STORAGE_BLOCKS(COMMON, "storage_blocks/andesite_alloy"),
 
 		CORALS,
 
@@ -188,16 +195,32 @@ public class AllTags {
 		CHAIN_RIDEABLE,
 		TRACKS,
 		UPRIGHT_ON_BELT,
+		NOT_UPRIGHT_ON_BELT,
 		VALVE_HANDLES,
 		DISPENSE_BEHAVIOR_WRAP_BLACKLIST,
 
 		PLATES(COMMON),
+		OBSIDIAN_PLATES(COMMON, "plates/obsidian"),
+		CARDBOARD_PLATES(COMMON, "plates/cardboard"),
 		OBSIDIAN_DUST(COMMON, "dusts/obsidian"),
 		WRENCH(COMMON, "tools/wrench"),
 
 		ALLURITE(MOD, "stone_types/galosphere/allurite"),
 		AMETHYST(MOD, "stone_types/galosphere/amethyst"),
 		LUMIERE(MOD, "stone_types/galosphere/lumiere"),
+
+		CERTUS_QUARTZ(COMMON, "gems/certus_quartz"),
+		AMETRINE_ORES(COMMON, "ores/ametrine"),
+		ANTHRACITE_ORES(COMMON, "ores/anthracite"),
+		EMERALDITE_ORES(COMMON, "ores/emeraldite"),
+		LIGNITE_ORES(COMMON, "ores/lignite"),
+		CARDBOARD_STORAGE_BLOCKS(COMMON, "storage_blocks/cardboard"),
+		ANDESITE_ALLOY_STORAGE_BLOCKS(COMMON, "storage_blocks/andesite_alloy"),
+		HONEY_BUCKETS(COMMON, "buckets/honey"),
+		FLOURS(COMMON),
+		WHEAT_FLOURS(COMMON, "foods/flour/wheat"),
+		FOODS_DOUGH(COMMON, "foods/dough"),
+		FOODS_DOUGH_WHEAT(COMMON, "foods/dough/wheat"),
 
 		UA_CORAL(MOD, "upgrade_aquatic/coral"),
 		// fabric: Trinkets compat is used instead
@@ -255,6 +278,9 @@ public class AllTags {
 		FAN_PROCESSING_CATALYSTS_HAUNTING(MOD, "fan_processing_catalysts/haunting"),
 		FAN_PROCESSING_CATALYSTS_SMOKING(MOD, "fan_processing_catalysts/smoking"),
 		FAN_PROCESSING_CATALYSTS_SPLASHING(MOD, "fan_processing_catalysts/splashing"),
+		TEA(COMMON),
+		CHOCOLATE(COMMON),
+		CREOSOTE(COMMON),
 
 		;
 

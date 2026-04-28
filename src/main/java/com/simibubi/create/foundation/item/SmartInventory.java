@@ -62,6 +62,10 @@ public class SmartInventory extends ItemStackHandler {
 		return this;
 	}
 
+	public net.minecraft.world.item.ItemStack getItem(int slot) {
+		return getStackInSlot(slot);
+	}
+
 	@Override
 	public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
 		if (!insertionAllowed)

@@ -13,8 +13,11 @@ public class FanSmokingEmiRecipe extends FanEmiRecipe<SmokingRecipe> {
 
 	public FanSmokingEmiRecipe(SmokingRecipe recipe) {
 		super(CreateEmiPlugin.FAN_SMOKING, recipe);
-		ResourceLocation rid = recipe.getId();
-		this.id = new ResourceLocation("emi", "create/fan_smoking/" + rid.getNamespace() + "/" + rid.getPath());
+	}
+
+	public FanSmokingEmiRecipe(SmokingRecipe recipe, ResourceLocation recipeId) {
+		this(recipe);
+		this.id = ResourceLocation.fromNamespaceAndPath("emi", "create/fan_smoking/" + recipeId.getNamespace() + "/" + recipeId.getPath());
 	}
 
 	@Override

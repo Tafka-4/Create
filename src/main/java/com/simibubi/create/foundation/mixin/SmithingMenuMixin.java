@@ -36,10 +36,10 @@ public class SmithingMenuMixin {
 		)
 	)
 	private ItemStack create$preventUnbreakingOnBacktanks(ItemStack original) {
-		if (AllItems.COPPER_BACKTANK.is(original) || AllItems.NETHERITE_BACKTANK.is(original)) {
+		if (AllItems.COPPER_BACKTANK.isIn(original) || AllItems.NETHERITE_BACKTANK.isIn(original)) {
 			ItemEnchantments.Mutable mutableEnchantments =
-				new ItemEnchantments.Mutable(original.getTagEnchantments());
-			mutableEnchantments.removeIf(enchant -> !original.supportsEnchantment(enchant));
+				new ItemEnchantments.Mutable(original.getEnchantments());
+			mutableEnchantments.removeIf(enchant -> !enchant.value().isSupportedItem(original));
 			original.set(DataComponents.ENCHANTMENTS, mutableEnchantments.toImmutable());
 		}
 

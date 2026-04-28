@@ -6,7 +6,7 @@ import java.util.Set;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 
-import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
+import io.github.fabricators_of_create.porting_lib.entity.IEntityWithComplexSpawn;
 
 import org.jetbrains.annotations.NotNull;
 

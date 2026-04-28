@@ -55,13 +55,14 @@ import com.simibubi.create.infrastructure.ponder.scenes.trains.TrackScenes;
 import com.simibubi.create.infrastructure.ponder.scenes.trains.TrainScenes;
 import com.simibubi.create.infrastructure.ponder.scenes.trains.TrainSignalScenes;
 import com.simibubi.create.infrastructure.ponder.scenes.trains.TrainStationScenes;
-import com.tterrag.registrate.fabric.RegistryObject;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 
+import io.github.fabricators_of_create.porting_lib.util.DeferredHolder;
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 
 public class AllCreatePonderScenes {
@@ -392,7 +393,7 @@ public class AllCreatePonderScenes {
 					// note: these blocks probably WON'T be in the Create Registrate, but a simple
 					// code trace reveals the Entry's registrate isn't used
 					Create.registrate(),
-					RegistryObject.of(BuiltInRegistries.BLOCK.getKey(trackSupplier.get()), BuiltInRegistries.BLOCK)
+					DeferredHolder.create(Registries.BLOCK, BuiltInRegistries.BLOCK.getKey(trackSupplier.get()))
 				))
 				.toArray(BlockEntry[]::new))
 			.addStoryBoard("train_track/placement", TrackScenes::placement)

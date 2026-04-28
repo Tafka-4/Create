@@ -9,9 +9,7 @@
   "results": [
     {
       "chance": 0.25,
-      "item": {
-        "id": "minecraft:wheat_seeds"
-      }
+      "id": "minecraft:wheat_seeds"
     }
   ]
 }

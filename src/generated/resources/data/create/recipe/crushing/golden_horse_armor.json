@@ -9,37 +9,27 @@
   "results": [
     {
       "count": 2,
-      "item": {
-        "id": "minecraft:gold_ingot"
-      }
+      "id": "minecraft:gold_ingot"
     },
     {
       "chance": 0.5,
       "count": 2,
-      "item": {
-        "id": "minecraft:leather"
-      }
+      "id": "minecraft:leather"
     },
     {
       "chance": 0.5,
       "count": 2,
-      "item": {
-        "id": "minecraft:gold_ingot"
-      }
+      "id": "minecraft:gold_ingot"
     },
     {
       "chance": 0.25,
       "count": 2,
-      "item": {
-        "id": "minecraft:string"
-      }
+      "id": "minecraft:string"
     },
     {
       "chance": 0.25,
       "count": 8,
-      "item": {
-        "id": "minecraft:gold_nugget"
-      }
+      "id": "minecraft:gold_nugget"
     }
   ]
 }

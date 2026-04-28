@@ -73,7 +73,7 @@ public abstract class ProcessingRecipeGen extends CreateRecipeProvider {
 	 * Create a processing recipe with a single itemstack ingredient, using its id
 	 * as the name of the recipe
 	 */
-	protected <T extends ProcessingRecipe<?>> GeneratedRecipe create(String namespace,
+	protected <T extends ProcessingRecipe<?, ?>> GeneratedRecipe create(String namespace,
 		Supplier<ItemLike> singleIngredient, UnaryOperator<ProcessingRecipeBuilder<T>> transform) {
 		ProcessingRecipeSerializer<T> serializer = getSerializer();
 		GeneratedRecipe generatedRecipe = c -> {
@@ -92,12 +92,12 @@ public abstract class ProcessingRecipeGen extends CreateRecipeProvider {
 	 * Create a processing recipe with a single itemstack ingredient, using its id
 	 * as the name of the recipe
 	 */
-	<T extends ProcessingRecipe<?>> GeneratedRecipe create(Supplier<ItemLike> singleIngredient,
+	<T extends ProcessingRecipe<?, ?>> GeneratedRecipe create(Supplier<ItemLike> singleIngredient,
 		UnaryOperator<ProcessingRecipeBuilder<T>> transform) {
 		return create(Create.ID, singleIngredient, transform);
 	}
 
-	protected <T extends ProcessingRecipe<?>> GeneratedRecipe createWithDeferredId(Supplier<ResourceLocation> name,
+	protected <T extends ProcessingRecipe<?, ?>> GeneratedRecipe createWithDeferredId(Supplier<ResourceLocation> name,
 		UnaryOperator<ProcessingRecipeBuilder<T>> transform) {
 		ProcessingRecipeSerializer<T> serializer = getSerializer();
 		GeneratedRecipe generatedRecipe =
@@ -111,7 +111,7 @@ public abstract class ProcessingRecipeGen extends CreateRecipeProvider {
 	 * Create a new processing recipe, with recipe definitions provided by the
 	 * function
 	 */
-	protected <T extends ProcessingRecipe<?>> GeneratedRecipe create(ResourceLocation name,
+	protected <T extends ProcessingRecipe<?, ?>> GeneratedRecipe create(ResourceLocation name,
 		UnaryOperator<ProcessingRecipeBuilder<T>> transform) {
 		return createWithDeferredId(() -> name, transform);
 	}
@@ -120,14 +120,14 @@ public abstract class ProcessingRecipeGen extends CreateRecipeProvider {
 	 * Create a new processing recipe, with recipe definitions provided by the
 	 * function
 	 */
-	<T extends ProcessingRecipe<?>> GeneratedRecipe create(String name,
+	<T extends ProcessingRecipe<?, ?>> GeneratedRecipe create(String name,
 		UnaryOperator<ProcessingRecipeBuilder<T>> transform) {
 		return create(Create.asResource(name), transform);
 	}
 
 	protected abstract IRecipeTypeInfo getRecipeType();
 
-	protected <T extends ProcessingRecipe<?>> ProcessingRecipeSerializer<T> getSerializer() {
+	protected <T extends ProcessingRecipe<?, ?>> ProcessingRecipeSerializer<T> getSerializer() {
 		return getRecipeType().getSerializer();
 	}
 

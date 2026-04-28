@@ -1,7 +1,10 @@
 package com.simibubi.create.content.kinetics.deployer;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -48,6 +51,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MobBucketItem;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
@@ -73,11 +77,14 @@ import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 
-import io.github.fabricators_of_create.porting_lib.item.UseFirstBehaviorItem;
+import io.github.fabricators_of_create.porting_lib.item.extensions.UseFirstBehaviorItem;
 import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.BucketItemAccessor;
 
 public class DeployerHandler {
+	private static final Map<BlockPos, List<ItemEntity>> CAPTURED_BLOCK_DROPS = new HashMap<>();
+	public static final Map<BlockPos, List<ItemEntity>> CAPTURED_BLOCK_DROPS_VIEW = Collections.unmodifiableMap(CAPTURED_BLOCK_DROPS);
 
 	private static final class ItemUseWorld extends WrappedLevel {
 		private final Direction face;
@@ -88,6 +95,21 @@ public class DeployerHandler {
 			super(world);
 			this.face = face;
 			this.pos = pos;
+		}
+
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		@Override
+		public SnapshotParticipant snapshotParticipant() {
+			if (level instanceof io.github.fabricators_of_create.porting_lib.extensions.common.LevelExtensions extensions)
+				return extensions.snapshotParticipant();
+			if (level instanceof io.github.fabricators_of_create.porting_lib.extensions.extensions.LevelExtensions extensions)
+				return extensions.snapshotParticipant();
+			throw new UnsupportedOperationException("Wrapped level does not expose a Porting Lib snapshot participant");
+		}
+
+		@Override
+		public boolean isAreaLoaded(BlockPos center, int range) {
+			return true;
 		}
 
 		@Override
@@ -116,7 +138,7 @@ public class DeployerHandler {
 				return false;
 
 		if (held.getItem() instanceof BucketItem bucketItem) {
-			Fluid fluid = bucketItem.content;
+			Fluid fluid = ((BucketItemAccessor) bucketItem).port_lib$getContent();
 			if (fluid != Fluids.EMPTY && world.getFluidState(targetPos)
 				.getType() == fluid)
 				return false;
@@ -132,7 +154,7 @@ public class DeployerHandler {
 	static void activate(DeployerFakePlayer player, Vec3 vec, BlockPos clickedPos, Vec3 extensionVector, Mode mode) {
 		HashMultimap<Holder<Attribute>, AttributeModifier> attributeModifiers = HashMultimap.create();
 		player.getMainHandItem()
-			.getAttributeModifiers()
+			.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY)
 			.modifiers()
 			.forEach(e -> attributeModifiers.put(e.attribute(), e.modifier()));
 
@@ -187,7 +209,7 @@ public class DeployerHandler {
 				}
 				if (!success && entity instanceof Player playerEntity) {
 					if (stack.has(DataComponents.FOOD)) {
-						FoodProperties foodProperties = item.getFoodProperties(stack, player);
+						FoodProperties foodProperties = stack.get(DataComponents.FOOD);
 						if (foodProperties != null && playerEntity.canEat(foodProperties.canAlwaysEat())) {
 							ItemStack copy = stack.copy();
 							player.setItemInHand(hand, stack.finishUsingItem(world, playerEntity));
@@ -351,7 +373,7 @@ public class DeployerHandler {
 		}
 
 		if (stack.getItem() instanceof SandPaperItem && stack.has(AllDataComponents.SAND_PAPER_POLISHING)) {
-			player.spawnedItemEffects = stack.get(AllDataComponents.SAND_PAPER_POLISHING);
+			player.spawnedItemEffects = stack.get(AllDataComponents.SAND_PAPER_POLISHING).item();
 			AllSoundEvents.SANDING_SHORT.playOnServer(world, pos, .25f, 1f);
 		}
 
@@ -414,7 +436,16 @@ public class DeployerHandler {
 											  InteractionHand hand, BlockHitResult ray) {
 		if (state.getBlock() instanceof BeehiveBlock)
 			return safeOnBeehiveUse(state, world, pos, player, hand);
-		return BlockHelper.invokeUse(state, world, player, hand, ray);
+		List<ItemEntity> drops = new ArrayList<>(4);
+		CAPTURED_BLOCK_DROPS.put(pos, drops);
+		try {
+			InteractionResult result = BlockHelper.invokeUse(state, world, player, hand, ray);
+			for (ItemEntity itemEntity : drops)
+				player.getInventory().placeItemBackInInventory(itemEntity.getItem());
+			return result;
+		} finally {
+			CAPTURED_BLOCK_DROPS.remove(pos);
+		}
 	}
 
 	protected static InteractionResult safeOnBeehiveUse(BlockState state, Level world, BlockPos pos, Player player,

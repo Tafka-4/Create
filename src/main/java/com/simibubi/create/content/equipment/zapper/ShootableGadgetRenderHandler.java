@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
-import io.github.fabricators_of_create.porting_lib.event.client.RenderHandCallback;
+import io.github.fabricators_of_create.porting_lib.client_events.event.client.RenderHandEvent;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -19,8 +19,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
-import io.github.fabricators_of_create.porting_lib.event.client.RenderHandCallback;
-import io.github.fabricators_of_create.porting_lib.event.client.RenderHandCallback.RenderHandEvent;
+import io.github.fabricators_of_create.porting_lib.client_events.event.client.RenderHandEvent;
+import io.github.fabricators_of_create.porting_lib.client_events.event.client.RenderHandEvent;
 
 public abstract class ShootableGadgetRenderHandler {
 
@@ -69,7 +69,7 @@ public abstract class ShootableGadgetRenderHandler {
 	protected abstract void transformHand(PoseStack ms, float flip, float equipProgress, float recoil, float pt);
 
 	public void registerListeners() {
-		RenderHandCallback.EVENT.register(this::onRenderPlayerHand);
+		RenderHandEvent.EVENT.register(this::onRenderPlayerHand);
 	}
 
 	protected void onRenderPlayerHand(RenderHandEvent event) {
@@ -86,7 +86,7 @@ public abstract class ShootableGadgetRenderHandler {
 		PoseStack ms = event.getPoseStack();
 		MultiBufferSource buffer = event.getMultiBufferSource();
 		int light = event.getPackedLight();
-		float pt = event.getPartialTicks();
+		float pt = event.getPartialTick();
 
 		boolean rightHand = event.getHand() == InteractionHand.MAIN_HAND ^ mc.player.getMainArm() == HumanoidArm.LEFT;
 		float recoil = rightHand ? Mth.lerp(pt, lastRightHandAnimation, rightHandAnimation)

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.simibubi.create.AllPackets;
 import com.simibubi.create.content.logistics.BigItemStack;
+import com.simibubi.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.simibubi.create.foundation.networking.BlockEntityConfigurationPacket;
 
 import io.netty.buffer.ByteBuf;
@@ -49,6 +50,8 @@ public class RedstoneRequesterConfigurationPacket extends BlockEntityConfigurati
 			if (!stack.isEmpty())
 				stacks.set(i, new BigItemStack(stack, amounts.get(i)));
 		}
+		if (!be.encodedRequest.orderedStacksMatchOrderedRecipes())
+			be.encodedRequest = PackageOrderWithCrafts.simple(be.encodedRequest.stacks());
 		be.allowPartialRequests = allowPartial;
 	}
 

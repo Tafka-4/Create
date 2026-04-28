@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.foundation.utility.fabric.ListeningStorageView;
 import com.simibubi.create.infrastructure.fabric.ProcessingIterator;
+import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -32,15 +33,6 @@ public class PortableFluidInterfaceBlockEntity extends PortableStorageInterfaceB
 		super(type, pos, state);
 		capability = createEmptyHandler();
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.FluidHandler.BLOCK,
-				AllBlockEntityTypes.PORTABLE_FLUID_INTERFACE.get(),
-				(be, context) -> be.capability
-		);
-	}
-
 	@Override
 	public void startTransferringTo(Contraption contraption, float distance) {
 		capability.setWrapped(contraption.getStorage().getFluids());
@@ -93,9 +85,11 @@ public class PortableFluidInterfaceBlockEntity extends PortableStorageInterfaceB
 			return drain;
 		}
 
-		@Override
 		public @Nullable StorageView<FluidVariant> exactView(FluidVariant resource) {
-			return listen(super.exactView(resource));
+			for (StorageView<FluidVariant> view : wrapped.nonEmptyViews())
+				if (resource.equals(view.getResource()))
+					return listen(view);
+			return null;
 		}
 
 		@Override

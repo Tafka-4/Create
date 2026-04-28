@@ -1,43 +1,43 @@
 {
   "type": "create:sequenced_assembly",
   "ingredient": {
-    "tag": "c:gold_plates"
+    "tag": "c:plates/gold"
   },
   "loops": 5,
   "results": [
     {
       "chance": 120.0,
-      "item": "create:precision_mechanism"
+      "id": "create:precision_mechanism"
     },
     {
       "chance": 8.0,
-      "item": "create:golden_sheet"
+      "id": "create:golden_sheet"
     },
     {
       "chance": 8.0,
-      "item": "create:andesite_alloy"
+      "id": "create:andesite_alloy"
     },
     {
       "chance": 5.0,
-      "item": "create:cogwheel"
+      "id": "create:cogwheel"
     },
     {
       "chance": 3.0,
-      "item": "minecraft:gold_nugget"
+      "id": "minecraft:gold_nugget"
     },
     {
       "chance": 2.0,
-      "item": "create:shaft"
+      "id": "create:shaft"
     },
     {
       "chance": 2.0,
-      "item": "create:crushed_raw_gold"
+      "id": "create:crushed_raw_gold"
     },
     {
-      "item": "minecraft:iron_ingot"
+      "id": "minecraft:iron_ingot"
     },
     {
-      "item": "minecraft:clock"
+      "id": "minecraft:clock"
     }
   ],
   "sequence": [
@@ -53,7 +53,7 @@
       ],
       "results": [
         {
-          "item": "create:incomplete_precision_mechanism"
+          "id": "create:incomplete_precision_mechanism"
         }
       ]
     },
@@ -69,7 +69,7 @@
       ],
       "results": [
         {
-          "item": "create:incomplete_precision_mechanism"
+          "id": "create:incomplete_precision_mechanism"
         }
       ]
     },
@@ -80,17 +80,17 @@
           "item": "create:incomplete_precision_mechanism"
         },
         {
-          "tag": "c:iron_nuggets"
+          "tag": "c:nuggets/iron"
         }
       ],
       "results": [
         {
-          "item": "create:incomplete_precision_mechanism"
+          "id": "create:incomplete_precision_mechanism"
         }
       ]
     }
   ],
-  "transitionalItem": {
-    "item": "create:incomplete_precision_mechanism"
+  "transitional_item": {
+    "id": "create:incomplete_precision_mechanism"
   }
 }

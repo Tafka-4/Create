@@ -5,7 +5,6 @@ import static net.minecraft.world.level.block.state.properties.BlockStatePropert
 import com.simibubi.create.AllFluids;
 import com.simibubi.create.api.effect.OpenPipeEffectHandler;
 import com.simibubi.create.content.fluids.pipes.VanillaFluidTargets;
-import com.simibubi.create.foundation.ICapabilityProvider;
 import com.simibubi.create.foundation.advancement.AdvancementBehaviour;
 import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.fluid.FluidHelper;
@@ -52,8 +51,6 @@ public class OpenEndedPipe extends FlowSource {
 	private OpenEndFluidHandler fluidHandler;
 	private BlockPos outputPos;
 	private boolean wasPulling;
-
-	private final ICapabilityProvider<IFluidHandler> fluidHandlerProvider = ICapabilityProvider.of(() -> fluidHandler);
 
 	public OpenEndedPipe(BlockFace face) {
 		super(face);
@@ -128,7 +125,7 @@ public class OpenEndedPipe extends FlowSource {
 		if (!drainBlock.isEmpty()) {
 			if (state.hasProperty(BlockStateProperties.LEVEL_HONEY)
 				&& AllFluids.HONEY.is(drainBlock.getFluid()))
-				TransactionSuccessCallback.register(ctx, () -> AdvancementBehaviour.tryAward(world, pos, AllAdvancements.HONEY_DRAIN));
+				TransactionCallback.onSuccess(ctx, () -> AdvancementBehaviour.tryAward(world, pos, AllAdvancements.HONEY_DRAIN));
 			return drainBlock;
 		}
 
@@ -145,7 +142,7 @@ public class OpenEndedPipe extends FlowSource {
 		world.updateSnapshots(ctx);
 		if (waterlog) {
 			world.setBlock(outputPos, state.setValue(WATERLOGGED, false), 3);
-			TransactionSuccessCallback.register(ctx, () -> world.scheduleTick(outputPos, Fluids.WATER, 1));
+			TransactionCallback.onSuccess(ctx, () -> world.scheduleTick(outputPos, Fluids.WATER, 1));
 		} else {
 			var newState = fluidState.createLegacyBlock()
 				.setValue(LiquidBlock.LEVEL, 14);
@@ -206,7 +203,7 @@ public class OpenEndedPipe extends FlowSource {
 			int i = outputPos.getX();
 			int j = outputPos.getY();
 			int k = outputPos.getZ();
-			TransactionSuccessCallback.register(ctx, () -> world.playSound(null, i, j, k, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F,
+			TransactionCallback.onSuccess(ctx, () -> world.playSound(null, i, j, k, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F,
 					2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F));
 			return true;
 		}
@@ -214,7 +211,7 @@ public class OpenEndedPipe extends FlowSource {
 		world.updateSnapshots(ctx);
 		if (waterlog) {
 			world.setBlock(outputPos, state.setValue(WATERLOGGED, true), 3);
-			TransactionSuccessCallback.register(ctx, () -> world.scheduleTick(outputPos, Fluids.WATER, 1));
+			TransactionCallback.onSuccess(ctx, () -> world.scheduleTick(outputPos, Fluids.WATER, 1));
 			return true;
 		}
 
@@ -252,7 +249,7 @@ public class OpenEndedPipe extends FlowSource {
 			FluidStack containedFluidStack = getFluid();
 			boolean hasBlockState = FluidHelper.hasBlockState(containedFluidStack.getFluid());
 
-			if (!containedFluidStack.isEmpty() && !FluidStack.isSameFluidSameComponents(containedFluidStack, resource))
+			if (!containedFluidStack.isEmpty() && !FluidStack.isSameFluidSameComponents(containedFluidStack, new FluidStack(resource, containedFluidStack.getAmount())))
 				setFluid(FluidStack.EMPTY);
 			if (wasPulling)
 				wasPulling = false;
@@ -299,7 +296,8 @@ public class OpenEndedPipe extends FlowSource {
 			FluidStack drainedFromWorld = removeFluidFromSpace(transaction);
 			if (drainedFromWorld.isEmpty())
 				return 0;
-			if (!FluidStack.isSameFluidSameComponents(drainedFromWorld, filter))
+			if (!extractedVariant.isBlank()
+				&& !FluidStack.isSameFluidSameComponents(drainedFromWorld, new FluidStack(extractedVariant, drainedFromWorld.getAmount())))
 				return 0;
 
 			long remainder = drainedFromWorld.getAmount() - maxAmount;

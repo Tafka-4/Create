@@ -111,19 +111,6 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements S
 		recipeIndex = 0;
 		playEvent = ItemStack.EMPTY;
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.ItemHandler.BLOCK,
-				AllBlockEntityTypes.SAW.get(),
-				(be, context) -> {
-					if (context != Direction.DOWN)
-						return be.inventory;
-					return null;
-				}
-		);
-	}
-
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		super.addBehaviours(behaviours);
@@ -171,7 +158,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements S
 			Item item = playEvent.getItem();
 			if (item instanceof BlockItem) {
 				Block block = ((BlockItem) item).getBlock();
-				isWood = block.getSoundType(block.defaultBlockState()) == SoundType.WOOD;
+				isWood = block.defaultBlockState().getSoundType() == SoundType.WOOD;
 			}
 			spawnEventParticles(playEvent);
 			playEvent = ItemStack.EMPTY;
@@ -435,7 +422,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements S
 			if (contained.getCount() == inserted)
 				entity.discard();
 			else
-				entity.setItem(ItemHandlerHelper.copyStackWithSize(contained, (int) (contained.getCount() - inserted)));
+				entity.setItem(contained.copyWithCount((int) (contained.getCount() - inserted)));
 			t.commit();
 		}
 	}

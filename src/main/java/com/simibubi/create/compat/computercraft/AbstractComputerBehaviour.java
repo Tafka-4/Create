@@ -1,7 +1,9 @@
 package com.simibubi.create.compat.computercraft;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.simibubi.create.compat.computercraft.events.ComputerEvent;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -41,8 +43,15 @@ public class AbstractComputerBehaviour extends BlockEntityBehaviour {
 		this.hasAttachedComputer = hasAttachedComputer;
 	}
 
+	public void removePeripheral() {
+		this.hasAttachedComputer = false;
+	}
+
 	public boolean hasAttachedComputer() {
 		return hasAttachedComputer;
+	}
+
+	public void prepareComputerEvent(@NotNull ComputerEvent event) {
 	}
 
 	@Override

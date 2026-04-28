@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class AllPotatoProjectileBlockHitActions {
@@ -58,10 +59,11 @@ public class AllPotatoProjectileBlockHitActions {
 			if (!level.getBlockState(placePos)
 				.canBeReplaced())
 				return false;
-			if (!(cropBlock.value() instanceof SpecialPlantable specialPlantable))
+			BlockState state = cropBlock.value()
+				.defaultBlockState();
+			if (!state.canSurvive(level, placePos))
 				return false;
-			if (specialPlantable.canPlacePlantAtPosition(projectile, level, placePos, null))
-				specialPlantable.spawnPlantAtPosition(projectile, level, placePos, null);
+			level.setBlock(placePos, state, Block.UPDATE_ALL);
 			return true;
 		}
 
@@ -97,7 +99,7 @@ public class AllPotatoProjectileBlockHitActions {
 
 			if (face == Direction.UP) {
 				levelAccessor.setBlock(placePos, block.value()
-					.defaultBlockState(), 3);
+					.defaultBlockState(), Block.UPDATE_ALL);
 			} else if (levelAccessor instanceof Level level) {
 				double y = ray.getLocation().y - 0.5;
 				if (!level.isEmptyBlock(placePos.above()))

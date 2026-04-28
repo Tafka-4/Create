@@ -2,6 +2,7 @@ package com.simibubi.create.infrastructure.fabric.transfer.fluid;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 
@@ -16,12 +17,15 @@ import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.component.DataComponentHolder;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
@@ -39,9 +43,17 @@ public final class FluidStack implements DataComponentHolder {
 
 	public static final FluidStack EMPTY = new FluidStack(FluidVariant.blank(), 0);
 
-	public static final Codec<FluidStack> CODEC = null;
-	public static final Codec<FluidStack> OPTIONAL_CODEC = null;
-	public static final StreamCodec<RegistryFriendlyByteBuf, FluidStack> STREAM_CODEC = null;
+	public static final Codec<FluidStack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+		FluidVariant.CODEC.fieldOf("fluid").forGetter(FluidStack::getVariant),
+		Codec.LONG.fieldOf("amount").forGetter(FluidStack::getAmount)
+	).apply(instance, FluidStack::new));
+	public static final Codec<FluidStack> OPTIONAL_CODEC = CODEC;
+	public static final StreamCodec<RegistryFriendlyByteBuf, FluidStack> STREAM_CODEC = StreamCodec.composite(
+		FluidVariant.PACKET_CODEC, FluidStack::getVariant,
+		ByteBufCodecs.VAR_LONG, FluidStack::getAmount,
+		FluidStack::new
+	);
+	public static final StreamCodec<RegistryFriendlyByteBuf, FluidStack> OPTIONAL_STREAM_CODEC = STREAM_CODEC;
 
 	private final FluidVariant variant;
 	private long amount;
@@ -53,6 +65,14 @@ public final class FluidStack implements DataComponentHolder {
 
 	public FluidStack(Fluid fluid, long amount) {
 		this(FluidVariant.of(fluid), amount);
+	}
+
+	public FluidStack(Fluid fluid, long amount, DataComponentPatch components) {
+		this(FluidVariant.of(fluid, components), amount);
+	}
+
+	public FluidStack(Fluid fluid, long amount, @Nullable Object components) {
+		this(components instanceof DataComponentPatch patch ? FluidVariant.of(fluid, patch) : FluidVariant.of(fluid), amount);
 	}
 
 	public FluidStack(Holder<Fluid> fluid, long amount, DataComponentPatch components) {
@@ -82,6 +102,10 @@ public final class FluidStack implements DataComponentHolder {
 
 	public DataComponentPatch getComponentsPatch() {
 		return !this.isEmpty() ? this.variant.getComponents() : DataComponentPatch.EMPTY;
+	}
+
+	public DataComponentPatch getTag() {
+		return getComponentsPatch();
 	}
 
 	public long getAmount() {
@@ -116,6 +140,15 @@ public final class FluidStack implements DataComponentHolder {
 		return copy;
 	}
 
+	public boolean canFill(FluidVariant fluidVariant) {
+		return !this.isEmpty() && this.variant.isOf(fluidVariant.getFluid())
+			&& this.variant.componentsMatch(fluidVariant.getComponents());
+	}
+
+	public boolean isFluidEqual(FluidStack other) {
+		return isSameFluidSameComponents(this, other);
+	}
+
 	public Tag save(Provider registries, Tag output) {
 		if (this.isEmpty()) {
 			throw new IllegalStateException("Cannot encode empty FluidStack");
@@ -138,6 +171,14 @@ public final class FluidStack implements DataComponentHolder {
 		return this.isEmpty() ? new CompoundTag() : this.save(registries, new CompoundTag());
 	}
 
+	public CompoundTag writeToNBT(CompoundTag tag) {
+		if (this.isEmpty())
+			return tag;
+		tag.putString("FluidName", BuiltInRegistries.FLUID.getKey(getFluid()).toString());
+		tag.putLong("Amount", amount);
+		return tag;
+	}
+
 	public boolean isComponentsPatchEmpty() {
 		return !this.variant.hasComponents();
 	}
@@ -158,6 +199,16 @@ public final class FluidStack implements DataComponentHolder {
 
 	public static FluidStack parseOptional(HolderLookup.Provider registries, CompoundTag tag) {
 		return tag.isEmpty() ? EMPTY : parse(registries, tag).orElse(EMPTY);
+	}
+
+	public static FluidStack loadFluidStackFromNBT(CompoundTag tag) {
+		if (!tag.contains("FluidName", Tag.TAG_STRING))
+			return EMPTY;
+		Fluid fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(tag.getString("FluidName")));
+		long amount = tag.contains("Amount", Tag.TAG_ANY_NUMERIC) ? tag.getLong("Amount") : 0;
+		if (amount <= 0)
+			return EMPTY;
+		return new FluidStack(fluid, amount);
 	}
 
 	public static FluidStack of(@Nullable ResourceAmount<FluidVariant> resource) {

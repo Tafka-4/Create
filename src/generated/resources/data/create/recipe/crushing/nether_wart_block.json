@@ -9,9 +9,7 @@
   "results": [
     {
       "chance": 0.25,
-      "item": {
-        "id": "minecraft:nether_wart"
-      }
+      "id": "minecraft:nether_wart"
     }
   ]
 }

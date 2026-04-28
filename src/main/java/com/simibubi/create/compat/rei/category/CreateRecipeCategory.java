@@ -114,7 +114,7 @@ public abstract class CreateRecipeCategory<T extends Recipe<?>> implements Displ
 		AllGuiTextures jeiSlot = AllGuiTextures.JEI_SLOT;
 		if (!(recipe instanceof ProcessingRecipe))
 			return jeiSlot;
-		ProcessingRecipe<?> processingRecipe = (ProcessingRecipe<?>) recipe;
+		ProcessingRecipe<?, ?> processingRecipe = (ProcessingRecipe<?, ?>) recipe;
 		List<ProcessingOutput> rollableResults = processingRecipe.getRollableResults();
 		if (rollableResults.size() <= index)
 			return jeiSlot;

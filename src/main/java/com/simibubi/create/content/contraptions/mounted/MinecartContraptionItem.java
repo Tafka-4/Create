@@ -2,9 +2,9 @@ package com.simibubi.create.content.contraptions.mounted;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
-import io.github.fabricators_of_create.porting_lib.util.MinecartAndRailUtil;
+import io.github.fabricators_of_create.porting_lib.blocks.util.MinecartAndRailUtil;
 
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -52,12 +52,13 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseRailBlock;
 import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.phys.EntityHitResult;
 
-import io.github.fabricators_of_create.porting_lib.util.MinecartAndRailUtil;
+import io.github.fabricators_of_create.porting_lib.blocks.util.MinecartAndRailUtil;
 
 public class MinecartContraptionItem extends Item {
 
@@ -145,7 +146,7 @@ public class MinecartContraptionItem extends Item {
 		@Override
 		protected void playSound(BlockSource source) {
 			source.level()
-				.levelEvent(1000, source.pos(), 0);
+				.levelEvent(LevelEvent.SOUND_DISPENSER_DISPENSE, source.pos(), 0);
 		}
 	};
 
@@ -270,7 +271,7 @@ public class MinecartContraptionItem extends Item {
 		ItemStack generatedStack = create(type, oce);
 		generatedStack.set(DataComponents.CUSTOM_NAME, entity.getCustomName());
 
-		if (ContraptionPickupLimiting.isTooLargeForPickup(generatedStack.saveOptional(event.getLevel().registryAccess()))) {
+		if (ContraptionPickupLimiting.isTooLargeForPickup(generatedStack.saveOptional(world.registryAccess()))) {
 			MutableComponent message = CreateLang.translateDirect("contraption.minecart_contraption_too_big")
 				.withStyle(ChatFormatting.RED);
 			player.displayClientMessage(message, true);

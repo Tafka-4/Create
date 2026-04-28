@@ -30,7 +30,7 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
-import io.github.fabricators_of_create.porting_lib.block.ConnectableRedstoneBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.ConnectableRedstoneBlock;
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 
 public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<SmartObserverBlockEntity>, ConnectableRedstoneBlock {

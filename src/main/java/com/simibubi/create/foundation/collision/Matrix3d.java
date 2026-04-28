@@ -115,9 +115,24 @@ public class Matrix3d {
 	}
 
 	public Vec3 transform(Vec3 vec) {
-		double x = vec.x * m00 + vec.y * m01 + vec.z * m02;
-		double y = vec.x * m10 + vec.y * m11 + vec.z * m12;
-		double z = vec.x * m20 + vec.y * m21 + vec.z * m22;
+		return transform(vec.x, vec.y, vec.z);
+	}
+
+	public Vec3 transformTransposed(Vec3 vec) {
+		return transformTransposed(vec.x, vec.y, vec.z);
+	}
+
+	public Vec3 transform(double vecX, double vecY, double vecZ) {
+		double x = vecX * m00 + vecY * m01 + vecZ * m02;
+		double y = vecX * m10 + vecY * m11 + vecZ * m12;
+		double z = vecX * m20 + vecY * m21 + vecZ * m22;
+		return new Vec3(x, y, z);
+	}
+
+	public Vec3 transformTransposed(double vecX, double vecY, double vecZ) {
+		double x = vecX * m00 + vecY * m10 + vecZ * m20;
+		double y = vecX * m01 + vecY * m11 + vecZ * m21;
+		double z = vecX * m02 + vecY * m12 + vecZ * m22;
 		return new Vec3(x, y, z);
 	}
 

@@ -1,10 +1,15 @@
 package com.simibubi.create.foundation.events;
 
+import java.util.List;
 import java.util.function.Supplier;
 
+import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.simibubi.create.AllFluids;
 import com.simibubi.create.AllItems;
+import com.simibubi.create.AllKeys;
+import com.simibubi.create.AllParticleTypes;
 import com.simibubi.create.Create;
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.compat.trainmap.TrainMapEvents;
@@ -114,6 +119,7 @@ import net.minecraft.world.phys.Vec3;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
@@ -127,29 +133,17 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 
-import io.github.fabricators_of_create.porting_lib.client_events.event.client.RenderArmCallback;
-import io.github.fabricators_of_create.porting_lib.entity.events.EntityMountEvents;
-import io.github.fabricators_of_create.porting_lib.entity.events.PlayerTickEvents;
 import io.github.fabricators_of_create.porting_lib.entity.events.player.AttackEntityEvent;
-import io.github.fabricators_of_create.porting_lib.event.client.CameraSetupCallback;
-import io.github.fabricators_of_create.porting_lib.event.client.CameraSetupCallback.CameraInfo;
-import io.github.fabricators_of_create.porting_lib.event.client.ClientWorldEvents;
 import io.github.fabricators_of_create.porting_lib.event.client.DrawSelectionEvents;
 import io.github.fabricators_of_create.porting_lib.event.client.FogEvents;
 import io.github.fabricators_of_create.porting_lib.event.client.FogEvents.ColorData;
 import io.github.fabricators_of_create.porting_lib.event.client.InteractEvents;
 import io.github.fabricators_of_create.porting_lib.event.client.ParticleManagerRegistrationCallback;
-import io.github.fabricators_of_create.porting_lib.event.client.RenderHandCallback;
+import io.github.fabricators_of_create.porting_lib.client_events.event.client.RenderHandEvent;
 import io.github.fabricators_of_create.porting_lib.event.client.RenderPlayerEvents;
-import io.github.fabricators_of_create.porting_lib.event.client.RenderTickStartCallback;
-import io.github.fabricators_of_create.porting_lib.event.client.TextureStitchCallback;
-import io.github.fabricators_of_create.porting_lib.event.common.AttackAirCallback;
 
 public class ClientEvents {
-	@SubscribeEvent
-	public static void onTickPre(ClientTickEvent.Pre event) {
-		onTick( true);
-	}
+	private static ClientLevel currentClientWorld;
 
 	public static void onTickStart(Minecraft client) {
 		LinkedControllerClientHandler.tick();
@@ -256,6 +250,18 @@ public class ClientEvents {
 		}
 	}
 
+	public static void onClientWorldChange(Minecraft client, ClientLevel world) {
+		if (currentClientWorld != null && currentClientWorld != world) {
+			onUnloadWorld(client, currentClientWorld);
+			CommonEvents.onUnloadWorld(client, currentClientWorld);
+		}
+		currentClientWorld = world;
+		if (world != null) {
+			onLoadWorld(client, world);
+			CommonEvents.onLoadWorld(client, world);
+		}
+	}
+
 	public static void onRenderWorld(WorldRenderContext event) {
 		PoseStack ms = event.matrixStack();
 		ms.pushPose();
@@ -277,18 +283,7 @@ public class ClientEvents {
 		ContraptionPlayerPassengerRotation.frame();
 	}
 
-	public static boolean onCameraSetup(CameraInfo info) {
-		float partialTicks = AnimationTickHolder.getPartialTicks();
-
-		if (CameraAngleAnimationService.isYawAnimating())
-			info.yaw = CameraAngleAnimationService.getYaw(partialTicks);
-
-		if (CameraAngleAnimationService.isPitchAnimating())
-			info.pitch = CameraAngleAnimationService.getPitch(partialTicks);
-		return false;
-	}
-
-	public static void addToItemTooltip(ItemStack stack, TooltipFlag iTooltipFlag, List<Component> itemTooltip) {
+	public static void addToItemTooltip(ItemStack stack, Item.TooltipContext tooltipContext, TooltipFlag iTooltipFlag, List<Component> itemTooltip) {
 		if (!AllConfigs.client().tooltips.get())
 			return;
 		Player player = Minecraft.getInstance().player;
@@ -304,10 +299,19 @@ public class ClientEvents {
 		SequencedAssemblyRecipe.addToTooltip(stack, itemTooltip);
 	}
 
-	public static void onRenderTick() {
+	public static void onRenderTick(WorldRenderContext context) {
 		if (!isGameActive())
 			return;
-		TurntableHandler.gameRenderFrame();
+		TurntableHandler.gameRenderFrame(context.tickCounter());
+	}
+
+	public static void tickClientPlayers(Minecraft client) {
+		if (client.level == null)
+			return;
+		for (Player player : client.level.players()) {
+			ContraptionHandlerClient.preventRemotePlayersWalkingAnimations(player);
+			CardboardArmorHandlerClient.keepCacheAliveDesignDespiteNotRendering(player);
+		}
 	}
 
 	public static boolean onMount(Entity vehicle, Entity passenger) {
@@ -421,10 +425,8 @@ public class ClientEvents {
 
 		ClientTickEvents.END_CLIENT_TICK.register(ClientEvents::onTick);
 		ClientTickEvents.START_CLIENT_TICK.register(ClientEvents::onTickStart);
-		ClientWorldEvents.LOAD.register(ClientEvents::onLoadWorld);
-		ClientWorldEvents.UNLOAD.register(ClientEvents::onUnloadWorld);
-		ClientWorldEvents.LOAD.register(CommonEvents::onLoadWorld);
-		ClientWorldEvents.UNLOAD.register(CommonEvents::onUnloadWorld);
+		ClientTickEvents.END_CLIENT_TICK.register(ClientEvents::tickClientPlayers);
+		ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register(ClientEvents::onClientWorldChange);
 		ClientChunkEvents.CHUNK_UNLOAD.register(CommonEvents::onChunkUnloaded);
 		ClientPlayConnectionEvents.JOIN.register(ClientEvents::onJoin);
 		ClientEntityEvents.ENTITY_LOAD.register(CommonEvents::onEntityAdded);
@@ -432,15 +434,10 @@ public class ClientEvents {
 		ItemTooltipCallback.EVENT.register(ClientEvents::addToItemTooltip);
 		FogEvents.RENDER_FOG.register(ClientEvents::getFogDensity);
 		FogEvents.SET_COLOR.register(ClientEvents::getFogColor);
-		RenderTickStartCallback.EVENT.register(ClientEvents::onRenderTick);
-		AttackAirCallback.EVENT.register(ClientEvents::leftClickEmpty);
+		WorldRenderEvents.START.register(ClientEvents::onRenderTick);
 		UseBlockCallback.EVENT.register(TrackBlockItem::sendExtenderPacket);
-		EntityMountEvents.MOUNT.register(ClientEvents::onMount);
-		EntityMountEvents.DISMOUNT.register(ClientEvents::onDismount);
 		LivingEntityFeatureRendererRegistrationCallback.EVENT.register(ClientEvents::addEntityRendererLayers);
-		CameraSetupCallback.EVENT.register(ClientEvents::onCameraSetup);
 		DrawSelectionEvents.BLOCK.register(ClipboardValueSettingsHandler::drawCustomBlockSelection);
-		TextureStitchCallback.POST.register(StitchedSprite::onTextureStitchPost);
 
 		// External Events
 
@@ -451,15 +448,12 @@ public class ClientEvents {
 		AttackBlockCallback.EVENT.register(ArmInteractionPointHandler::leftClickingBlocksDeselectsThem);
 		AttackBlockCallback.EVENT.register(EjectorTargetHandler::leftClickingBlocksDeselectsThem);
 		ParticleManagerRegistrationCallback.EVENT.register(AllParticleTypes::registerFactories);
-		RenderHandCallback.EVENT.register(ExtendoGripRenderHandler::onRenderPlayerHand);
+		RenderHandEvent.EVENT.register(ExtendoGripRenderHandler::onRenderPlayerHand);
 		InteractEvents.USE.register(ContraptionHandlerClient::rightClickingOnContraptionsGetsHandledLocally);
-		RenderArmCallback.EVENT.register(NetheriteBacktankFirstPersonRenderer::onRenderPlayerHand);
-		PlayerTickEvents.END.register(ContraptionHandlerClient::preventRemotePlayersWalkingAnimations);
-		PlayerTickEvents.END.register(CardboardArmorHandlerClient::keepCacheAliveDesignDespiteNotRendering);
 		RenderPlayerEvents.PRE.register(CardboardArmorHandlerClient::playerRendersAsBoxWhenSneaking);
 		ClientPlayConnectionEvents.DISCONNECT.register(ClientEvents::onLeave);
 		DrawSelectionEvents.BLOCK.register(TrackBlockOutline::drawCustomBlockSelection);
-		AttackEntityEvent.ATTACK_ENTITY.register(PackageClientInteractionHandler::onPlayerPunchPackage);
+		AttackEntityEvent.EVENT.register(PackageClientInteractionHandler::onPlayerPunchPackage);
 		WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register(ChainConveyorInteractionHandler::hideVanillaBlockSelection);
 
 		// we need to add our config button after mod menu, so we register our event with a phase that comes later

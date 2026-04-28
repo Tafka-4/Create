@@ -27,6 +27,7 @@ import com.simibubi.create.content.schematics.requirement.ItemRequirement;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.gui.menu.MenuOpeningData;
 import com.simibubi.create.foundation.utility.BlockHelper;
 import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.infrastructure.config.AllConfigs;
@@ -56,6 +57,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
@@ -78,18 +80,19 @@ import net.minecraft.world.phys.AABB;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
-import io.github.fabricators_of_create.porting_lib.block.CustomRenderBoundingBoxBlockEntity;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.CustomRenderBoundingBoxBlockEntity;
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 
 import io.github.fabricators_of_create.porting_lib.util.StorageProvider;
 
-public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuProvider, CustomRenderBoundingBoxBlockEntity {
+public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuProvider, ExtendedScreenHandlerFactory<MenuOpeningData>, CustomRenderBoundingBoxBlockEntity {
 
 	public static final int NEIGHBOUR_CHECKING = 100;
 	public static final int MAX_ANCHOR_DISTANCE = 256;
@@ -814,7 +817,7 @@ if (printer.isErrored())
 			return;
 		}
 
-		CompoundTag data = BlockHelper.prepareBlockEntityData(blockState, blockEntity);
+		CompoundTag data = BlockHelper.prepareBlockEntityData(level, blockState, blockEntity);
 		launchBlock(target, icon, blockState, data);
 	}
 
@@ -850,6 +853,11 @@ if (printer.isErrored())
 	@Override
 	public Component getDisplayName() {
 		return CreateLang.translateDirect("gui.schematicannon.title");
+	}
+
+	@Override
+	public MenuOpeningData getScreenOpeningData(ServerPlayer player) {
+		return this::sendToMenu;
 	}
 
 	public void updateChecklist() {
@@ -888,7 +896,8 @@ if (printer.isErrored())
 	@Override
 	@Environment(EnvType.CLIENT)
 	public AABB getRenderBoundingBox() {
-		return AABB.INFINITE;
+		return new AABB(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY,
+			Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 	}
 
 	@Override

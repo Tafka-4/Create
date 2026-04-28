@@ -20,23 +20,19 @@
   "results": [
     {
       "count": 2,
-      "item": "thermal:cinnabar"
+      "id": "thermal:cinnabar"
     },
     {
       "chance": 0.25,
-      "item": "thermal:cinnabar"
+      "id": "thermal:cinnabar"
     },
     {
       "chance": 0.12,
-      "item": {
-        "id": "minecraft:cobblestone"
-      }
+      "id": "minecraft:cobblestone"
     },
     {
       "chance": 0.75,
-      "item": {
-        "id": "create:experience_nugget"
-      }
+      "id": "create:experience_nugget"
     }
   ]
 }

@@ -6,10 +6,10 @@ import java.util.UUID;
 
 import com.simibubi.create.AllPackets;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
-import net.createmod.catnip.net.base.ClientboundPacketPayload;
 
 import io.netty.buffer.ByteBuf;
 import net.createmod.catnip.math.VecHelper;
+import net.createmod.catnip.net.base.ClientboundPacketPayload;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -28,6 +28,10 @@ public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapp
 	        ContraptionSeatMappingPacket::new
 	);
 
+	public ContraptionSeatMappingPacket {
+		mapping = Map.copyOf(mapping);
+	}
+
 	public ContraptionSeatMappingPacket(int entityID, Map<UUID, Integer> mapping) {
 		this(entityID, mapping, -1);
 	}
@@ -42,12 +46,11 @@ public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapp
 		if (dismountedId == player.getId()) {
 			Vec3 transformedVector = contraptionEntity.getPassengerPosition(player, 1);
 			if (transformedVector != null)
-				player.getPersistentData()
+				player.getCustomData()
 						.put("ContraptionDismountLocation", VecHelper.writeNBT(transformedVector));
 		}
 
-		contraptionEntity.getContraption()
-				.setSeatMapping(mapping);
+		contraptionEntity.getContraption().setSeatMapping(mapping);
 	}
 
 	@Override

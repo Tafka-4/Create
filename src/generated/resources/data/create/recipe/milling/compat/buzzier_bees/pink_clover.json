@@ -11,7 +11,7 @@
       "type": "neoforge:compound",
       "ingredients": [
         {
-          "item": "buzzier_bees:buttercup"
+          "item": "buzzier_bees:pink_clover"
         }
       ]
     }
@@ -20,15 +20,11 @@
   "results": [
     {
       "count": 2,
-      "item": {
-        "id": "minecraft:pink_dye"
-      }
+      "id": "minecraft:pink_dye"
     },
     {
       "chance": 0.1,
-      "item": {
-        "id": "minecraft:lime_dye"
-      }
+      "id": "minecraft:lime_dye"
     }
   ]
 }

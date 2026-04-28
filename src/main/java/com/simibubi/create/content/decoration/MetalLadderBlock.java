@@ -2,7 +2,6 @@ package com.simibubi.create.content.decoration;
 
 import java.util.function.Predicate;
 
-import com.jamieswhiteshirt.reachentityattributes.ReachEntityAttributes;
 import com.simibubi.create.AllShapes;
 import com.simibubi.create.content.equipment.extendoGrip.ExtendoGripItem;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
@@ -70,7 +69,7 @@ public class MetalLadderBlock extends LadderBlock implements IWrenchable {
 
 	@Override
 	public BlockState updateShape(BlockState pState, Direction pFacing, BlockState pFacingState, LevelAccessor pLevel,
-		BlockPos pCurrentPos, BlockPos pFacingPos) {
+								  BlockPos pCurrentPos, BlockPos pFacingPos) {
 		if (!pState.canSurvive(pLevel, pCurrentPos))
 			return Blocks.AIR.defaultBlockState();
 		return super.updateShape(pState, pFacing, pFacingState, pLevel, pCurrentPos, pFacingPos);
@@ -78,8 +77,9 @@ public class MetalLadderBlock extends LadderBlock implements IWrenchable {
 
 	@Override
 	public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
-		return super.canSurvive(pState, pLevel, pPos) || pLevel.getBlockState(pPos.relative(Direction.UP))
-			.is(this);
+		BlockState otherState = pLevel.getBlockState(pPos.relative(Direction.UP));
+		return super.canSurvive(pState, pLevel, pPos) ||
+			(otherState.is(this) && pState.getValue(FACING).equals(otherState.getValue(FACING)));
 	}
 
 	@Override

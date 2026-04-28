@@ -50,7 +50,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 
-import io.github.fabricators_of_create.porting_lib.block.CustomRenderBoundingBoxBlockEntity;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.CustomRenderBoundingBoxBlockEntity;
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 
 public class SpoutBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation, SidedStorageBlockEntity, CustomRenderBoundingBoxBlockEntity {
@@ -70,19 +70,6 @@ public class SpoutBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 		super(type, pos, state);
 		processingTicks = -1;
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.FluidHandler.BLOCK,
-				AllBlockEntityTypes.SPOUT.get(),
-				(be, context) -> {
-					if (context != Direction.DOWN)
-						return be.tank.getCapability();
-					return null;
-				}
-		);
-	}
-
 	@Override
 	protected AABB createRenderBoundingBox() {
 		return super.createRenderBoundingBox().expandTowards(0, -2, 0);
@@ -259,9 +246,7 @@ public class SpoutBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 	}
 
 	protected void spawnProcessingParticles(FluidStack fluid) {
-		if (isVirtual())
-			return;
-		if (fluid.isEmpty())
+		if (isVirtual() || fluid.isEmpty())
 			return;
 		Vec3 vec = VecHelper.getCenterOf(worldPosition);
 		vec = vec.subtract(0, 8 / 16f, 0);
@@ -272,7 +257,7 @@ public class SpoutBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 	protected static int SPLASH_PARTICLE_COUNT = 20;
 
 	protected void spawnSplash(FluidStack fluid) {
-		if (isVirtual())
+		if (isVirtual() || fluid.isEmpty())
 			return;
 		Vec3 vec = VecHelper.getCenterOf(worldPosition);
 		vec = vec.subtract(0, 2 - 5 / 16f, 0);

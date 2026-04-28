@@ -24,11 +24,11 @@ import com.simibubi.create.foundation.recipe.RecipeApplier;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -38,7 +38,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class BeltDeployerCallbacks {
 
 	public static ProcessingResult onItemReceived(TransportedItemStack s, TransportedItemStackHandlerBehaviour i,
-		DeployerBlockEntity blockEntity) {
+												  DeployerBlockEntity blockEntity) {
 
 		if (blockEntity.getSpeed() == 0)
 			return ProcessingResult.PASS;
@@ -71,7 +71,7 @@ public class BeltDeployerCallbacks {
 	}
 
 	public static ProcessingResult whenItemHeld(TransportedItemStack s, TransportedItemStackHandlerBehaviour i,
-		DeployerBlockEntity blockEntity) {
+												DeployerBlockEntity blockEntity) {
 
 		if (blockEntity.getSpeed() == 0)
 			return ProcessingResult.PASS;
@@ -108,10 +108,10 @@ public class BeltDeployerCallbacks {
 	}
 
 	public static void activate(TransportedItemStack transported, TransportedItemStackHandlerBehaviour handler,
-		DeployerBlockEntity blockEntity, Recipe<?> recipe) {
+								DeployerBlockEntity blockEntity, Recipe<?> recipe) {
 
 		List<TransportedItemStack> collect =
-			RecipeApplier.applyRecipeOn(blockEntity.getLevel(), transported.stack.copyWithCount(1), recipe)
+			RecipeApplier.applyRecipeOn(blockEntity.getLevel(), transported.stack.copyWithCount(1), recipe, true)
 				.stream()
 				.map(stack -> {
 					TransportedItemStack copy = transported.copy();
@@ -134,7 +134,7 @@ public class BeltDeployerCallbacks {
 		TransportedItemStack left = transported.copy();
 		blockEntity.player.spawnedItemEffects = transported.stack.copy();
 		left.stack.shrink(1);
-		ItemStack resultItem = null;
+		ItemStack resultItem;
 
 		if (collect.isEmpty()) {
 			resultItem = left.stack.copy();
@@ -145,22 +145,29 @@ public class BeltDeployerCallbacks {
 		}
 
 		ItemStack heldItem = blockEntity.player.getMainHandItem();
-		// https://github.com/stal111/Forbidden-Arcanus/blob/6a0ae16061dfa1e97c0d27007869c6b23e9ef43a/src/main/java/com/stal111/forbidden_arcanus/core/init/ModDataComponents.java#L27
-		// FIXME 1.21: Re-enable Forbidden Arcanus compat
-		boolean unbreakable = heldItem.has(DataComponents.UNBREAKABLE); //||
-				//heldItem.getTag().getString("Modifier").equals("forbidden_arcanus:eternal"); // Forbidden Arcanus Compat, See Creators-of-Create#6220
 		boolean keepHeld =
 			recipe instanceof ItemApplicationRecipe && ((ItemApplicationRecipe) recipe).shouldKeepHeldItem();
 
-		if (!unbreakable && !keepHeld) {
-			if (heldItem.isDamageableItem())
-				heldItem.hurtAndBreak(1, blockEntity.player,
-						LivingEntity.getSlotForHand(InteractionHand.MAIN_HAND));
-			else
+		if (!keepHeld) {
+			if (heldItem.getMaxDamage() > 0) {
+				heldItem.hurtAndBreak(1, blockEntity.player, EquipmentSlot.MAINHAND);
+			} else {
+				Player player = blockEntity.player;
+				ItemStack leftover = heldItem.getItem().hasCraftingRemainingItem()
+					? new ItemStack(heldItem.getItem().getCraftingRemainingItem())
+					: ItemStack.EMPTY;
 				heldItem.shrink(1);
+				if (heldItem.isEmpty()) {
+					player.setItemInHand(InteractionHand.MAIN_HAND, leftover);
+				} else {
+					if (!player.getInventory().add(leftover)) {
+						player.drop(leftover, false);
+					}
+				}
+			}
 		}
 
-		if (resultItem != null && !resultItem.isEmpty())
+		if (!resultItem.isEmpty())
 			awardAdvancements(blockEntity, resultItem);
 
 		BlockPos pos = blockEntity.getBlockPos();

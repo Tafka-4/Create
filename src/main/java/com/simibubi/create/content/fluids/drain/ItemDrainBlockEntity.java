@@ -80,29 +80,6 @@ public class ItemDrainBlockEntity extends SmartBlockEntity implements IHaveGoggl
 			itemHandlers.put(d, itemDrainItemHandler);
 		}
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.ItemHandler.BLOCK,
-				AllBlockEntityTypes.ITEM_DRAIN.get(),
-				(be, context) -> {
-					if (context != null && context.getAxis().isHorizontal())
-						return be.itemHandlers.get(context);
-					return null;
-				}
-		);
-
-		event.registerBlockEntity(
-				Capabilities.FluidHandler.BLOCK,
-				AllBlockEntityTypes.ITEM_DRAIN.get(),
-				(be, context) -> {
-					if (context != Direction.UP)
-						return be.internalTank.getCapability();
-					return null;
-				}
-		);
-	}
-
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		behaviours.add(new DirectBeltInputBehaviour(this).allowingBeltFunnels()

@@ -2,12 +2,12 @@
   "type": "create:haunting",
   "ingredients": [
     {
-      "tag": "c:cobblestone"
+      "tag": "c:cobblestones"
     }
   ],
   "results": [
     {
-      "item": "minecraft:blackstone"
+      "id": "minecraft:blackstone"
     }
   ]
 }

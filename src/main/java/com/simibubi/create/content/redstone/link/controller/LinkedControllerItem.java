@@ -5,7 +5,6 @@ import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency;
 import com.simibubi.create.foundation.item.ItemHelper;
-import com.simibubi.create.foundation.item.render.SimpleCustomRenderer;
 
 import com.simibubi.create.foundation.utility.AdventureUtil;
 
@@ -14,6 +13,7 @@ import net.createmod.catnip.platform.CatnipServices;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -37,9 +37,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import io.github.fabricators_of_create.porting_lib.item.UseFirstBehaviorItem;
+import io.github.fabricators_of_create.porting_lib.item.extensions.UseFirstBehaviorItem;
 import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
-import io.github.fabricators_of_create.porting_lib.util.NetworkHooks;
 
 public class LinkedControllerItem extends Item implements MenuProvider, UseFirstBehaviorItem {
 
@@ -61,7 +60,7 @@ public class LinkedControllerItem extends Item implements MenuProvider, UseFirst
 				if (AllBlocks.LECTERN_CONTROLLER.has(hitState)) {
 					if (!world.isClientSide)
 						AllBlocks.LECTERN_CONTROLLER.get().withBlockEntityDo(world, pos, be ->
-								be.swapControllers(stack, player, ctx.getHand(), hitState));
+							be.swapControllers(stack, player, ctx.getHand(), hitState));
 					return InteractionResult.SUCCESS;
 				}
 			} else {
@@ -69,7 +68,7 @@ public class LinkedControllerItem extends Item implements MenuProvider, UseFirst
 					if (world.isClientSide)
 						CatnipServices.PLATFORM.executeOnClientOnly(() -> () -> this.toggleBindMode(ctx.getClickedPos()));
 					player.getCooldowns()
-							.addCooldown(this, 2);
+						.addCooldown(this, 2);
 					return InteractionResult.SUCCESS;
 				}
 
@@ -94,10 +93,8 @@ public class LinkedControllerItem extends Item implements MenuProvider, UseFirst
 		ItemStack heldItem = player.getItemInHand(hand);
 
 		if (player.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
-			if (!world.isClientSide && player instanceof ServerPlayer && player.mayBuild())
-				player.openMenu(this, buf -> {
-					ItemStack.STREAM_CODEC.encode(buf, heldItem);
-				});
+			if (!world.isClientSide && player instanceof ServerPlayer serverPlayer && player.mayBuild())
+				serverPlayer.openMenu(new LinkedControllerMenuProvider(heldItem.copy()));
 			return InteractionResultHolder.success(heldItem);
 		}
 
@@ -148,6 +145,29 @@ public class LinkedControllerItem extends Item implements MenuProvider, UseFirst
 	@Override
 	public Component getDisplayName() {
 		return getDescription();
+	}
+
+	private class LinkedControllerMenuProvider implements ExtendedScreenHandlerFactory<ItemStack> {
+		private final ItemStack heldItem;
+
+		private LinkedControllerMenuProvider(ItemStack heldItem) {
+			this.heldItem = heldItem;
+		}
+
+		@Override
+		public ItemStack getScreenOpeningData(ServerPlayer player) {
+			return heldItem;
+		}
+
+		@Override
+		public Component getDisplayName() {
+			return LinkedControllerItem.this.getDisplayName();
+		}
+
+		@Override
+		public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
+			return LinkedControllerItem.this.createMenu(id, inv, player);
+		}
 	}
 
 //	@Override

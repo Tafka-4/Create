@@ -21,15 +21,15 @@ import com.tterrag.registrate.util.entry.FluidEntry;
 import io.github.fabricators_of_create.porting_lib.tags.Tags;
 
 import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.nbt.NBTHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
@@ -50,7 +50,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.base.EmptyItemFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.FullItemFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 
-import io.github.fabricators_of_create.porting_lib.event.common.FluidPlaceBlockCallback;
+import io.github.fabricators_of_create.porting_lib.level.events.BlockEvent;
 
 @SuppressWarnings("UnstableApiUsage")
 public class AllFluids {
@@ -145,8 +145,11 @@ public class AllFluids {
 	}
 
 	public static void registerFluidInteractions() {
-		// fabric: no fluid interaction API, use legacy method
-		FluidPlaceBlockCallback.EVENT.register(AllFluids::whenFluidsMeet);
+		BlockEvent.FluidPlaceBlockEvent.EVENT.register(event -> {
+			BlockState interaction = whenFluidsMeet(event.getLevel(), event.getLiquidPos(), event.getNewState());
+			if (interaction != null)
+				event.setNewState(interaction);
+		});
 	}
 
 	public static BlockState whenFluidsMeet(LevelAccessor world, BlockPos pos, BlockState blockState) {
@@ -203,12 +206,14 @@ public class AllFluids {
 	public static class PotionFluidVariantRenderHandler implements FluidVariantRenderHandler {
 		@Override
 		public int getColor(FluidVariant fluidVariant, @Nullable BlockAndTintGetter view, @Nullable BlockPos pos) {
-			return PotionUtils.getColor(PotionUtils.getAllEffects(fluidVariant.getNbt())) | 0xff000000;
+			return fluidVariant.getComponentMap()
+				.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
+				.getColor() | 0xff000000;
 		}
 
 		@Override
 		public void appendTooltip(FluidVariant fluidVariant, List<Component> tooltip, TooltipFlag tooltipContext) {
-			PotionFluidHandler.addPotionTooltip(fluidVariant, tooltip, 1);
+			PotionFluidHandler.addPotionTooltip(fluidVariant, tooltip::add, 1);
 		}
 	}
 
@@ -219,14 +224,13 @@ public class AllFluids {
 		}
 
 		public String getTranslationKey(FluidVariant stack) {
-			CompoundTag tag = stack.getNbt();
-			if (tag == null)
-				return "create.potion.invalid";
+			PotionContents contents = stack.getComponentMap()
+				.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
 			ItemLike itemFromBottleType =
-					PotionFluidHandler.itemFromBottleType(NBTHelper.readEnum(tag, "Bottle", BottleType.class));
-			return PotionUtils.getPotion(tag)
-					.getName(itemFromBottleType.asItem()
-							.getDescriptionId() + ".effect.");
+				PotionFluidHandler.itemFromBottleType(stack.getComponentMap()
+					.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR));
+			return Potion.getName(contents.potion(), itemFromBottleType.asItem()
+				.getDescriptionId() + ".effect.");
 		}
 	}
 

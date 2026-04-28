@@ -9,16 +9,12 @@
   "results": [
     {
       "count": 3,
-      "item": {
-        "id": "minecraft:blaze_powder"
-      }
+      "id": "minecraft:blaze_powder"
     },
     {
       "chance": 0.25,
       "count": 3,
-      "item": {
-        "id": "minecraft:blaze_powder"
-      }
+      "id": "minecraft:blaze_powder"
     }
   ]
 }

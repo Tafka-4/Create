@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
+import com.simibubi.create.AllBlockEntityTypes;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.AllTags.AllBlockTags;
+import com.simibubi.create.api.contraption.transformable.TransformableBlockEntity;
+import com.simibubi.create.compat.Mods;
+import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
+import com.simibubi.create.compat.computercraft.ComputerCraftProxy;
+import com.simibubi.create.content.contraptions.StructureTransform;
 import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.content.logistics.packager.InventorySummary;
 import com.simibubi.create.content.logistics.redstoneRequester.AutoRequestData;
@@ -41,13 +47,17 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class TableClothBlockEntity extends SmartBlockEntity {
+
+public class TableClothBlockEntity extends SmartBlockEntity implements TransformableBlockEntity {
+
+	public AbstractComputerBehaviour computerBehaviour;
 
 	public AutoRequestData requestData;
 	public List<ItemStack> manuallyAddedItems;
@@ -66,10 +76,10 @@ public class TableClothBlockEntity extends SmartBlockEntity {
 		owner = null;
 		facing = Direction.SOUTH;
 	}
-
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		behaviours.add(priceTag = new TableClothFilteringBehaviour(this));
+		behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
 	}
 
 	public List<ItemStack> getItemsForRender() {
@@ -84,6 +94,15 @@ public class TableClothBlockEntity extends SmartBlockEntity {
 		}
 
 		return manuallyAddedItems;
+	}
+
+	public void invalidateItemsForRender() {
+		renderedItemsForShop = null;
+	}
+
+	public void notifyShopUpdate() {
+		if (level instanceof ServerLevel serverLevel)
+			CatnipServices.NETWORK.sendToClientsTrackingChunk(serverLevel, new ChunkPos(worldPosition), new ShopUpdatePacket(worldPosition));
 	}
 
 	@Override
@@ -116,8 +135,8 @@ public class TableClothBlockEntity extends SmartBlockEntity {
 			player.setItemInHand(InteractionHand.MAIN_HAND, manuallyAddedItems.remove(manuallyAddedItems.size() - 1));
 			level.playSound(null, worldPosition, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.5f, 1f);
 
-			if (manuallyAddedItems.isEmpty()) {
-				level.setBlock(worldPosition, getBlockState().setValue(TableClothBlock.HAS_BE, false), 3);
+			if (manuallyAddedItems.isEmpty() && !computerBehaviour.hasAttachedComputer()) {
+				level.setBlock(worldPosition, getBlockState().setValue(TableClothBlock.HAS_BE, false), Block.UPDATE_ALL);
 				if (level instanceof ServerLevel serverLevel)
 					CatnipServices.NETWORK.sendToClientsTrackingChunk(serverLevel, new ChunkPos(worldPosition), new RemoveBlockEntityPacket(worldPosition));
 			} else
@@ -329,4 +348,16 @@ public class TableClothBlockEntity extends SmartBlockEntity {
 			.isEmpty() ? 1 : priceTag.count;
 	}
 
+	@Override
+	public void invalidate() {
+		super.invalidate();
+		computerBehaviour.removePeripheral();
+	}
+
+	public void transform(BlockEntity blockEntity, StructureTransform transform) {
+		facing = transform.mirrorFacing(facing);
+		if (transform.rotationAxis == Direction.Axis.Y)
+			facing = transform.rotateFacing(facing);
+		notifyUpdate();
+	}
 }

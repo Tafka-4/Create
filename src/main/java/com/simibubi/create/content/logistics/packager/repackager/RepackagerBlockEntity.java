@@ -9,6 +9,7 @@ import com.simibubi.create.content.logistics.packager.PackageDefragmenter;
 import com.simibubi.create.content.logistics.packager.PackagerBlockEntity;
 import com.simibubi.create.content.logistics.packager.PackagerItemHandler;
 import com.simibubi.create.content.logistics.packager.PackagingRequest;
+import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
 
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionCallback;
@@ -104,7 +105,7 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
 			if (!PackageItem.isPackage(resource))
 				continue;
 
-			if (!defragmenter.isFragmented(resource)) {
+			if (!defragmenter.isFragmented(resource.toStack())) {
 				try (Transaction t = Transaction.openOuter()) {
 					if (view.extract(resource, 1, t) == 1) {
 						t.commit();
@@ -160,13 +161,4 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
 
 		notifyUpdate();
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-			Capabilities.ItemHandler.BLOCK,
-			AllBlockEntityTypes.REPACKAGER.get(),
-			(be, context) -> be.inventory
-		);
-	}
-
 }

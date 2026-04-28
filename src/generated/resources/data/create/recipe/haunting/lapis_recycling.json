@@ -8,15 +8,11 @@
   "results": [
     {
       "chance": 0.75,
-      "item": {
-        "id": "minecraft:prismarine_shard"
-      }
+      "id": "minecraft:prismarine_shard"
     },
     {
       "chance": 0.125,
-      "item": {
-        "id": "minecraft:prismarine_crystals"
-      }
+      "id": "minecraft:prismarine_crystals"
     }
   ]
 }

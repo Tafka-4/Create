@@ -13,7 +13,7 @@ import com.simibubi.create.AllEntityTypes;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.Create;
 import com.simibubi.create.content.logistics.box.PackageStyles.PackageStyle;
-import com.simibubi.create.content.logistics.stockTicker.PackageOrder;
+import com.simibubi.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.simibubi.create.foundation.item.ItemHelper;
 
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
@@ -123,7 +123,7 @@ public class PackageItem extends Item {
 	}
 
 	public static void setOrder(ItemStack box, int orderId, int linkIndex, boolean isFinalLink, int fragmentIndex,
-								boolean isFinal, @Nullable PackageOrder orderContext) {
+								boolean isFinal, @Nullable PackageOrderWithCrafts orderContext) {
 		PackageOrderData order = new PackageOrderData(orderId, linkIndex, isFinalLink, fragmentIndex, isFinal, orderContext);
 		box.set(AllDataComponents.PACKAGE_ORDER_DATA, order);
 	}
@@ -138,14 +138,30 @@ public class PackageItem extends Item {
 	}
 
 	public static int getOrderId(ItemVariant box) {
-		CompoundTag tag = box.getNbt();
-		if (tag == null || !tag.contains("Fragment"))
-			return -1;
-		return tag.getCompound("Fragment")
-			.getInt("OrderId");
+		return getOrderId(box.toStack());
 	}
 
-	public static PackageOrder getOrderContext(ItemStack box) {
+	public static boolean hasOrderData(ItemStack box) {
+		return box.has(AllDataComponents.PACKAGE_ORDER_DATA);
+	}
+
+	public static int getIndex(ItemStack box) {
+		return box.has(AllDataComponents.PACKAGE_ORDER_DATA) ? box.get(AllDataComponents.PACKAGE_ORDER_DATA).fragmentIndex() : -1;
+	}
+
+	public static boolean isFinal(ItemStack box) {
+		return box.has(AllDataComponents.PACKAGE_ORDER_DATA) && box.get(AllDataComponents.PACKAGE_ORDER_DATA).isFinal();
+	}
+
+	public static int getLinkIndex(ItemStack box) {
+		return box.has(AllDataComponents.PACKAGE_ORDER_DATA) ? box.get(AllDataComponents.PACKAGE_ORDER_DATA).linkIndex() : -1;
+	}
+
+	public static boolean isFinalLink(ItemStack box) {
+		return box.has(AllDataComponents.PACKAGE_ORDER_DATA) && box.get(AllDataComponents.PACKAGE_ORDER_DATA).isFinalLink();
+	}
+
+	public static PackageOrderWithCrafts getOrderContext(ItemStack box) {
 		if (box.has(AllDataComponents.PACKAGE_ORDER_DATA)) {
 			PackageOrderData data = box.get(AllDataComponents.PACKAGE_ORDER_DATA);
 			return data.orderContext();
@@ -156,7 +172,7 @@ public class PackageItem extends Item {
 		}
 	}
 
-	public static void addOrderContext(ItemStack box, PackageOrder orderContext) {
+	public static void addOrderContext(ItemStack box, PackageOrderWithCrafts orderContext) {
 		box.set(AllDataComponents.PACKAGE_ORDER_CONTEXT, orderContext);
 	}
 
@@ -183,10 +199,7 @@ public class PackageItem extends Item {
 	}
 
 	public static String getAddress(ItemVariant variant) {
-		String boxAddress = !variant.hasNbt() ? ""
-			: variant.getNbt()
-			.getString("Address");
-		return boxAddress;
+		return getAddress(variant.toStack());
 	}
 
 	public static float getWidth(ItemStack box) {
@@ -413,9 +426,9 @@ public class PackageItem extends Item {
 	}
 
 	public record PackageOrderData(int orderId, int linkIndex, boolean isFinalLink, int fragmentIndex,
-								   boolean isFinal, @Nullable PackageOrder orderContext) {
+								   boolean isFinal, @Nullable PackageOrderWithCrafts orderContext) {
 		public PackageOrderData(int orderId, int linkIndex, boolean isFinalLink, int fragmentIndex,
-								boolean isFinal, Optional<PackageOrder> orderContext) {
+								boolean isFinal, Optional<PackageOrderWithCrafts> orderContext) {
 			this(orderId, linkIndex, isFinalLink, fragmentIndex, isFinal, orderContext.orElse(null));
 		}
 
@@ -425,7 +438,7 @@ public class PackageItem extends Item {
 			Codec.BOOL.fieldOf("is_final_link").forGetter(PackageOrderData::isFinalLink),
 			Codec.INT.fieldOf("fragment_index").forGetter(PackageOrderData::fragmentIndex),
 			Codec.BOOL.fieldOf("is_final").forGetter(PackageOrderData::isFinal),
-			PackageOrder.CODEC.optionalFieldOf("order_context").forGetter(i -> Optional.ofNullable(i.orderContext))
+			PackageOrderWithCrafts.CODEC.optionalFieldOf("order_context").forGetter(i -> Optional.ofNullable(i.orderContext))
 		).apply(instance, PackageOrderData::new));
 
 		public static final StreamCodec<RegistryFriendlyByteBuf, PackageOrderData> STREAM_CODEC = StreamCodec.composite(
@@ -434,7 +447,7 @@ public class PackageItem extends Item {
 			ByteBufCodecs.BOOL, PackageOrderData::isFinalLink,
 			ByteBufCodecs.INT, PackageOrderData::fragmentIndex,
 			ByteBufCodecs.BOOL, PackageOrderData::isFinal,
-			CatnipStreamCodecBuilders.nullable(PackageOrder.STREAM_CODEC), PackageOrderData::orderContext,
+			CatnipStreamCodecBuilders.nullable(PackageOrderWithCrafts.STREAM_CODEC), PackageOrderData::orderContext,
 		    PackageOrderData::new
 		);
 	}

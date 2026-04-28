@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:dough"
+            "items": "#c:foods/dough"
           }
         ]
       },
@@ -20,14 +20,13 @@
   },
   "requirements": [
     [
-      "has_item",
-      "has_the_recipe"
+      "has_the_recipe",
+      "has_item"
     ]
   ],
   "rewards": {
     "recipes": [
       "create:crafting/curiosities/cake"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

@@ -9,15 +9,11 @@
   "results": [
     {
       "chance": 0.8,
-      "item": {
-        "id": "create:crushed_raw_copper"
-      }
+      "id": "create:crushed_raw_copper"
     },
     {
       "chance": 0.8,
-      "item": {
-        "id": "create:copper_nugget"
-      }
+      "id": "create:copper_nugget"
     }
   ]
 }

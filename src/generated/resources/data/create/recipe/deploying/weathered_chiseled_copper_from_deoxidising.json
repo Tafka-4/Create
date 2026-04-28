@@ -11,9 +11,7 @@
   "keep_held_item": true,
   "results": [
     {
-      "item": {
-        "id": "minecraft:weathered_chiseled_copper"
-      }
+      "id": "minecraft:weathered_chiseled_copper"
     }
   ]
 }

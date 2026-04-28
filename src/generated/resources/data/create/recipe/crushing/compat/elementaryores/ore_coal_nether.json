@@ -19,27 +19,19 @@
   "processing_time": 350,
   "results": [
     {
-      "item": {
-        "id": "minecraft:coal"
-      }
+      "id": "minecraft:coal"
     },
     {
       "chance": 0.25,
-      "item": {
-        "id": "minecraft:coal"
-      }
+      "id": "minecraft:coal"
     },
     {
       "chance": 0.75,
-      "item": {
-        "id": "create:experience_nugget"
-      }
+      "id": "create:experience_nugget"
     },
     {
       "chance": 0.12,
-      "item": {
-        "id": "minecraft:netherrack"
-      }
+      "id": "minecraft:netherrack"
     }
   ]
 }

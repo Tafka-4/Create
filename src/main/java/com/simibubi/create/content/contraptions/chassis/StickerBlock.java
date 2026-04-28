@@ -25,8 +25,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.Vec3;
 
-import io.github.fabricators_of_create.porting_lib.block.CustomLandingEffectsBlock;
-import io.github.fabricators_of_create.porting_lib.block.CustomRunningEffectsBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.CustomLandingEffectsBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.CustomRunningEffectsBlock;
 import com.simibubi.create.infrastructure.fabric.block.WeakPowerCheckingBlock;
 
 public class StickerBlock extends WrenchableDirectionalBlock implements IBE<StickerBlockEntity>, CustomRunningEffectsBlock,
@@ -69,7 +69,7 @@ public class StickerBlock extends WrenchableDirectionalBlock implements IBE<Stic
 			state = state.cycle(POWERED);
 			if (state.getValue(POWERED))
 				state = state.cycle(EXTENDED);
-			worldIn.setBlock(pos, state, 2);
+			worldIn.setBlock(pos, state, Block.UPDATE_CLIENTS);
 		}
 	}
 

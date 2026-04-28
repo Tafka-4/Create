@@ -8,22 +8,16 @@
   "processing_time": 150,
   "results": [
     {
-      "item": {
-        "id": "create:wheat_flour"
-      }
+      "id": "create:wheat_flour"
     },
     {
       "chance": 0.25,
       "count": 2,
-      "item": {
-        "id": "create:wheat_flour"
-      }
+      "id": "create:wheat_flour"
     },
     {
       "chance": 0.25,
-      "item": {
-        "id": "minecraft:wheat_seeds"
-      }
+      "id": "minecraft:wheat_seeds"
     }
   ]
 }

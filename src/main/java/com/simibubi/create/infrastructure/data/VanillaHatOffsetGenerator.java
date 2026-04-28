@@ -1,15 +1,18 @@
 package com.simibubi.create.infrastructure.data;
 
+import java.util.concurrent.CompletableFuture;
+
 import com.simibubi.create.api.data.TrainHatInfoProvider;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 
 public class VanillaHatOffsetGenerator extends TrainHatInfoProvider {
-	public VanillaHatOffsetGenerator(FabricDataOutput output) {
-		super(output);
+	public VanillaHatOffsetGenerator(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+		super(output, registries);
 	}
 
 	@Override

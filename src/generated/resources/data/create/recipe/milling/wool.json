@@ -8,9 +8,7 @@
   "processing_time": 100,
   "results": [
     {
-      "item": {
-        "id": "minecraft:string"
-      }
+      "id": "minecraft:string"
     }
   ]
 }

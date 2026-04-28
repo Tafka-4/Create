@@ -11,7 +11,6 @@ import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -33,7 +32,7 @@ public class ChainPackageInteractionHandler {
 					.inflate(0.45);
 
 				double range = mc.player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 1;
-				Vec3 from = RaycastHelper.getTraceOrigin(mc.player);
+				Vec3 from = mc.player.getEyePosition();
 				Vec3 to = RaycastHelper.getTraceTarget(mc.player, range, from);
 
 				if (bounds.clip(from, to)
@@ -47,7 +46,7 @@ public class ChainPackageInteractionHandler {
 				for (ChainConveyorPackage pckg : ccbe.getLoopingPackages()) {
 					if (pckg.netId == i) {
 						CatnipServices.NETWORK.sendToServer(
-								new ChainPackageInteractionPacket(ccbe.getBlockPos(), null, pckg.chainPosition, ItemStack.EMPTY));
+								new ChainPackageInteractionPacket(ccbe.getBlockPos(), null, pckg.chainPosition, true));
 						success.setTrue();
 						return;
 					}
@@ -60,7 +59,7 @@ public class ChainPackageInteractionHandler {
 					for (ChainConveyorPackage pckg : list) {
 						if (pckg.netId == i) {
 							CatnipServices.NETWORK.sendToServer(new ChainPackageInteractionPacket(ccbe.getBlockPos(), connection,
-									pckg.chainPosition, ItemStack.EMPTY));
+									pckg.chainPosition, true));
 							success.setTrue();
 							return;
 						}

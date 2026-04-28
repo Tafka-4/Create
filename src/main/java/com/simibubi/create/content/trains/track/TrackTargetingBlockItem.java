@@ -21,9 +21,9 @@ import com.simibubi.create.content.trains.track.TrackBlockOutline.BezierPointSel
 import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.utility.CreateLang;
+import com.simibubi.create.infrastructure.config.AllConfigs;
 import com.tterrag.registrate.util.nullness.NonNullBiFunction;
 
-import net.createmod.catnip.codecs.CatnipCodecUtils;
 import net.createmod.catnip.data.Couple;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.ChatFormatting;
@@ -128,7 +128,7 @@ public class TrackTargetingBlockItem extends BlockItem {
 
 		boolean bezier = stack.has(AllDataComponents.TRACK_TARGETING_ITEM_BEZIER);
 
-		if (!selectedPos.closerThan(placedPos, bezier ? 64 + 16 : 16)) {
+		if (!selectedPos.closerThan(placedPos, bezier ? AllConfigs.server().trains.maxTrackPlacementLength.get() + 16 : 16)) {
 			player.displayClientMessage(CreateLang.translateDirect("track_target.too_far")
 				.withStyle(ChatFormatting.RED), true);
 			return InteractionResult.FAIL;

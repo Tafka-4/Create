@@ -77,7 +77,7 @@ public class MountedStorageManager {
 	private ImmutableMap<BlockPos, SyncedMountedStorage> syncedFluids;
 
 	private List<SlottedStorage<ItemVariant>> externalHandlers;
-	private CombinedSlottedStorage<ItemVariant, ? extends SlottedStorage<ItemVariant>> allItems;
+	protected CombinedSlottedStorage<ItemVariant, ? extends SlottedStorage<ItemVariant>> allItems;
 
 	// ticks until storage can sync again
 	private int syncCooldown;

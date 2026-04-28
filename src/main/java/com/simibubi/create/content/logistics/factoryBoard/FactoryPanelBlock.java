@@ -3,7 +3,7 @@ package com.simibubi.create.content.logistics.factoryBoard;
 import java.util.Objects;
 import java.util.UUID;
 
-import io.github.fabricators_of_create.porting_lib.block.PlayerDestroyBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.PlayerDestroyBlock;
 
 import io.netty.buffer.ByteBuf;
 

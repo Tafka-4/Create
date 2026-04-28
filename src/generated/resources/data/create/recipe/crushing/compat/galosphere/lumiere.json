@@ -18,7 +18,7 @@
     {
       "chance": 0.8,
       "count": 4,
-      "item": "galosphere:lumiere_shard"
+      "id": "galosphere:lumiere_shard"
     }
   ]
 }

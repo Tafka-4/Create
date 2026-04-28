@@ -8,15 +8,11 @@
   "results": [
     {
       "count": 9,
-      "item": {
-        "id": "create:zinc_nugget"
-      }
+      "id": "create:zinc_nugget"
     },
     {
       "chance": 0.25,
-      "item": {
-        "id": "minecraft:gunpowder"
-      }
+      "id": "minecraft:gunpowder"
     }
   ]
 }

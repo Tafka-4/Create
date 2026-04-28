@@ -133,18 +133,15 @@ public class CreateClient implements ClientModInitializer {
 
 	private static void registerOverlays() {
 		HudRenderCallback.EVENT.register((graphics, partialTicks) -> {
-			Window window = Minecraft.getInstance().getWindow();
-			Gui gui = Minecraft.getInstance().gui;
-
-			RemainingAirOverlay.render(graphics, window.getGuiScaledWidth(), window.getGuiScaledHeight()); // Create's Remaining Air
-			TrainHUD.renderOverlay(graphics, partialTicks, window); // Create's Train Driver HUD
-			GoggleOverlayRenderer.renderOverlay(graphics, partialTicks, window.getGuiScaledWidth(), window.getGuiScaledHeight()); // Create's Goggle Information
-			BlueprintOverlayRenderer.renderOverlay(gui, graphics, partialTicks, window); // Create's Blueprints
-			LinkedControllerClientHandler.renderOverlay(graphics, partialTicks, window); // Create's Linked Controller
-			SCHEMATIC_HANDLER.renderOverlay(graphics, partialTicks, window); // Create's Schematics
-			ToolboxHandlerClient.renderOverlay(graphics, partialTicks, window); // Create's Toolboxes
-			VALUE_SETTINGS_HANDLER.render(graphics, window.getGuiScaledWidth(), window.getGuiScaledHeight()); // Create's Value Settings
-			TrackPlacementOverlay.renderOverlay(gui, graphics); // Create's Track Placement
+			RemainingAirOverlay.INSTANCE.render(graphics, partialTicks); // Create's Remaining Air
+			TrainHUD.OVERLAY.render(graphics, partialTicks); // Create's Train Driver HUD
+			GoggleOverlayRenderer.renderOverlay(graphics, partialTicks); // Create's Goggle Information
+			BlueprintOverlayRenderer.renderOverlay(graphics, partialTicks); // Create's Blueprints
+			LinkedControllerClientHandler.renderOverlay(graphics, partialTicks); // Create's Linked Controller
+			SCHEMATIC_HANDLER.render(graphics, partialTicks); // Create's Schematics
+			ToolboxHandlerClient.renderOverlay(graphics, partialTicks); // Create's Toolboxes
+			VALUE_SETTINGS_HANDLER.render(graphics, partialTicks); // Create's Value Settings
+			TrackPlacementOverlay.INSTANCE.render(graphics, partialTicks); // Create's Track Placement
 		});
 	}
 

@@ -12,8 +12,9 @@ public class CrushingEmiRecipe extends CreateEmiRecipe<AbstractCrushingRecipe> {
 
 	public CrushingEmiRecipe(AbstractCrushingRecipe recipe) {
 		super(CreateEmiPlugin.CRUSHING, recipe, 134, 110);
-		ResourceLocation rid = recipe.getId();
-		this.id = new ResourceLocation("emi", "create/crushing/" + rid.getNamespace() + "/" + rid.getPath());
+		ResourceLocation rid = recipe.id;
+		if (rid != null)
+			this.id = ResourceLocation.fromNamespaceAndPath("emi", "create/crushing/" + rid.getNamespace() + "/" + rid.getPath());
 	}
 
 	@Override

@@ -25,9 +25,10 @@ import com.mojang.serialization.MapCodec;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import io.github.fabricators_of_create.porting_lib.resources.conditions.ICondition;
+import io.github.fabricators_of_create.porting_lib.resources.conditions.ModLoadedCondition;
+import io.github.fabricators_of_create.porting_lib.resources.conditions.NotCondition;
 
-import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -98,8 +99,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
-import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
+import io.github.fabricators_of_create.porting_lib.resources.conditions.ICondition;
 
 import io.github.fabricators_of_create.porting_lib.tags.Tags;
 
@@ -1516,7 +1516,7 @@ public class StandardRecipeGen extends CreateRecipeProvider {
 		private String suffix;
 		private Supplier<? extends ItemLike> result;
 		private ResourceLocation compatDatagenOutput;
-		List<ConditionJsonProvider> recipeConditions;
+		List<ICondition> recipeConditions;
 
 		private Supplier<ItemPredicate> unlockedBy;
 		private int amount;
@@ -1558,14 +1558,14 @@ public class StandardRecipeGen extends CreateRecipeProvider {
 		}
 
 		GeneratedRecipeBuilder whenModLoaded(String modid) {
-			return withCondition(DefaultResourceConditions.allModsLoaded(modid));
+			return withCondition(new ModLoadedCondition(modid));
 		}
 
 		GeneratedRecipeBuilder whenModMissing(String modid) {
-			return withCondition(DefaultResourceConditions.not(DefaultResourceConditions.allModsLoaded(modid)));
+			return withCondition(new NotCondition(new ModLoadedCondition(modid)));
 		}
 
-		GeneratedRecipeBuilder withCondition(ConditionJsonProvider condition) {
+		GeneratedRecipeBuilder withCondition(ICondition condition) {
 			recipeConditions.add(condition);
 			return this;
 		}

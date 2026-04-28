@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.simibubi.create.AllBlocks;
-import net.createmod.catnip.platform.CatnipServices;
+
 import net.createmod.catnip.data.IntAttached;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.core.BlockPos;
@@ -15,8 +15,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
-
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 
 public class HauntedBellPulser {
 
@@ -28,12 +26,12 @@ public class HauntedBellPulser {
 		.expireAfterAccess(250, TimeUnit.MILLISECONDS)
 		.build();
 
-	public static void hauntedBellCreatesPulse(PlayerTickEvent.Post event) {
-		Player player = event.getEntity();
+	public static void hauntedBellCreatesPulse(ServerLevel level) {
+		for (Player player : level.players())
+			hauntedBellCreatesPulse(player);
+	}
 
-		if (player.level().isClientSide())
-			return;
-
+	private static void hauntedBellCreatesPulse(Player player) {
 		if (player.isSpectator())
 			return;
 		if (!player.isHolding(AllBlocks.HAUNTED_BELL::isIn))

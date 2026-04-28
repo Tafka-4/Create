@@ -1,6 +1,6 @@
 package com.simibubi.create.content.schematics.cannon;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.AllBlockEntityTypes;
 import com.simibubi.create.AllShapes;
@@ -24,7 +24,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import io.github.fabricators_of_create.porting_lib.util.NetworkHooks;
 
 public class SchematicannonBlock extends Block implements IBE<SchematicannonBlockEntity> {
 
@@ -51,7 +50,7 @@ public class SchematicannonBlock extends Block implements IBE<SchematicannonBloc
 		if (level.isClientSide)
 			return InteractionResult.SUCCESS;
 		withBlockEntityDo(level, pos,
-				be -> player.openMenu(be, be::sendToMenu));
+				player::openMenu);
 		return InteractionResult.SUCCESS;
 	}
 

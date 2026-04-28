@@ -18,6 +18,7 @@ import net.createmod.catnip.data.Couple;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -44,7 +45,6 @@ import net.minecraft.world.level.Level;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import io.github.fabricators_of_create.porting_lib.util.NetworkHooks;
 
 public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopying {
 
@@ -64,10 +64,8 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
 		ItemStack heldItem = player.getItemInHand(hand);
 
 		if (!player.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
-			if (!world.isClientSide && player instanceof ServerPlayer)
-				player.openMenu(this, buf -> {
-					ItemStack.STREAM_CODEC.encode(buf, heldItem);
-				});
+			if (!world.isClientSide && player instanceof ServerPlayer serverPlayer)
+				serverPlayer.openMenu(new ScheduleMenuProvider(heldItem.copy()));
 			return InteractionResultHolder.success(heldItem);
 		}
 		return InteractionResultHolder.pass(heldItem);
@@ -175,6 +173,29 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
 	@Override
 	public DataComponentType<?> getComponentType() {
 		return AllDataComponents.TRAIN_SCHEDULE;
+	}
+
+	private class ScheduleMenuProvider implements ExtendedScreenHandlerFactory<ItemStack> {
+		private final ItemStack heldItem;
+
+		private ScheduleMenuProvider(ItemStack heldItem) {
+			this.heldItem = heldItem;
+		}
+
+		@Override
+		public ItemStack getScreenOpeningData(ServerPlayer player) {
+			return heldItem;
+		}
+
+		@Override
+		public Component getDisplayName() {
+			return ScheduleItem.this.getDisplayName();
+		}
+
+		@Override
+		public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
+			return ScheduleItem.this.createMenu(id, inv, player);
+		}
 	}
 
 }

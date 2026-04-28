@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllDataComponents;
+import com.simibubi.create.content.equipment.clipboard.ClipboardContent;
 import com.simibubi.create.content.equipment.clipboard.ClipboardEntry;
 import com.simibubi.create.content.equipment.clipboard.ClipboardOverrides.ClipboardType;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -20,6 +21,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -31,13 +33,14 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 
 import org.jetbrains.annotations.Nullable;
 
-public abstract class PackagePortBlockEntity extends SmartBlockEntity implements MenuProvider, SidedStorageBlockEntity {
+public abstract class PackagePortBlockEntity extends SmartBlockEntity implements MenuProvider, ExtendedScreenHandlerFactory<BlockPos>, SidedStorageBlockEntity {
 
 	public boolean acceptsPackages;
 	public String addressFilter;
@@ -151,7 +154,8 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
 			return ItemInteractionResult.SUCCESS;
 		}
 
-		player.openMenu(this, worldPosition);
+		if (player instanceof ServerPlayer serverPlayer)
+			serverPlayer.openMenu(this);
 		return ItemInteractionResult.SUCCESS;
 	}
 
@@ -188,7 +192,8 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
 		player.displayClientMessage(CreateLang.translate("clipboard.address_added", addressFilter)
 			.component(), true);
 
-		ClipboardEntry.saveAll(list, mainHandItem);
+		ClipboardContent content = mainHandItem.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY);
+		mainHandItem.set(AllDataComponents.CLIPBOARD_CONTENT, content.setPages(list));
 		mainHandItem.set(AllDataComponents.CLIPBOARD_TYPE, ClipboardType.WRITTEN);
 	}
 
@@ -200,6 +205,11 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
 	@Override
 	public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
 		return PackagePortMenu.create(pContainerId, pPlayerInventory, this);
+	}
+
+	@Override
+	public BlockPos getScreenOpeningData(ServerPlayer player) {
+		return worldPosition;
 	}
 
 	public int getComparatorOutput() {

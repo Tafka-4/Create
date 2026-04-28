@@ -11,9 +11,7 @@
   "keep_held_item": true,
   "results": [
     {
-      "item": {
-        "id": "minecraft:waxed_exposed_copper_trapdoor"
-      }
+      "id": "minecraft:waxed_exposed_copper_trapdoor"
     }
   ]
 }

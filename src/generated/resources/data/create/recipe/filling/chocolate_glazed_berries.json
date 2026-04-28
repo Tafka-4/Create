@@ -5,14 +5,14 @@
       "item": "minecraft:sweet_berries"
     },
     {
-      "amount": 27000,
-      "fluid": "create:chocolate",
-      "nbt": {}
+      "type": "neoforge:single",
+      "amount": 250,
+      "fluid": "create:chocolate"
     }
   ],
   "results": [
     {
-      "item": "create:chocolate_glazed_berries"
+      "id": "create:chocolate_glazed_berries"
     }
   ]
 }

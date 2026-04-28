@@ -3,7 +3,7 @@ package com.simibubi.create.foundation.data;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.jetbrains.annotations.NotNull;
@@ -20,8 +20,6 @@ import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-
 import net.fabricmc.api.EnvType;
 
 @ParametersAreNonnullByDefault

@@ -12,6 +12,7 @@ import com.simibubi.create.foundation.gui.AllGuiTextures;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 public class DeployingEmiRecipe extends CreateEmiRecipe<DeployerApplicationRecipe> {
 
@@ -40,11 +41,17 @@ public class DeployingEmiRecipe extends CreateEmiRecipe<DeployerApplicationRecip
 		CreateEmiAnimations.addDeployer(widgets, widgets.getWidth() / 2 - 13, 30);
 	}
 
-	public static DeployingEmiRecipe fromSandpaper(SandPaperPolishingRecipe recipe) {
-		return new DeployingEmiRecipe(DeployerApplicationRecipe.convert(recipe));
+	public static DeployingEmiRecipe fromSandpaper(RecipeHolder<SandPaperPolishingRecipe> recipe) {
+		RecipeHolder<DeployerApplicationRecipe> converted = DeployerApplicationRecipe.convert(recipe);
+		DeployingEmiRecipe emiRecipe = new DeployingEmiRecipe(converted.value());
+		emiRecipe.setRecipeId(converted.id());
+		return emiRecipe;
 	}
 
-	public static DeployingEmiRecipe fromItemApplication(ManualApplicationRecipe recipe) {
-		return new DeployingEmiRecipe(ManualApplicationRecipe.asDeploying(recipe));
+	public static DeployingEmiRecipe fromItemApplication(RecipeHolder<ManualApplicationRecipe> recipe) {
+		RecipeHolder<DeployerApplicationRecipe> converted = ManualApplicationRecipe.asDeploying(recipe);
+		DeployingEmiRecipe emiRecipe = new DeployingEmiRecipe(converted.value());
+		emiRecipe.setRecipeId(converted.id());
+		return emiRecipe;
 	}
 }

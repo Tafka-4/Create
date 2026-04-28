@@ -7,7 +7,7 @@ import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.Create;
 import com.simibubi.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.simibubi.create.content.trains.station.GlobalStation;
-import com.simibubi.create.content.trains.station.GlobalStation.GlobalPackagePort;
+import com.simibubi.create.content.trains.station.GlobalPackagePort;
 
 import net.createmod.catnip.animation.LerpedFloat;
 import net.createmod.catnip.animation.LerpedFloat.Chaser;
@@ -21,8 +21,6 @@ import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
 public class PostboxBlockEntity extends PackagePortBlockEntity {
 
@@ -39,15 +37,6 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
 		flag = LerpedFloat.linear()
 			.startWithValue(0);
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-			Capabilities.ItemHandler.BLOCK,
-			AllBlockEntityTypes.PACKAGE_POSTBOX.get(),
-			(be, context) -> be.itemHandler
-		);
-	}
-
 	@Override
 	public void tick() {
 		super.tick();

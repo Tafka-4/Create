@@ -28,7 +28,7 @@ public class AllInventoryIdentifiers {
 
 		InventoryIdentifier.BY_BLOCK_ENTITY.register(
 			AllBlockEntityTypes.ITEM_VAULT.get(),
-			(level, pos, state, side, be) -> ((ItemVaultBlockEntity) be).getInvId()
+			(level, pos, state, side, be) -> face -> ((ItemVaultBlockEntity) be).getInvId().contains(face)
 		);
 
 		InventoryIdentifier.BY_BLOCK.registerProvider(block -> {

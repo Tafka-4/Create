@@ -5,7 +5,7 @@ import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.content.logistics.packager.InventorySummary;
 import com.simibubi.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour.RequestType;
 import com.simibubi.create.content.logistics.packagerLink.WiFiParticle;
-import com.simibubi.create.content.logistics.stockTicker.PackageOrder;
+import com.simibubi.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.simibubi.create.content.logistics.stockTicker.StockCheckingBlockEntity;
 
 import net.createmod.catnip.codecs.CatnipCodecUtils;
@@ -16,6 +16,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -26,14 +27,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 
-import io.github.fabricators_of_create.porting_lib.util.NetworkHooks;
 
-public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity implements MenuProvider {
+public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity implements MenuProvider, ExtendedScreenHandlerFactory<BlockPos> {
 
 	public boolean allowPartialRequests;
-	public PackageOrder encodedRequest = PackageOrder.empty();
-	public PackageOrder encodedRequestContext = PackageOrder.empty();
+	public PackageOrderWithCrafts encodedRequest = PackageOrderWithCrafts.empty();
 	public String encodedTargetAdress = "";
 
 	public boolean lastRequestSucceeded;
@@ -81,7 +81,7 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
 			}
 		}
 
-		broadcastPackageRequest(RequestType.REDSTONE, encodedRequest, null, encodedTargetAdress, encodedRequestContext.isEmpty() ? null : encodedRequestContext);
+		broadcastPackageRequest(RequestType.REDSTONE, encodedRequest, null, encodedTargetAdress);
 		if (level instanceof ServerLevel serverLevel)
 			CatnipServices.NETWORK.sendToClientsAround(serverLevel, worldPosition, 32, new RedstoneRequesterEffectPacket(worldPosition, anySucceeded));
 		lastRequestSucceeded = true;
@@ -93,8 +93,7 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
 		redstonePowered = tag.getBoolean("Powered");
 		lastRequestSucceeded = tag.getBoolean("Success");
 		allowPartialRequests = tag.getBoolean("AllowPartial");
-		encodedRequest = CatnipCodecUtils.decode(PackageOrder.CODEC, tag.getCompound("EncodedRequest")).orElse(PackageOrder.empty());
-		encodedRequestContext = CatnipCodecUtils.decode(PackageOrder.CODEC, tag.getCompound("EncodedRequestContext")).orElse(PackageOrder.empty());
+		encodedRequest = CatnipCodecUtils.decode(PackageOrderWithCrafts.CODEC, tag.getCompound("EncodedRequest")).orElse(PackageOrderWithCrafts.empty());
 		encodedTargetAdress = tag.getString("EncodedAddress");
 	}
 
@@ -103,8 +102,7 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
 		super.writeSafe(tag, registries);
 		tag.putBoolean("AllowPartial", allowPartialRequests);
 		tag.putString("EncodedAddress", encodedTargetAdress);
-		tag.put("EncodedRequest", CatnipCodecUtils.encode(PackageOrder.CODEC, encodedRequest).orElseThrow());
-		tag.put("EncodedRequestContext", CatnipCodecUtils.encode(PackageOrder.CODEC, encodedRequestContext).orElseThrow());
+		tag.put("EncodedRequest", CatnipCodecUtils.encode(PackageOrderWithCrafts.CODEC, encodedRequest).orElseThrow());
 	}
 
 	@Override
@@ -114,8 +112,7 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
 		tag.putBoolean("Success", lastRequestSucceeded);
 		tag.putBoolean("AllowPartial", allowPartialRequests);
 		tag.putString("EncodedAddress", encodedTargetAdress);
-		tag.put("EncodedRequest", CatnipCodecUtils.encode(PackageOrder.CODEC, encodedRequest).orElseThrow());
-		tag.put("EncodedRequestContext", CatnipCodecUtils.encode(PackageOrder.CODEC, encodedRequestContext).orElseThrow());
+		tag.put("EncodedRequest", CatnipCodecUtils.encode(PackageOrderWithCrafts.CODEC, encodedRequest).orElseThrow());
 	}
 
 	public InteractionResult use(Player player) {
@@ -128,7 +125,8 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
 		if (!behaviour.mayInteractMessage(player))
 			return InteractionResult.SUCCESS;
 
-		player.openMenu(this, worldPosition);
+		if (player instanceof ServerPlayer serverPlayer)
+			serverPlayer.openMenu(this);
 		return InteractionResult.SUCCESS;
 	}
 
@@ -140,6 +138,11 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
 	@Override
 	public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
 		return RedstoneRequesterMenu.create(pContainerId, pPlayerInventory, this);
+	}
+
+	@Override
+	public BlockPos getScreenOpeningData(ServerPlayer player) {
+		return worldPosition;
 	}
 
 	public void playEffect(boolean success) {

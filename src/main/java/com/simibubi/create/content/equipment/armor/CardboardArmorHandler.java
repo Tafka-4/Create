@@ -18,7 +18,7 @@ import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.player.Player;
 
 import io.github.fabricators_of_create.porting_lib.entity.events.EntityEvents;
-import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
+import io.github.fabricators_of_create.porting_lib.entity.events.living.LivingEvents.LivingVisibilityEvent;
 
 public class CardboardArmorHandler {
 
@@ -36,7 +36,7 @@ public class CardboardArmorHandler {
 			AllAdvancements.CARDBOARD_ARMOR.awardTo(p);
 	}
 
-	public static void playersStealthWhenWearingCardboard(LivingEvent.LivingVisibilityEvent event) {
+	public static void playersStealthWhenWearingCardboard(LivingVisibilityEvent event) {
 		LivingEntity entity = event.getEntity();
 		if (!testForStealth(entity))
 			return;

@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import dev.engine_room.flywheel.api.visualization.VisualizationLevel;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -28,6 +30,7 @@ import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.Block;
@@ -51,8 +54,7 @@ import net.minecraft.world.level.storage.WritableLevelData;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.ticks.LevelTickAccess;
-
-import org.jetbrains.annotations.NotNull;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 
 public class VirtualRenderWorld extends Level implements VisualizationLevel {
 	protected final Level level;
@@ -71,17 +73,13 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
 
 	protected final BlockPos.MutableBlockPos scratchPos = new BlockPos.MutableBlockPos();
 
-	public VirtualRenderWorld(Level level) {
-		this(level, Vec3i.ZERO);
-	}
+	protected final Runnable onBlockUpdated;
 
-	public VirtualRenderWorld(Level level, Vec3i biomeOffset) {
-		this(level, level.getMinBuildHeight(), level.getHeight(), biomeOffset);
-	}
+	private int externalPackedLight = 0;
 
-	public VirtualRenderWorld(Level level, int minBuildHeight, int height, Vec3i biomeOffset) {
+	public VirtualRenderWorld(Level level, int minBuildHeight, int height, Vec3i biomeOffset, Runnable onBlockUpdated) {
 		super((WritableLevelData) level.getLevelData(), level.dimension(), level.registryAccess(), level.dimensionTypeRegistration(), level.getProfilerSupplier(),
-				true, false, 0, 0);
+			true, false, 0, 0);
 		this.level = level;
 		this.minBuildHeight = nextMultipleOf16(minBuildHeight);
 		this.height = nextMultipleOf16(height);
@@ -89,6 +87,17 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
 
 		this.chunkSource = new VirtualChunkSource(this);
 		this.lightEngine = new LevelLightEngine(chunkSource, true, false);
+		this.onBlockUpdated = onBlockUpdated;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public SnapshotParticipant snapshotParticipant() {
+		if (level instanceof io.github.fabricators_of_create.porting_lib.extensions.common.LevelExtensions extensions)
+			return extensions.snapshotParticipant();
+		if (level instanceof io.github.fabricators_of_create.porting_lib.extensions.extensions.LevelExtensions extensions)
+			return extensions.snapshotParticipant();
+		throw new UnsupportedOperationException("Wrapped level does not expose a Porting Lib snapshot participant");
 	}
 
 	/**
@@ -103,6 +112,36 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
 		}
 	}
 
+	/**
+	 * Set an external light value that will be maxed with any light queries.
+	 */
+	public void setExternalLight(int packedLight) {
+		this.externalPackedLight = packedLight;
+	}
+
+	/**
+	 * Reset the external light.
+	 */
+	public void resetExternalLight() {
+		this.externalPackedLight = 0;
+	}
+
+	@Override
+	public void sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
+		onBlockUpdated.run();
+	}
+
+	@Override
+	public int getBrightness(LightLayer lightType, BlockPos blockPos) {
+		var selfBrightness = super.getBrightness(lightType, blockPos);
+
+		if (lightType == LightLayer.SKY) {
+			return Math.max(selfBrightness, LightTexture.sky(externalPackedLight));
+		} else {
+			return Math.max(selfBrightness, LightTexture.block(externalPackedLight));
+		}
+	}
+
 	public void clear() {
 		blockStates.clear();
 		blockEntities.clear();
@@ -114,8 +153,6 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
 		});
 
 		nonEmptyBlockCounts.clear();
-
-		runLightEngine();
 	}
 
 	public void setBlockEntities(Collection<BlockEntity> blockEntities) {
@@ -143,17 +180,13 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
 	// MEANINGFUL OVERRIDES
 
 	@Override
-	public LevelChunk getChunk(int x, int z) {
-		throw new UnsupportedOperationException();
-	}
-
-	public ChunkAccess actuallyGetChunk(int x, int z) {
-		return getChunk(x, z, ChunkStatus.FULL);
+	public LevelChunk getChunk(int chunkX, int chunkZ) {
+		return (LevelChunk) getChunk(chunkX, chunkZ, ChunkStatus.FULL);
 	}
 
 	@Override
 	public ChunkAccess getChunk(BlockPos pos) {
-		return actuallyGetChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
+		return getChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
 	}
 
 	@Override
@@ -241,7 +274,10 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
 	@Override
 	public void removeBlockEntity(BlockPos pos) {
 		if (!isOutsideBuildHeight(pos)) {
-			blockEntities.remove(pos);
+			BlockEntity blockEntity = blockEntities.remove(pos);
+			if (blockEntity != null) {
+				blockEntity.setRemoved();
+			}
 		}
 	}
 
@@ -335,26 +371,6 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
 		return level.potionBrewing();
 	}
 
-	@Override
-	public void setDayTimeFraction(float v) {
-		level.setDayTimeFraction(v);
-	}
-
-	@Override
-	public void setDayTimePerTick(float v) {
-		level.setDayTimePerTick(v);
-	}
-
-	@Override
-	public float getDayTimeFraction() {
-		return level.getDayTimeFraction();
-	}
-
-	@Override
-	public float getDayTimePerTick() {
-		return level.getDayTimePerTick();
-	}
-
 	// ADDITIONAL OVERRRIDES
 
 	@Override
@@ -374,17 +390,13 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
 	// UNIMPORTANT IMPLEMENTATIONS
 
 	@Override
-	public void sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
-	}
-
-	@Override
 	public void playSeededSound(Player player, double x, double y, double z, Holder<SoundEvent> soundEvent,
-			SoundSource soundSource, float volume, float pitch, long seed) {
+								SoundSource soundSource, float volume, float pitch, long seed) {
 	}
 
 	@Override
 	public void playSeededSound(Player player, Entity entity, Holder<SoundEvent> soundEvent, SoundSource soundSource,
-			float volume, float pitch, long seed) {
+								float volume, float pitch, long seed) {
 	}
 
 	@Override
@@ -410,7 +422,8 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
 	}
 
 	@Override
-	public void setMapData(MapId mapId, MapItemSavedData mapItemSavedData) {}
+	public void setMapData(MapId mapId, MapItemSavedData mapItemSavedData) {
+	}
 
 	@NotNull
 	@Override

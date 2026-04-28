@@ -198,11 +198,11 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock
 				if (capability == null)
 					return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 				try (Transaction t = Transaction.openOuter()) {
-					long inserted = capability.insert(ItemVariant.of(heldItem), heldItem.getCount(), t);
+					long inserted = capability.insert(ItemVariant.of(stack), stack.getCount(), t);
 					if (inserted <= 0)
 						return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 
-					player.setItemInHand(handIn, ItemHandlerHelper.copyStackWithSize(heldItem, (int) (heldItem.getCount() - inserted)));
+					player.setItemInHand(hand, stack.copyWithCount((int) (stack.getCount() - inserted)));
 					t.commit();
 					return ItemInteractionResult.SUCCESS;
 				}

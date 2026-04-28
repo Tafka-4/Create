@@ -29,5 +29,7 @@ accessible field net/minecraft/data/models/ItemModelGenerators GENERATED_TRIM_MO
 # TODO - Convert to accessor
 accessible field net/minecraft/world/entity/Mob targetSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
 accessible field net/minecraft/client/particle/Particle stoppedByCollision Z
+accessible field net/minecraft/client/renderer/ItemInHandRenderer mainHandItem Lnet/minecraft/world/item/ItemStack;
+accessible field net/minecraft/client/renderer/ItemInHandRenderer offHandItem Lnet/minecraft/world/item/ItemStack;
 accessible field net/minecraft/server/network/ServerGamePacketListenerImpl aboveGroundTickCount I
 accessible field net/minecraft/server/network/ServerGamePacketListenerImpl aboveGroundVehicleTickCount I

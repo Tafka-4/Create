@@ -47,6 +47,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
+import io.github.fabricators_of_create.porting_lib.item.extensions.EntitySwingListenerItem;
+import io.github.fabricators_of_create.porting_lib.item.extensions.ReequipAnimationItem;
+
 public abstract class ZapperItem extends Item implements CustomArmPoseItem, EntitySwingListenerItem, ReequipAnimationItem {
 
 	public ZapperItem(Properties properties) {

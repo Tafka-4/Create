@@ -1,25 +1,36 @@
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
 // versions
 // https://parchmentmc.org/docs/getting-started
 val parchmentVersion = "2024.11.17"
 // https://fabricmc.net/develop/
 val minecraftVersion = "1.21.1"
-val loaderVersion = "0.16.10"
-val fapiVersion = "0.115.1+1.21.1"
+val loaderVersion = "0.18.5"
+val fapiVersion = "0.116.9+1.21.1"
 
 // in-house dependencies
-val flywheelVersion = "1.0.1-11"
-val ponderVersion = "1.0.44"
+val flywheelVersion = "1.0.6"
+val ponderVersion = "1.0.69"
 val registrateVersion = "1.3.77-MC1.21.1"
 val milkLibVersion = "1.2.60"
+val portingLibVersion = "3.1.0-beta.85+1.21.1"
+val portingLibLegacyVersion = "3.1.0-beta.54+1.21.1"
+val portingLibLazyRegistrationVersion = "3.1.0-beta.39+1.21.1"
 
 // external dependencies
-val configApiVersion = "21.1.3"
+val configApiVersion = "21.1.6"
 val nightConfigVersion =  "3.6.3"
 val jsr305Version = "3.0.2"
 
 // compat
 // https://modrinth.com/mod/cc-tweaked/versions
-val ccVersion = "1.115.1"
+val ccVersion = "1.118.0"
 // for CC - https://modrinth.com/mod/cloth-config/versions
 val clothVersion = "15.0.140+fabric"
 // https://modrinth.com/mod/jei/versions
@@ -31,7 +42,7 @@ val emiVersion = "1.1.20+1.21.1"
 // https://modrinth.com/mod/botania
 val botaniaVersion = "1.19.2-436-FABRIC"
 // https://modrinth.com/mod/modmenu/versions
-val modmenuVersion = "11.0.3"
+val modmenuVersion = "11.0.4"
 // https://modrinth.com/mod/sandwichable/versions
 val sandwichableVersion = "1.3.1+1.20.1"
 // https://modrinth.com/mod/sodium
@@ -39,7 +50,7 @@ val sodiumVersion = "mc1.21.1-0.6.9-fabric"
 // https://github.com/emilyploszaj/trinkets/releases/
 val trinketsVersion = "3.10.0"
 // for Trinkets - https://modrinth.com/mod/cardinal-components-api/versions
-val ccaVersion = "6.1.2"
+val ccaVersion = "6.1.3"
 // https://modrinth.com/mod/journeymap
 val jmVersion = "1.21.1-6.0.0-beta.39+fabric"
 // check the jm jar, it's JiJ
@@ -50,17 +61,21 @@ val ccRuntime = false
 val recipeViewer = "emi" // jei, rei, or emi
 
 plugins {
-    id("fabric-loom") version "1.10.+"
+    id("fabric-loom") version "1.16.1"
     id("maven-publish")
 }
 
+val buildChannel = providers.environmentVariable("CREATE_BUILD_CHANNEL")
+    .filter(String::isNotEmpty)
+    .orElse("beta")
+    .get()
 val buildNum = providers.environmentVariable("GITHUB_RUN_NUMBER")
     .filter(String::isNotEmpty)
-    .map { "-build.$it" }
-    .orElse("-local")
+    .map { "-$buildChannel.$it" }
+    .orElse("-$buildChannel")
     .getOrElse("")
 
-version = "6.0.0.0+mc$minecraftVersion$buildNum"
+version = "6.0.11+mc$minecraftVersion$buildNum"
 
 group = "com.simibubi.create"
 base.archivesName = "create-fabric"
@@ -82,7 +97,7 @@ repositories {
         content { includeGroup("com.jamieswhiteshirt") }
     }
     maven("https://maven.ladysnake.org/releases") // CCA, for Trinkets
-    maven("https://maven.saps.dev/releases") // FTB
+    maven("https://maven.ftb.dev/releases") // FTB
     maven("https://maven.architectury.dev") // Architectury API
     maven("https://jm.gserv.me/repository/maven-public/") // Journey map
 }
@@ -102,6 +117,40 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fapiVersion")
 
     modApi(include("com.tterrag.registrate_fabric:Registrate:$registrateVersion")!!)
+
+    fun portingLib(module: String, version: String = portingLibVersion) {
+        modApi(include("io.github.fabricators_of_create.Porting-Lib:$module:$version")!!)
+    }
+
+    listOf(
+        "base",
+        "blocks",
+        "brewing",
+        "client_events",
+        "common",
+        "config",
+        "core",
+        "data",
+        "entity",
+        "fluids",
+        "gametest",
+        "gui_utils",
+        "item_abilities",
+        "items",
+        "level_events",
+        "loot",
+        "mixin_extensions",
+        "model_loader",
+        "models",
+        "obj_loader",
+        "registry",
+        "render_types",
+        "resources",
+        "tags",
+        "transfer"
+    ).forEach(::portingLib)
+    portingLib("lazy_registration", portingLibLazyRegistrationVersion)
+    portingLib("extensions", portingLibLegacyVersion)
 
     modApi(include("com.electronwill.night-config:core:$nightConfigVersion")!!)
     modApi(include("com.electronwill.night-config:toml:$nightConfigVersion")!!)
@@ -134,10 +183,10 @@ dependencies {
     modCompileOnly("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$ccaVersion")
 
     // FIXME - Use gradle.properties for these versions, make change to concealed for this
-    modCompileOnly("dev.architectury:architectury-fabric:9.1.12")
-    modCompileOnly("dev.ftb.mods:ftb-chunks-fabric:2001.3.1")
-    modCompileOnly("dev.ftb.mods:ftb-teams-fabric:2001.3.0")
-    modCompileOnly("dev.ftb.mods:ftb-library-fabric:2001.2.4")
+    modCompileOnly("dev.architectury:architectury-fabric:13.0.8")
+    modCompileOnly("dev.ftb.mods:ftb-chunks-fabric:2101.1.14")
+    modCompileOnly("dev.ftb.mods:ftb-teams-fabric:2101.1.10")
+    modCompileOnly("dev.ftb.mods:ftb-library-fabric:2101.1.31")
 
     modCompileOnly("maven.modrinth:journeymap:$jmVersion")
     modCompileOnly("info.journeymap:journeymap-api:$jmApiVersion")
@@ -171,10 +220,399 @@ dependencies {
 }
 
 sourceSets.named("main") {
+    java {
+        if (recipeViewer != "jei") {
+            exclude("com/simibubi/create/compat/jei/**")
+        }
+        if (recipeViewer != "rei") {
+            exclude("com/simibubi/create/compat/rei/**")
+        }
+        if (recipeViewer != "emi") {
+            exclude("com/simibubi/create/compat/emi/**")
+        }
+        exclude("com/simibubi/create/foundation/mixin/compat/xaeros/**")
+        exclude("com/simibubi/create/foundation/mixin/accessor/ItemStackHandlerAccessor.java")
+        exclude("com/simibubi/create/foundation/mixin/datafixer/ItemStackComponentizationFixMixin.java")
+        exclude("com/simibubi/create/foundation/utility/SameSizeCombinedInvWrapper.java")
+        exclude("com/simibubi/create/impl/contraption/storage/FallbackMountedStorageType.java")
+        exclude("com/simibubi/create/foundation/data/recipe/CompactingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/CrushingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/CuttingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/DeployingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/EmptyingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/FillingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/HauntingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/ItemApplicationRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/MechanicalCraftingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/MillingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/MixingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/PolishingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/PressingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/ProcessingRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/SequencedAssemblyRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/StandardRecipeGen.java")
+        exclude("com/simibubi/create/foundation/data/recipe/WashingRecipeGen.java")
+    }
     resources {
         srcDir("src/generated/resources")
         exclude(".cache/")
     }
+}
+
+fun stripNestedJars(jarFile: File) {
+    if (!jarFile.isFile)
+        return
+
+    val tempFile = jarFile.resolveSibling("${jarFile.name}.tmp")
+
+    ZipInputStream(FileInputStream(jarFile)).use { input ->
+        ZipOutputStream(FileOutputStream(tempFile)).use { output ->
+            while (true) {
+                val entry = input.nextEntry ?: break
+                val name = entry.name
+
+                if (name == "META-INF/jars/" || name.startsWith("META-INF/jars/")) {
+                    input.closeEntry()
+                    continue
+                }
+
+                var bytes = input.readBytes()
+                if (name == "fabric.mod.json") {
+                    val json = bytes.toString(Charsets.UTF_8)
+                        .replace(Regex("""(?s),\s*"jars"\s*:\s*\[[^\]]*]\s*(?=\})"""), "")
+                    bytes = json.toByteArray(Charsets.UTF_8)
+                }
+
+                val newEntry = ZipEntry(name)
+                output.putNextEntry(newEntry)
+                output.write(bytes)
+                output.closeEntry()
+                input.closeEntry()
+            }
+        }
+    }
+
+    tempFile.copyTo(jarFile, overwrite = true)
+	tempFile.delete()
+}
+
+fun removeIncompatibleMilkMixins(jarFile: File) {
+	if (!jarFile.isFile)
+		return
+
+	val tempFile = jarFile.resolveSibling("${jarFile.name}.tmp")
+	val incompatibleMixins = listOf(
+		"PotionEntityMixin",
+		"BrewingRecipeRegistryAccessor",
+		"BrewingRecipeRegistryMixin"
+	)
+
+	ZipInputStream(FileInputStream(jarFile)).use { input ->
+		ZipOutputStream(FileOutputStream(tempFile)).use { output ->
+			while (true) {
+				val entry = input.nextEntry ?: break
+				val name = entry.name
+				var bytes = input.readBytes()
+
+				if (name == "milk.mixins.json") {
+					var json = bytes.toString(Charsets.UTF_8)
+					incompatibleMixins.forEach { mixin ->
+						json = json
+							.replace(Regex("""(?s)\s*"$mixin"\s*,\s*"""), "")
+							.replace(Regex("""(?s),\s*"$mixin"\s*"""), "")
+					}
+					bytes = json.toByteArray(Charsets.UTF_8)
+				}
+
+				val newEntry = ZipEntry(name)
+				output.putNextEntry(newEntry)
+				output.write(bytes)
+				output.closeEntry()
+				input.closeEntry()
+			}
+		}
+	}
+
+	tempFile.copyTo(jarFile, overwrite = true)
+	tempFile.delete()
+}
+
+fun removeIncompatiblePortingLibExtensionsMixins(jarFile: File) {
+	if (!jarFile.isFile)
+		return
+
+	val tempFile = jarFile.resolveSibling("${jarFile.name}.tmp")
+	val incompatibleMixins = listOf(
+		"common.BlockMixin",
+		"common.TrunkPlacerMixin"
+	)
+
+	ZipInputStream(FileInputStream(jarFile)).use { input ->
+		ZipOutputStream(FileOutputStream(tempFile)).use { output ->
+			while (true) {
+				val entry = input.nextEntry ?: break
+				val name = entry.name
+				var bytes = input.readBytes()
+
+				if (name == "porting_lib_extensions.mixins.json") {
+					var json = bytes.toString(Charsets.UTF_8)
+					incompatibleMixins.forEach { mixin ->
+						json = json
+							.replace(Regex("""(?s)\s*"$mixin"\s*,\s*"""), "")
+							.replace(Regex("""(?s),\s*"$mixin"\s*"""), "")
+					}
+					bytes = json.toByteArray(Charsets.UTF_8)
+				}
+
+				val newEntry = ZipEntry(name)
+				output.putNextEntry(newEntry)
+				output.write(bytes)
+				output.closeEntry()
+				input.closeEntry()
+			}
+		}
+	}
+
+	tempFile.copyTo(jarFile, overwrite = true)
+	tempFile.delete()
+}
+
+fun replaceJarEntry(jarFile: File, entryName: String, replacement: File) {
+	if (!jarFile.isFile || !replacement.isFile)
+		return
+
+	val replacementBytes = replacement.readBytes()
+	val tempFile = jarFile.resolveSibling("${jarFile.name}.tmp")
+	var replaced = false
+
+	ZipInputStream(FileInputStream(jarFile)).use { input ->
+		ZipOutputStream(FileOutputStream(tempFile)).use { output ->
+			while (true) {
+				val entry = input.nextEntry ?: break
+				val name = entry.name
+				val bytes = if (name == entryName) {
+					replaced = true
+					replacementBytes
+				} else {
+					input.readBytes()
+				}
+
+				val newEntry = ZipEntry(name)
+				output.putNextEntry(newEntry)
+				output.write(bytes)
+				output.closeEntry()
+				input.closeEntry()
+			}
+
+			if (!replaced) {
+				val newEntry = ZipEntry(entryName)
+				output.putNextEntry(newEntry)
+				output.write(replacementBytes)
+				output.closeEntry()
+			}
+		}
+	}
+
+	tempFile.copyTo(jarFile, overwrite = true)
+	tempFile.delete()
+}
+
+fun writeJson(file: File, value: Any?) {
+	file.writeText(JsonOutput.prettyPrint(JsonOutput.toJson(value)) + "\n")
+}
+
+fun normalizeFabricModJson(file: File) {
+	if (!file.isFile)
+		return
+
+	@Suppress("UNCHECKED_CAST")
+	val json = JsonSlurper().parse(file) as MutableMap<String, Any?>
+	@Suppress("UNCHECKED_CAST")
+	val entrypoints = json["entrypoints"] as? MutableMap<String, Any?> ?: return
+
+	if (recipeViewer != "jei") {
+		entrypoints.remove("jei_mod_plugin")
+	}
+	if (recipeViewer != "rei") {
+		entrypoints.remove("rei_client")
+	}
+	if (recipeViewer != "emi") {
+		entrypoints.remove("emi")
+	}
+
+	writeJson(file, json)
+}
+
+fun convertNeoForgeCondition(value: Any?): Any? {
+	val condition = value as? Map<*, *> ?: return null
+	return when (condition["type"]?.toString()) {
+		"neoforge:mod_loaded" -> condition["modid"]?.toString()?.let {
+			linkedMapOf(
+				"condition" to "fabric:all_mods_loaded",
+				"values" to listOf(it)
+			)
+		}
+		"neoforge:not" -> convertNeoForgeCondition(condition["value"])?.let {
+			linkedMapOf(
+				"condition" to "fabric:not",
+				"value" to it
+			)
+		}
+		"neoforge:tag_empty" -> condition["tag"]?.toString()?.let {
+			linkedMapOf(
+				"condition" to "fabric:not",
+				"value" to linkedMapOf(
+					"condition" to "fabric:tags_populated",
+					"values" to listOf(it)
+				)
+			)
+		}
+		else -> null
+	}
+}
+
+fun normalizeResourceJsonValue(value: Any?, parentKey: String? = null, recipeResource: Boolean = false): Any? {
+	return when (value) {
+		is Map<*, *> -> {
+			val normalized = linkedMapOf<String, Any?>()
+			value.forEach { (key, child) ->
+				if (key != null) {
+					normalized[key.toString()] = normalizeResourceJsonValue(child, key.toString(), recipeResource)
+				}
+			}
+
+			val neoForgeConditions = normalized.remove("neoforge:conditions")
+			if (neoForgeConditions is List<*>) {
+				val convertedConditions = neoForgeConditions.mapNotNull(::convertNeoForgeCondition)
+				if (convertedConditions.isNotEmpty()) {
+					@Suppress("UNCHECKED_CAST")
+					val existingConditions = normalized["fabric:load_conditions"] as? List<Any?>
+					normalized["fabric:load_conditions"] = (existingConditions ?: emptyList()) + convertedConditions
+				}
+			}
+
+			if (recipeResource) {
+				if (normalized.containsKey("heatRequirement") && !normalized.containsKey("heat_requirement")) {
+					normalized["heat_requirement"] = normalized.remove("heatRequirement")
+				}
+				if (normalized.containsKey("processingTime") && !normalized.containsKey("processing_time")) {
+					normalized["processing_time"] = normalized.remove("processingTime")
+				}
+				if (normalized.containsKey("acceptMirrored") && !normalized.containsKey("accept_mirrored")) {
+					normalized["accept_mirrored"] = normalized.remove("acceptMirrored")
+				}
+
+				when (normalized["type"]) {
+					"neoforge:compound" -> {
+						@Suppress("UNCHECKED_CAST")
+						val ingredients = normalized["ingredients"] as? List<Any?>
+						if (ingredients != null && ingredients.size == 1) {
+							return ingredients.single()
+						}
+						normalized.remove("type")
+						normalized["fabric:type"] = "fabric:all"
+					}
+					"neoforge:single" -> normalized["type"] = "fluid_stack"
+					"neoforge:tag" -> {
+						normalized["type"] = "fluid_tag"
+						if (normalized.containsKey("tag")) {
+							normalized["fluid_tag"] = normalized.remove("tag")
+						}
+					}
+					"neoforge:components" -> {
+						normalized["type"] = "fluid_stack"
+						if (normalized.containsKey("fluids")) {
+							normalized["fluid"] = normalized.remove("fluids")
+						}
+					}
+					"neoforge:block_tag" -> {
+						normalized.remove("type")
+						normalized["fabric:type"] = "create:block_tag_ingredient"
+					}
+				}
+
+				if ((parentKey == "result" || parentKey == "results") && normalized.containsKey("item") && !normalized.containsKey("id")) {
+					normalized["id"] = normalized.remove("item")
+				}
+				if (parentKey == "results" && normalized["id"] is String && normalized.containsKey("amount") && !normalized.containsKey("count")) {
+					normalized["fluid"] = linkedMapOf("fluid" to normalized.remove("id"))
+				}
+				if (parentKey == "results" && normalized["fluid"] is String && normalized.containsKey("amount")) {
+					normalized["fluid"] = linkedMapOf("fluid" to normalized["fluid"])
+				}
+			}
+
+			normalized
+		}
+		is List<*> -> value.map { normalizeResourceJsonValue(it, parentKey, recipeResource) }
+		is String -> if (recipeResource && parentKey == "result") linkedMapOf("id" to value) else value
+		else -> value
+	}
+}
+
+fun normalizeResourceJson(file: File) {
+	if (!file.isFile)
+		return
+
+	val json = JsonSlurper().parse(file)
+	val path = file.path.replace(File.separatorChar, '/')
+	val recipeResource = "/data/" in path && ("/recipe/" in path || "/recipes/" in path)
+	writeJson(file, normalizeResourceJsonValue(json, recipeResource = recipeResource))
+}
+
+fun copyLegacyTagDirectories(outputDir: File) {
+	val dataDir = outputDir.resolve("data")
+	val legacyDirectories = mapOf(
+		"blocks" to "block",
+		"items" to "item",
+		"fluids" to "fluid",
+		"entity_types" to "entity_type",
+		"game_events" to "game_event"
+	)
+
+	dataDir.listFiles { file -> file.isDirectory }?.forEach { namespaceDir ->
+		legacyDirectories.forEach { (oldName, newName) ->
+			val oldDir = namespaceDir.resolve("tags/$oldName")
+			if (!oldDir.isDirectory)
+				return@forEach
+
+			oldDir.walkTopDown()
+				.filter { it.isFile }
+				.forEach { oldFile ->
+					val newFile = namespaceDir.resolve("tags/$newName/${oldFile.relativeTo(oldDir).invariantSeparatorsPath}")
+					if (!newFile.exists()) {
+						newFile.parentFile.mkdirs()
+						oldFile.copyTo(newFile)
+					}
+				}
+		}
+	}
+
+	val wrenchesTag = dataDir.resolve("c/tags/item/wrenches.json")
+	val toolWrenchTag = dataDir.resolve("c/tags/item/tools/wrench.json")
+	if (wrenchesTag.isFile && !toolWrenchTag.exists()) {
+		toolWrenchTag.parentFile.mkdirs()
+		wrenchesTag.copyTo(toolWrenchTag)
+	}
+}
+
+tasks.named("processIncludeJars") {
+	dependsOn(tasks.named("compileJava"))
+	doLast {
+		listOf(
+			"Registrate-$registrateVersion.jar",
+			"lazy_registration-$portingLibLazyRegistrationVersion.jar"
+		).forEach { jarName ->
+			stripNestedJars(layout.buildDirectory.file("processIncludeJars/$jarName").get().asFile)
+		}
+		replaceJarEntry(
+			layout.buildDirectory.file("processIncludeJars/Registrate-$registrateVersion.jar").get().asFile,
+			"com/tterrag/registrate/builders/MenuBuilder.class",
+			layout.buildDirectory.file("classes/java/main/com/tterrag/registrate/builders/MenuBuilder.class").get().asFile
+		)
+		removeIncompatibleMilkMixins(layout.buildDirectory.file("processIncludeJars/milk-lib-$milkLibVersion.jar").get().asFile)
+		removeIncompatiblePortingLibExtensionsMixins(layout.buildDirectory.file("processIncludeJars/extensions-$portingLibLegacyVersion.jar").get().asFile)
+	}
 }
 
 loom {
@@ -220,7 +658,7 @@ configurations {
 }
 
 tasks.named<ProcessResources>("processResources") {
-    exclude("**/*.bbmodel", "**/*.lnk")
+    exclude("**/*.bbmodel", "**/*.lnk", "data/neoforge/data_maps/**", "data/create/data_maps/**")
 
     val properties: MutableMap<String, Any> = mutableMapOf(
         "version" to version,
@@ -236,13 +674,29 @@ tasks.named<ProcessResources>("processResources") {
     filesMatching("fabric.mod.json") {
         expand(properties)
     }
+
+    doLast {
+        normalizeFabricModJson(destinationDir.resolve("fabric.mod.json"))
+
+        val dataDir = destinationDir.resolve("data")
+        if (dataDir.isDirectory) {
+            dataDir.walkTopDown()
+                .filter { it.isFile && it.extension == "json" }
+                .forEach(::normalizeResourceJson)
+        }
+
+        copyLegacyTagDirectories(destinationDir)
+    }
 }
 
 java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
     withSourcesJar()
 }
 
 tasks.named<JavaCompile>("compileJava") {
+    options.release.set(21)
     options.compilerArgs.add("-Xmaxerrs")
     options.compilerArgs.add("10000")
 }

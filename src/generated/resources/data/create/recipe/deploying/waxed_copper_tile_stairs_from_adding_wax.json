@@ -11,9 +11,7 @@
   "keep_held_item": true,
   "results": [
     {
-      "item": {
-        "id": "create:waxed_copper_tile_stairs"
-      }
+      "id": "create:waxed_copper_tile_stairs"
     }
   ]
 }

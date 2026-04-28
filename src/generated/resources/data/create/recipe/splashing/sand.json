@@ -8,9 +8,7 @@
   "results": [
     {
       "chance": 0.25,
-      "item": {
-        "id": "minecraft:clay_ball"
-      }
+      "id": "minecraft:clay_ball"
     }
   ]
 }

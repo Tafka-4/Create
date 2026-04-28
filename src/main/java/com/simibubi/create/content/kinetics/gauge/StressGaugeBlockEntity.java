@@ -13,7 +13,6 @@ import com.simibubi.create.foundation.item.TooltipHelper;
 import net.createmod.catnip.platform.CatnipServices;
 import com.simibubi.create.foundation.utility.CreateLang;
 
-import dan200.computercraft.api.peripheral.PeripheralCapability;
 import net.createmod.catnip.lang.LangBuilder;
 import net.createmod.catnip.theme.Color;
 import net.minecraft.ChatFormatting;
@@ -34,17 +33,6 @@ public class StressGaugeBlockEntity extends GaugeBlockEntity {
 	public StressGaugeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		if (Mods.COMPUTERCRAFT.isLoaded()) {
-			event.registerBlockEntity(
-					PeripheralCapability.get(),
-					AllBlockEntityTypes.STRESSOMETER.get(),
-					(be, context) -> be.computerBehaviour.getPeripheralCapability()
-			);
-		}
-	}
-
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		super.addBehaviours(behaviours);
@@ -55,6 +43,9 @@ public class StressGaugeBlockEntity extends GaugeBlockEntity {
 	@Override
 	public void updateFromNetwork(float maxStress, float currentStress, int networkSize) {
 		super.updateFromNetwork(maxStress, currentStress, networkSize);
+
+		if (computerBehaviour.hasAttachedComputer())
+			computerBehaviour.prepareComputerEvent(makeComputerKineticsChangeEvent());
 
 		if (!StressImpact.isEnabled())
 			dialTarget = 0;

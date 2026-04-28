@@ -26,6 +26,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
@@ -221,10 +222,10 @@ public class SchematicPrinter {
 		BlockState toReplaceOther = null;
 
 		if (state.hasProperty(BlockStateProperties.BED_PART) && state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)
-				&& state.getValue(BlockStateProperties.BED_PART) == BedPart.FOOT)
+			&& state.getValue(BlockStateProperties.BED_PART) == BedPart.FOOT)
 			toReplaceOther = world.getBlockState(pos.relative(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
 		if (state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
-				&& state.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER)
+			&& state.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER)
 			toReplaceOther = world.getBlockState(pos.above());
 
 		boolean mergeTEs = blockEntity != null && toReplaceBE instanceof IMergeableBE mergeBE && toReplaceBE.getType()
@@ -237,7 +238,7 @@ public class SchematicPrinter {
 		if (toReplace == state && !mergeTEs)
 			return false;
 		if (toReplace.getDestroySpeed(world, pos) == -1
-				|| (toReplaceOther != null && toReplaceOther.getDestroySpeed(world, pos) == -1))
+			|| (toReplaceOther != null && toReplaceOther.getDestroySpeed(world, pos) == -1))
 			return false;
 
 		boolean isNormalCube = state.isRedstoneConductor(blockReader, currentPos);
@@ -251,7 +252,13 @@ public class SchematicPrinter {
 
 		BlockPos target = getCurrentTarget();
 		BlockState blockState = BlockHelper.setZeroAge(blockReader.getBlockState(target));
-		BlockEntity blockEntity = blockReader.getBlockEntity(target);
+		BlockEntity blockEntity = null;
+		if (blockState.hasBlockEntity()) {
+			blockEntity = ((EntityBlock) blockState.getBlock()).newBlockEntity(target, blockState);
+			CompoundTag data = BlockHelper.prepareBlockEntityData(blockReader, blockState, blockReader.getBlockEntity(target));
+			if (blockEntity != null && data != null)
+				blockEntity.loadWithComponents(data, blockReader.registryAccess());
+		}
 		return ItemRequirement.of(blockState, blockEntity);
 	}
 

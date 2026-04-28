@@ -8,6 +8,8 @@ import net.minecraft.core.BlockPos;
 /**
  * Wrapper around many MountedItemStorages, providing access to all of them as one storage.
  * They can still be accessed individually through the map.
+ * 
+ * Uses O(1) lookup arrays instead of O(n) linear scan.
  */
 public class MountedItemStorageWrapper extends CombinedSlottedStackStorage<MountedItemStorage> {
 	public final ImmutableMap<BlockPos, MountedItemStorage> storages;

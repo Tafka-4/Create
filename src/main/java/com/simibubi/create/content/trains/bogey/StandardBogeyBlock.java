@@ -50,7 +50,6 @@ public class StandardBogeyBlock extends AbstractBogeyBlock<StandardBogeyBlockEnt
 		return AllBogeyStyles.STANDARD;
 	}
 
-	@Override
 	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
 		return AllBlocks.RAILWAY_CASING.asStack();
 	}

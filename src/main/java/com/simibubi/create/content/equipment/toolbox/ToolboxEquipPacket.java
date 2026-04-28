@@ -11,11 +11,13 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
 public record ToolboxEquipPacket(BlockPos toolboxPos, int slot, int hotbarSlot) implements ServerboundPacketPayload {
 	public static final StreamCodec<ByteBuf, ToolboxEquipPacket> STREAM_CODEC = StreamCodec.composite(
@@ -60,16 +62,15 @@ public record ToolboxEquipPacket(BlockPos toolboxPos, int slot, int hotbarSlot) 
 		if (!playerStack.isEmpty() && !ToolboxInventory.canItemsShareCompartment(playerStack,
 				toolboxBlockEntity.inventory.filters.get(slot))) {
 			toolboxBlockEntity.inventory.inLimitedMode(inventory -> {
-				ItemStack remainder = ItemHandlerHelper.insertItemStacked(inventory, playerStack, false);
+				ItemStack remainder = insertItemStacked(inventory, playerStack);
 				if (!remainder.isEmpty())
-					remainder = ItemHandlerHelper.insertItemStacked(new ItemReturnInvWrapper(player.getInventory()),
-							remainder, false);
+					remainder = insertIntoMainInventory(player.getInventory(), remainder);
 				if (remainder.getCount() != playerStack.getCount())
 					player.getInventory().setItem(hotbarSlot, remainder);
 			});
 		}
 
-		CompoundTag compound = player.getPersistentData()
+		CompoundTag compound = player.getCustomData()
 				.getCompound("CreateToolboxData");
 		String key = String.valueOf(hotbarSlot);
 
@@ -78,10 +79,55 @@ public record ToolboxEquipPacket(BlockPos toolboxPos, int slot, int hotbarSlot) 
 		data.put("Pos", NbtUtils.writeBlockPos(toolboxPos));
 		compound.put(key, data);
 
-		player.getPersistentData()
+		player.getCustomData()
 				.put("CreateToolboxData", compound);
 
 		toolboxBlockEntity.connectPlayer(slot, player, hotbarSlot);
 		ToolboxHandler.syncData(player);
+	}
+
+	private static ItemStack insertItemStacked(ToolboxInventory inventory, ItemStack stack) {
+		if (stack.isEmpty())
+			return ItemStack.EMPTY;
+		try (Transaction transaction = Transaction.openOuter()) {
+			long inserted = inventory.insert(ItemVariant.of(stack), stack.getCount(), transaction);
+			transaction.commit();
+			return stack.copyWithCount(stack.getCount() - (int) inserted);
+		}
+	}
+
+	private static ItemStack insertIntoMainInventory(Inventory inventory, ItemStack stack) {
+		ItemStack remainder = stack.copy();
+		for (int slot = 9; slot < 36 && !remainder.isEmpty(); slot++)
+			remainder = mergeIntoSlot(inventory, slot, remainder);
+		for (int slot = 9; slot < 36 && !remainder.isEmpty(); slot++)
+			remainder = insertIntoEmptySlot(inventory, slot, remainder);
+		inventory.setChanged();
+		return remainder;
+	}
+
+	private static ItemStack mergeIntoSlot(Inventory inventory, int slot, ItemStack stack) {
+		ItemStack existing = inventory.getItem(slot);
+		if (existing.isEmpty() || !ItemStack.isSameItemSameComponents(existing, stack))
+			return stack;
+		int room = existing.getMaxStackSize() - existing.getCount();
+		if (room <= 0)
+			return stack;
+		int inserted = Math.min(room, stack.getCount());
+		existing.grow(inserted);
+		ItemStack remainder = stack.copy();
+		remainder.shrink(inserted);
+		return remainder;
+	}
+
+	private static ItemStack insertIntoEmptySlot(Inventory inventory, int slot, ItemStack stack) {
+		if (!inventory.getItem(slot)
+			.isEmpty())
+			return stack;
+		int inserted = Math.min(stack.getCount(), stack.getMaxStackSize());
+		inventory.setItem(slot, stack.copyWithCount(inserted));
+		ItemStack remainder = stack.copy();
+		remainder.shrink(inserted);
+		return remainder;
 	}
 }

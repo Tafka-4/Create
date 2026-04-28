@@ -3,7 +3,7 @@ package com.simibubi.create.content.kinetics.belt.item;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllDataComponents;
@@ -45,7 +45,7 @@ public class BeltConnectorItem extends BlockItem {
 		return getOrCreateDescriptionId();
 	}
 
-	@Nonnull
+	@NotNull
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
 		Player playerEntity = context.getPlayer();

@@ -5,13 +5,14 @@
       "item": "minecraft:bread"
     },
     {
-      "amount": 27000,
-      "fluidTag": "c:milk"
+      "type": "neoforge:tag",
+      "amount": 250,
+      "tag": "c:milk"
     }
   ],
   "results": [
     {
-      "item": "create:sweet_roll"
+      "id": "create:sweet_roll"
     }
   ]
 }

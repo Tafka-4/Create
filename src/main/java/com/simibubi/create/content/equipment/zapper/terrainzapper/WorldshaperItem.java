@@ -2,7 +2,6 @@ package com.simibubi.create.content.equipment.zapper.terrainzapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.content.equipment.zapper.PlacementPatterns;
@@ -10,9 +9,6 @@ import com.simibubi.create.content.equipment.zapper.ZapperItem;
 import com.simibubi.create.foundation.utility.CreateLang;
 
 import net.createmod.catnip.gui.ScreenOpener;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -24,19 +20,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.api.EnvType;
 
 public class WorldshaperItem extends ZapperItem {
 
 	public WorldshaperItem(Properties properties) {
 		super(properties);
-	}
-
-	@Override
-	@Environment(EnvType.CLIENT)
-	public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-		consumer.accept(SimpleCustomRenderer.create(this, new WorldshaperItemRenderer()));
 	}
 
 	@Override
@@ -69,7 +59,7 @@ public class WorldshaperItem extends ZapperItem {
 	}
 
 	@Override
-	protected boolean activate(Level world, Player player, ItemStack stack, BlockState stateToUse,
+	protected boolean activate(Level level, Player player, ItemStack stack, BlockState stateToUse,
 		BlockHitResult raytrace, CompoundTag data) {
 
 		BlockPos targetPos = raytrace.getBlockPos();
@@ -82,10 +72,10 @@ public class WorldshaperItem extends ZapperItem {
 
 		brush.set(params.getX(), params.getY(), params.getZ());
 		targetPos = targetPos.offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), option));
-		brush.addToGlobalPositions(world, targetPos, raytrace.getDirection(), affectedPositions, tool);
-		PlacementPatterns.applyPattern(affectedPositions, stack);
+		brush.addToGlobalPositions(level, targetPos, raytrace.getDirection(), affectedPositions, tool);
+		PlacementPatterns.applyPattern(affectedPositions, stack, level.random);
 		brush.redirectTool(tool)
-			.run(world, affectedPositions, raytrace.getDirection(), stateToUse, data, player);
+			.run(level, affectedPositions, raytrace.getDirection(), stateToUse, data, player);
 
 		return true;
 	}

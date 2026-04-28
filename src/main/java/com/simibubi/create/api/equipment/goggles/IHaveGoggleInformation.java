@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 
+// TODO: 1.21.1+ - Move into api package
 /**
  * Implement this interface on the {@link BlockEntity} that wants to add info to the goggle overlay
  */

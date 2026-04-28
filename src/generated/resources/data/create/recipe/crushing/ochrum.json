@@ -9,15 +9,11 @@
   "results": [
     {
       "chance": 0.2,
-      "item": {
-        "id": "create:crushed_raw_gold"
-      }
+      "id": "create:crushed_raw_gold"
     },
     {
       "chance": 0.2,
-      "item": {
-        "id": "minecraft:gold_nugget"
-      }
+      "id": "minecraft:gold_nugget"
     }
   ]
 }

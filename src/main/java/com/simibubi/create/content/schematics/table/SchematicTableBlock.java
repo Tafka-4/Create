@@ -26,7 +26,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import org.jetbrains.annotations.NotNull;
 
-import io.github.fabricators_of_create.porting_lib.util.NetworkHooks;
 
 public class SchematicTableBlock extends HorizontalDirectionalBlock implements IBE<SchematicTableBlockEntity> {
 
@@ -63,7 +62,7 @@ public class SchematicTableBlock extends HorizontalDirectionalBlock implements I
 		if (level.isClientSide)
 			return InteractionResult.SUCCESS;
 		withBlockEntityDo(level, pos,
-				be -> player.openMenu(be, be::sendToMenu));
+				player::openMenu);
 		return InteractionResult.SUCCESS;
 	}
 

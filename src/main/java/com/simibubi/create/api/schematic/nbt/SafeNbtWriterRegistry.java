@@ -25,4 +25,8 @@ public class SafeNbtWriterRegistry {
 		 */
 		void writeSafe(BlockEntity be, CompoundTag tag, HolderLookup.Provider registries);
 	}
+
+	private SafeNbtWriterRegistry() {
+		throw new AssertionError("This class should not be instantiated");
+	}
 }

@@ -17,6 +17,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -33,7 +34,7 @@ public class RotationIndicatorParticleData
 				.forGetter(p -> p.radius1),
 			Codec.FLOAT.fieldOf("radius2")
 				.forGetter(p -> p.radius2),
-			Codec.INT.fieldOf("lifeSpan")
+			Codec.INT.fieldOf("life_span")
 				.forGetter(p -> p.lifeSpan),
 			Axis.CODEC.fieldOf("axis")
 				.forGetter(p -> p.axis))

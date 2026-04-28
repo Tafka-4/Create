@@ -17,21 +17,15 @@
   "processing_time": 400,
   "results": [
     {
-      "item": {
-        "id": "create:crushed_raw_quicksilver"
-      }
+      "id": "create:crushed_raw_quicksilver"
     },
     {
       "chance": 0.75,
-      "item": {
-        "id": "create:crushed_raw_quicksilver"
-      }
+      "id": "create:crushed_raw_quicksilver"
     },
     {
       "chance": 0.75,
-      "item": {
-        "id": "create:experience_nugget"
-      }
+      "id": "create:experience_nugget"
     }
   ]
 }

@@ -14,14 +14,14 @@ import com.simibubi.create.infrastructure.worldgen.AllPlacedFeatures;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.PackOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 
 import io.github.fabricators_of_create.porting_lib.data.DatapackBuiltinEntriesProvider;
 
 public class GeneratedEntriesProvider extends DatapackBuiltinEntriesProvider {
 	private static final RegistrySetBuilder BUILDER = addBootstraps(new RegistrySetBuilder());
 
-	public GeneratedEntriesProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+	public GeneratedEntriesProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registries) {
 		super(output, registries, BUILDER, Set.of(Create.ID));
 	}
 

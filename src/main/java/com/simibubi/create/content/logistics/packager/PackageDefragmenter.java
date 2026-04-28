@@ -11,6 +11,7 @@ import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.content.logistics.box.PackageItem;
 import com.simibubi.create.content.logistics.box.PackageItem.PackageOrderData;
 import com.simibubi.create.content.logistics.stockTicker.PackageOrder;
+import com.simibubi.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 
 import net.minecraft.world.item.ItemStack;
 
@@ -53,13 +54,13 @@ public class PackageDefragmenter {
 	public List<ItemStack> repack(int orderId) {
 		List<ItemStack> exportingPackages = new ArrayList<>();
 		String address = "";
-		PackageOrder orderContext = null;
+		PackageOrderWithCrafts orderContext = null;
 		List<BigItemStack> allItems = new ArrayList<>();
 
 		for (ItemStack box : collectedPackages.get(orderId)) {
 			address = PackageItem.getAddress(box);
 			if (box.has(AllDataComponents.PACKAGE_ORDER_DATA)) {
-				PackageOrder context = box.get(AllDataComponents.PACKAGE_ORDER_DATA).orderContext();
+				PackageOrderWithCrafts context = box.get(AllDataComponents.PACKAGE_ORDER_DATA).orderContext();
 				if (context != null && !context.isEmpty())
 					orderContext = context;
 			}
@@ -148,7 +149,7 @@ public class PackageDefragmenter {
 		for (int i = 0; i < exportingPackages.size(); i++) {
 			ItemStack box = exportingPackages.get(i);
 			boolean isfinal = i == exportingPackages.size() - 1;
-			PackageItem.setOrder(box, orderId, 0, true, 0, true, isfinal ? new PackageOrder(originalContext) : null);
+			PackageItem.setOrder(box, orderId, 0, true, 0, true, isfinal ? PackageOrderWithCrafts.simple(originalContext) : null);
 		}
 
 		return exportingPackages;

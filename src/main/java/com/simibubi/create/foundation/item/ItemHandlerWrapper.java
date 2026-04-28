@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 public class ItemHandlerWrapper implements Storage<ItemVariant> {
@@ -27,9 +28,10 @@ public class ItemHandlerWrapper implements Storage<ItemVariant> {
 		return wrapped.insert(resource, maxAmount, transaction);
 	}
 
-	@Override
 	public long simulateInsert(ItemVariant resource, long maxAmount, @Nullable TransactionContext transaction) {
-		return wrapped.simulateInsert(resource, maxAmount, transaction);
+		try (Transaction nested = transaction == null ? Transaction.openOuter() : transaction.openNested()) {
+			return wrapped.insert(resource, maxAmount, nested);
+		}
 	}
 
 	@Override
@@ -42,9 +44,10 @@ public class ItemHandlerWrapper implements Storage<ItemVariant> {
 		return wrapped.extract(resource, maxAmount, transaction);
 	}
 
-	@Override
 	public long simulateExtract(ItemVariant resource, long maxAmount, @Nullable TransactionContext transaction) {
-		return wrapped.simulateExtract(resource, maxAmount, transaction);
+		try (Transaction nested = transaction == null ? Transaction.openOuter() : transaction.openNested()) {
+			return wrapped.extract(resource, maxAmount, nested);
+		}
 	}
 
 	@Override
@@ -52,9 +55,11 @@ public class ItemHandlerWrapper implements Storage<ItemVariant> {
 		return wrapped.iterator();
 	}
 
-	@Override
 	public @Nullable StorageView<ItemVariant> exactView(ItemVariant resource) {
-		return wrapped.exactView(resource);
+		for (StorageView<ItemVariant> view : wrapped.nonEmptyViews())
+			if (resource.equals(view.getResource()))
+				return view;
+		return null;
 	}
 
 	@Override

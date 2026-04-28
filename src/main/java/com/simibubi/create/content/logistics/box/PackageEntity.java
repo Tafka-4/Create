@@ -4,7 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllEntityTypes;
@@ -16,6 +16,7 @@ import net.createmod.catnip.math.VecHelper;
 import net.createmod.catnip.platform.CatnipServices;
 import net.createmod.ponder.api.level.PonderLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
@@ -44,15 +45,16 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 
-import io.github.fabricators_of_create.porting_lib.entity.IEntityAdditionalSpawnData;
+import io.github.fabricators_of_create.porting_lib.entity.IEntityWithComplexSpawn;
 import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
-import io.github.fabricators_of_create.porting_lib.entity.events.LivingAttackEvent;
+import io.github.fabricators_of_create.porting_lib.entity.events.living.LivingAttackEvent;
 import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
 
 public class PackageEntity extends LivingEntity implements IEntityWithComplexSpawn {
@@ -119,10 +121,8 @@ public class PackageEntity extends LivingEntity implements IEntityWithComplexSpa
 			.add(Attributes.MOVEMENT_SPEED, 1f);
 	}
 
-	public static EntityType.Builder<?> build(EntityType.Builder<?> builder) {
-		@SuppressWarnings("unchecked")
-		EntityType.Builder<PackageEntity> boxBuilder = (EntityType.Builder<PackageEntity>) builder;
-		return boxBuilder.sized(1, 1);
+	public static FabricEntityTypeBuilder<?> build(FabricEntityTypeBuilder<?> builder) {
+		return builder.dimensions(EntityDimensions.fixed(1, 1));
 		/*.setCustomClientFactory(PackageEntity::spawn)*/
 	}
 
@@ -292,7 +292,7 @@ public class PackageEntity extends LivingEntity implements IEntityWithComplexSpa
 		super.onInsideBlock(state);
 		if (!isAlive())
 			return;
-		if (state.getBlock() == Blocks.WATER) {
+		if (state.getBlock() == Blocks.WATER || (state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED))) {
 			destroy(damageSources().drown());
 			remove(RemovalReason.KILLED);
 		}
@@ -300,9 +300,6 @@ public class PackageEntity extends LivingEntity implements IEntityWithComplexSpa
 
 	@Override
 	public boolean hurt(DamageSource source, float amount) {
-		if (source.getEntity() instanceof Player player && !CommonHooks.onPlayerAttackTarget(player, this))
-			return false;
-
 		if (level().isClientSide || !this.isAlive())
 			return false;
 
@@ -310,6 +307,9 @@ public class PackageEntity extends LivingEntity implements IEntityWithComplexSpa
 			this.remove(RemovalReason.KILLED);
 			return false;
 		}
+
+		if (box.has(DataComponents.FIRE_RESISTANT) && source.is(DamageTypeTags.IS_FIRE))
+			return false;
 
 		if (source.equals(damageSources().inWall()) && (isPassenger() || insertionDelay < 20))
 			return false;
@@ -465,5 +465,10 @@ public class PackageEntity extends LivingEntity implements IEntityWithComplexSpa
 	@Override
 	public boolean isAffectedByPotions() {
 		return false;
+	}
+
+	@Override
+	public boolean fireImmune() {
+		return box.has(DataComponents.FIRE_RESISTANT) || super.fireImmune();
 	}
 }

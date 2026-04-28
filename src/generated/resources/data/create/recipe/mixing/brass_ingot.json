@@ -12,9 +12,7 @@
   "results": [
     {
       "count": 2,
-      "item": {
-        "id": "create:brass_ingot"
-      }
+      "id": "create:brass_ingot"
     }
   ]
 }

@@ -9,23 +9,17 @@
   "results": [
     {
       "count": 3,
-      "item": {
-        "id": "minecraft:red_dye"
-      }
+      "id": "minecraft:red_dye"
     },
     {
       "chance": 0.05,
       "count": 2,
-      "item": {
-        "id": "minecraft:green_dye"
-      }
+      "id": "minecraft:green_dye"
     },
     {
       "chance": 0.25,
       "count": 2,
-      "item": {
-        "id": "minecraft:red_dye"
-      }
+      "id": "minecraft:red_dye"
     }
   ]
 }

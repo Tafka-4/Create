@@ -7,7 +7,7 @@ import com.mojang.datafixers.util.Pair;
 import com.simibubi.create.AllAttachmentTypes;
 import com.simibubi.create.content.contraptions.minecart.capability.MinecartController;
 
-import io.github.fabricators_of_create.porting_lib.util.MinecartAndRailUtil;
+import io.github.fabricators_of_create.porting_lib.blocks.util.MinecartAndRailUtil;
 
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.Util;
@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.phys.Vec3;
 
-import io.github.fabricators_of_create.porting_lib.util.MinecartAndRailUtil;
+import io.github.fabricators_of_create.porting_lib.blocks.util.MinecartAndRailUtil;
 
 /**
  * Useful methods for dealing with Minecarts
@@ -83,8 +83,7 @@ public class MinecartSim2020 {
 		Vec3 actualVec = cart.getPos(actualX, actualY, actualZ);
 		actualY = cartPos.getY() + 1;
 
-		BaseRailBlock abstractrailblock = (BaseRailBlock) trackState.getBlock();
-		RailShape railshape = MinecartAndRailUtil.getDirectionOfRail(trackState, cart.level(), cartPos, abstractrailblock);
+		RailShape railshape = MinecartAndRailUtil.getDirectionOfRail(trackState, cart.level(), cartPos, cart);
 		switch (railshape) {
 		case ASCENDING_EAST:
 			forcedMovement = forcedMovement.add(-1 * MinecartAndRailUtil.getSlopeAdjustment(), 0.0D, 0.0D);

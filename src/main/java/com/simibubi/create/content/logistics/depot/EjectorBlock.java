@@ -38,7 +38,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import io.github.fabricators_of_create.porting_lib.block.CustomFrictionBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.CustomFrictionBlock;
 
 public class EjectorBlock extends HorizontalKineticBlock implements IBE<EjectorBlockEntity>, ProperWaterloggedBlock, CustomFrictionBlock {
 

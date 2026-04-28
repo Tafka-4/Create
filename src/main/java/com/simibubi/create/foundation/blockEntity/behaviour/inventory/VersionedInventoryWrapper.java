@@ -8,10 +8,12 @@ import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.infrastructure.fabric.ProcessingIterator;
 import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
+import com.simibubi.create.foundation.utility.fabric.ListeningStorageView;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 public class VersionedInventoryWrapper implements Storage<ItemVariant> {
@@ -33,6 +35,8 @@ public class VersionedInventoryWrapper implements Storage<ItemVariant> {
 	}
 
 	private void listen(TransactionContext transaction) {
+		if (transaction == null)
+			return;
 		TransactionSuccessCallback.register(transaction, this::incrementVersion);
 	}
 
@@ -66,11 +70,10 @@ public class VersionedInventoryWrapper implements Storage<ItemVariant> {
 		return inventory.insert(resource, maxAmount, transaction);
 	}
 
-	@SuppressWarnings("removal")
-	@Override
 	public long simulateInsert(ItemVariant resource, long maxAmount, @Nullable TransactionContext transaction) {
-		this.listen(transaction);
-		return inventory.simulateInsert(resource, maxAmount, transaction);
+		try (Transaction nested = transaction == null ? Transaction.openOuter() : transaction.openNested()) {
+			return inventory.insert(resource, maxAmount, nested);
+		}
 	}
 
 	@Override
@@ -79,11 +82,10 @@ public class VersionedInventoryWrapper implements Storage<ItemVariant> {
 		return inventory.extract(resource, maxAmount, transaction);
 	}
 
-	@SuppressWarnings("removal")
-	@Override
 	public long simulateExtract(ItemVariant resource, long maxAmount, @Nullable TransactionContext transaction) {
-		this.listen(transaction);
-		return inventory.simulateExtract(resource, maxAmount, transaction);
+		try (Transaction nested = transaction == null ? Transaction.openOuter() : transaction.openNested()) {
+			return inventory.extract(resource, maxAmount, nested);
+		}
 	}
 
 	@Override
@@ -102,10 +104,11 @@ public class VersionedInventoryWrapper implements Storage<ItemVariant> {
 		return this::nonEmptyIterator;
 	}
 
-	@SuppressWarnings("removal")
-	@Override
 	@Nullable
 	public StorageView<ItemVariant> exactView(ItemVariant resource) {
-		return new ListeningStorageView<>(Storage.super.exactView(resource), this::incrementVersion);
+		for (StorageView<ItemVariant> view : inventory.nonEmptyViews())
+			if (resource.equals(view.getResource()))
+				return new ListeningStorageView<>(view, this::incrementVersion);
+		return null;
 	}
 }

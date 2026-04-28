@@ -15,7 +15,6 @@ import net.createmod.catnip.registry.RegisteredObjectsHelper;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
@@ -27,7 +26,7 @@ public class ModelSwapper implements AfterBake {
 	protected CustomBlockModels customBlockModels = new CustomBlockModels();
 	protected CustomItemModels customItemModels = new CustomItemModels();
 
-	private Map<ResourceLocation, NonNullFunction<BakedModel, ? extends BakedModel>> swaps = null;
+	private Map<ModelResourceLocation, NonNullFunction<BakedModel, ? extends BakedModel>> swaps = null;
 
 	public CustomBlockModels getCustomBlockModels() {
 		return customBlockModels;
@@ -45,7 +44,10 @@ public class ModelSwapper implements AfterBake {
 	public BakedModel modifyModelAfterBake(BakedModel model, Context context) {
 		if (swaps == null)
 			collectSwaps();
-		NonNullFunction<BakedModel, ? extends BakedModel> swap = swaps.get(context.id());
+		ModelResourceLocation id = context.topLevelId();
+		if (id == null)
+			return model;
+		NonNullFunction<BakedModel, ? extends BakedModel> swap = swaps.get(id);
 		return swap != null ? swap.apply(model) : model;
 	}
 
@@ -59,7 +61,7 @@ public class ModelSwapper implements AfterBake {
 
 	public static List<ModelResourceLocation> getAllBlockStateModelLocations(Block block) {
 		List<ModelResourceLocation> models = new ArrayList<>();
-		ResourceLocation blockRl = RegisteredObjectsHelper.getKeyOrThrow(block);
+		var blockRl = RegisteredObjectsHelper.getKeyOrThrow(block);
 		block.getStateDefinition()
 			.getPossibleStates()
 			.forEach(state -> {

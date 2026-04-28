@@ -1,5 +1,6 @@
 package com.simibubi.create.content.equipment.toolbox;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,7 +21,7 @@ import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.animatedContainer.AnimatedContainerBehaviour;
-import com.simibubi.create.foundation.item.ItemHelper;
+import com.simibubi.create.foundation.gui.menu.MenuOpeningData;
 import com.simibubi.create.foundation.utility.ResetableLazy;
 
 import net.createmod.catnip.animation.LerpedFloat;
@@ -29,6 +30,7 @@ import net.createmod.catnip.math.VecHelper;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
@@ -37,7 +39,6 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap.Builder;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -50,7 +51,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -67,7 +67,7 @@ import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
 
 import org.jetbrains.annotations.Nullable;
 
-public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider, Nameable, SidedStorageBlockEntity {
+public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider, ExtendedScreenHandlerFactory<MenuOpeningData>, Nameable, SidedStorageBlockEntity {
 
 	public LerpedFloat lid = LerpedFloat.linear()
 		.startWithValue(0);
@@ -97,15 +97,6 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 		});
 		setLazyTickRate(10);
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.ItemHandler.BLOCK,
-				AllBlockEntityTypes.TOOLBOX.get(),
-				(be, context) -> be.inventory
-		);
-	}
-
 	public DyeColor getColor() {
 		return colorProvider.get();
 	}
@@ -180,7 +171,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 				}
 
 				int count = playerStack.getCount();
-				int targetAmount = (referenceItem.getOrDefault(DataComponents.MAX_STACK_SIZE, 64) + 1) / 2;
+				int targetAmount = (referenceItem.getMaxStackSize() + 1) / 2;
 
 				if (count < targetAmount) {
 					int amountToReplenish = targetAmount - count;
@@ -357,6 +348,11 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 	}
 
 	@Override
+	public MenuOpeningData getScreenOpeningData(ServerPlayer player) {
+		return this::sendToMenu;
+	}
+
+	@Override
 	public void lazyTick() {
 		// keep re-advertising active TEs
 		ToolboxHandler.onLoad(this);
@@ -376,8 +372,12 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 		map.put(player, hotbarSlot);
 	}
 
-	public void readInventory(ItemContainerContents contents) {
-		ItemHelper.fillItemStackHandler(contents, inventory);
+	public void readInventory(ToolboxInventory inv) {
+		if (inv != null) {
+			this.inventory.filters = new ArrayList<>(inv.filters);
+			for (int i = 0; i < inv.getSlotCount(); i++)
+				this.inventory.setStackInSlot(i, inv.getStackInSlot(i));
+		}
 	}
 
 	public void setUniqueId(UUID uniqueId) {
@@ -430,12 +430,12 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 	@Override
 	protected void applyImplicitComponents(DataComponentInput componentInput) {
 		setUniqueId(componentInput.get(AllDataComponents.TOOLBOX_UUID));
-		readInventory(componentInput.getOrDefault(AllDataComponents.TOOLBOX_INVENTORY, ItemContainerContents.EMPTY));
+		readInventory(componentInput.get(AllDataComponents.TOOLBOX_INVENTORY));
 	}
 
 	@Override
 	protected void collectImplicitComponents(Builder components) {
 		components.set(AllDataComponents.TOOLBOX_UUID, uniqueId);
-		components.set(AllDataComponents.TOOLBOX_INVENTORY, ItemHelper.containerContentsFromHandler(inventory));
+		components.set(AllDataComponents.TOOLBOX_INVENTORY, inventory);
 	}
 }

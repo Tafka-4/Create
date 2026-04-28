@@ -36,7 +36,6 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
 
 import io.github.fabricators_of_create.porting_lib.tags.Tags;
 
@@ -435,13 +434,13 @@ public class CrushingRecipeGen extends ProcessingRecipeGen {
 	}
 
 	protected GeneratedRecipe mineralRecycling(AllPaletteStoneTypes type,
-		UnaryOperator<ProcessingRecipeBuilder<ProcessingRecipe<?>>> transform) {
+		UnaryOperator<ProcessingRecipeBuilder<ProcessingRecipe<?, ?>>> transform) {
 		create(Lang.asId(type.name()) + "_recycling", b -> transform.apply(b.require(type.materialTag)));
 		return create(type.getBaseBlock()::get, transform);
 	}
 
 	protected GeneratedRecipe ensMineralRecycling(AllPaletteStoneTypes type,
-											   UnaryOperator<ProcessingRecipeBuilder<ProcessingRecipe<?>>> transform) {
+											   UnaryOperator<ProcessingRecipeBuilder<ProcessingRecipe<?, ?>>> transform) {
 		create(Lang.asId(type.name()) + "_recycling", b -> transform.apply(b.require(type.materialTag)));
 		return create(type.getBaseBlock()::get, b -> transform.apply(b.whenModMissing(Mods.ENS.getId())));
 	}
@@ -464,7 +463,7 @@ public class CrushingRecipeGen extends ProcessingRecipeGen {
 	protected GeneratedRecipe ore(ItemLike stoneType, Supplier<ItemLike> ore, Supplier<ItemLike> raw,
 		float expectedAmount, int duration) {
 		return create(ore, b -> {
-			ProcessingRecipeBuilder<ProcessingRecipe<?>> builder = b.duration(duration)
+			ProcessingRecipeBuilder<ProcessingRecipe<?, ?>> builder = b.duration(duration)
 				.output(raw.get(), Mth.floor(expectedAmount));
 			float extra = expectedAmount - Mth.floor(expectedAmount);
 			if (extra > 0)

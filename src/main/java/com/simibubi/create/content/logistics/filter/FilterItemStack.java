@@ -139,8 +139,8 @@ public class FilterItemStack {
 			boolean hasFilterItems = filter.has(AllDataComponents.FILTER_ITEMS);
 
 			containedItems = new ArrayList<>();
-			ItemStackHandler items = FilterItem.getFilterItems(filter);
-			for (int i = 0; i < items.getSlots().size(); i++) {
+			ItemStackHandler items = ((ListFilterItem) filter.getItem()).getFilterItemHandler(filter);
+			for (int i = 0; i < items.getSlotCount(); i++) {
 				ItemStack stackInSlot = items.getStackInSlot(i);
 				if (!stackInSlot.isEmpty())
 					containedItems.add(FilterItemStack.of(stackInSlot));

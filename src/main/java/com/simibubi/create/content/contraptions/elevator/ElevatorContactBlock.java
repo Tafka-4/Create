@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import io.github.fabricators_of_create.porting_lib.block.ConnectableRedstoneBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.ConnectableRedstoneBlock;
 import com.simibubi.create.infrastructure.fabric.block.WeakPowerCheckingBlock;
 
 import net.fabricmc.api.EnvType;
@@ -59,9 +59,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import io.github.fabricators_of_create.porting_lib.block.ConnectableRedstoneBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.ConnectableRedstoneBlock;
 import com.simibubi.create.infrastructure.fabric.block.WeakPowerCheckingBlock;
-import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
+import io.github.fabricators_of_create.porting_lib.common.util.EnvExecutor;
 
 public class ElevatorContactBlock extends WrenchableDirectionalBlock
 	implements IBE<ElevatorContactBlockEntity>, SpecialBlockItemRequirement, WeakPowerCheckingBlock, ConnectableRedstoneBlock {
@@ -199,7 +199,6 @@ public class ElevatorContactBlock extends WrenchableDirectionalBlock
 		return stateIn;
 	}
 
-	@Override
     public boolean shouldCheckWeakPower(BlockState state, SignalGetter level, BlockPos pos, Direction side) {
         return false;
     }
@@ -209,7 +208,6 @@ public class ElevatorContactBlock extends WrenchableDirectionalBlock
 		return state.getValue(POWERING);
 	}
 
-	@Override
 	public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
 		return AllBlocks.REDSTONE_CONTACT.asStack();
 	}

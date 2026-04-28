@@ -4,7 +4,7 @@ import static com.simibubi.create.content.equipment.toolbox.ToolboxInventory.STA
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
@@ -275,7 +275,7 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
 
 	@Override
 	public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
-		Window window = getMinecraft().getWindow();
+		Window window = Minecraft.getInstance().getWindow();
 		double hoveredX = pMouseY - window.getGuiScaledWidth() / 2;
 		double hoveredY = pMouseY - window.getGuiScaledHeight() / 2;
 		double distance = hoveredX * hoveredX + hoveredY * hoveredY;

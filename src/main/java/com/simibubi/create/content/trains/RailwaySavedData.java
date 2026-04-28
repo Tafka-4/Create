@@ -29,7 +29,7 @@ public class RailwaySavedData extends SavedData {
 	private Map<UUID, Train> trains = new HashMap<>();
 
 	public static SavedData.Factory<RailwaySavedData> factory() {
-		return new SavedData.Factory<>(RailwaySavedData::new, RailwaySavedData::load);
+		return new SavedData.Factory<>(RailwaySavedData::new, RailwaySavedData::load, null);
 	}
 
 	@Override

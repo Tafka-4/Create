@@ -35,6 +35,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -96,7 +97,7 @@ public class BeltSlicer {
 			world.setBlock(pos, ProperWaterloggedBlock.withWater(world, Blocks.AIR.defaultBlockState(), pos),
 				Block.UPDATE_ALL | Block.UPDATE_MOVE_BY_PISTON);
 			world.removeBlockEntity(pos);
-			world.levelEvent(2001, pos, Block.getId(state));
+			world.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
 
 			if (!creative && AllBlocks.BELT.has(replacedState)
 				&& replacedState.getValue(BeltBlock.PART) == BeltPart.PULLEY)
@@ -174,7 +175,7 @@ public class BeltSlicer {
 						continue;
 					int count = itemstack.getCount();
 
-					if (AllItems.BELT_CONNECTOR.isIn(itemstack)) {
+					if (AllItems.BELT_CONNECTOR.isIn(itemstack) && !beltFound) {
 						if (!world.isClientSide)
 							itemstack.shrink(1);
 						beltFound = true;
@@ -192,8 +193,10 @@ public class BeltSlicer {
 					}
 				}
 
-				if (!world.isClientSide)
+				if (!world.isClientSide){
 					player.getInventory().placeItemBackInInventory(AllBlocks.SHAFT.asStack(amountRetrieved));
+					if (beltFound) player.getInventory().placeItemBackInInventory(AllItems.BELT_CONNECTOR.asStack());
+				}
 				return ItemInteractionResult.FAIL;
 			}
 		}

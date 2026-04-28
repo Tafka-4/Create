@@ -8,23 +8,17 @@
   "processing_time": 150,
   "results": [
     {
-      "item": {
-        "id": "minecraft:quartz"
-      }
+      "id": "minecraft:quartz"
     },
     {
       "chance": 0.5,
       "count": 2,
-      "item": {
-        "id": "minecraft:quartz"
-      }
+      "id": "minecraft:quartz"
     },
     {
       "chance": 0.1,
       "count": 2,
-      "item": {
-        "id": "minecraft:glowstone_dust"
-      }
+      "id": "minecraft:glowstone_dust"
     }
   ]
 }

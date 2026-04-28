@@ -2,9 +2,6 @@ package com.simibubi.create.content.equipment.wrench;
 
 import javax.annotation.Nonnull;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
 import net.minecraft.world.phys.EntityHitResult;
 
 import org.jetbrains.annotations.Nullable;
@@ -32,12 +29,6 @@ public class WrenchItem extends Item {
 
 	public WrenchItem(Properties properties) {
 		super(properties);
-	}
-
-	@Override
-	@Environment(EnvType.CLIENT)
-	public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-		consumer.accept(SimpleCustomRenderer.create(this, new WrenchItemRenderer()));
 	}
 
 	@Nonnull

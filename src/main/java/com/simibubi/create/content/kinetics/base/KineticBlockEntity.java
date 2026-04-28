@@ -6,12 +6,13 @@ import static net.minecraft.ChatFormatting.GRAY;
 import java.util.List;
 import java.util.Objects;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.Create;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.api.equipment.goggles.IHaveHoveringInformation;
 import com.simibubi.create.api.stress.BlockStressValues;
+import com.simibubi.create.compat.computercraft.events.KineticsChangeEvent;
 import com.simibubi.create.content.kinetics.KineticNetwork;
 import com.simibubi.create.content.kinetics.RotationPropagator;
 import com.simibubi.create.content.kinetics.base.IRotate.SpeedLevel;
@@ -53,7 +54,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import io.github.fabricators_of_create.porting_lib.block.CustomRenderBoundingBoxBlockEntity;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.CustomRenderBoundingBoxBlockEntity;
 
 public class KineticBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation, IHaveHoveringInformation, CustomRenderBoundingBoxBlockEntity {
 
@@ -168,6 +169,10 @@ public class KineticBlockEntity extends SmartBlockEntity implements IHaveGoggleI
 			onSpeedChanged(prevSpeed);
 			sendData();
 		}
+	}
+
+	protected KineticsChangeEvent makeComputerKineticsChangeEvent() {
+		return new KineticsChangeEvent(speed, capacity, stress, overStressed);
 	}
 
 	protected Block getStressConfigKey() {
@@ -387,7 +392,7 @@ public class KineticBlockEntity extends SmartBlockEntity implements IHaveGoggleI
 		if (currentState == state)
 			return;
 		if (blockEntity == null || !isKinetic) {
-			world.setBlock(pos, state, 3);
+			world.setBlock(pos, state, Block.UPDATE_ALL);
 			return;
 		}
 
@@ -405,7 +410,7 @@ public class KineticBlockEntity extends SmartBlockEntity implements IHaveGoggleI
 			generatingBlockEntity.reActivateSource = true;
 		}
 
-		world.setBlock(pos, state, 3);
+		world.setBlock(pos, state, Block.UPDATE_ALL);
 	}
 
 	@Override
@@ -451,13 +456,11 @@ public class KineticBlockEntity extends SmartBlockEntity implements IHaveGoggleI
 
 	@Override
 	public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-		boolean added = false;
-
 		if (!StressImpact.isEnabled())
-			return added;
+			return false;
 		float stressAtBase = calculateStressApplied();
 		if (Mth.equal(stressAtBase, 0))
-			return added;
+			return false;
 
 		CreateLang.translate("gui.goggles.kinetic_stats")
 			.forGoggles(tooltip);
@@ -512,7 +515,9 @@ public class KineticBlockEntity extends SmartBlockEntity implements IHaveGoggleI
 	}
 
 	public static float convertToAngular(float speed) {
-		return speed * 3 / 10f;
+		// speed (rpm) * 360 (revolution->deg) / 60 (min->sec) / 20 (sec->tick)
+		// rpm -> deg/tick
+		return speed * 360f / 60f / 20f;
 	}
 
 	public boolean isOverStressed() {

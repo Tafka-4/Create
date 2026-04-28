@@ -8,15 +8,11 @@
   "processing_time": 50,
   "results": [
     {
-      "item": {
-        "id": "minecraft:green_dye"
-      }
+      "id": "minecraft:green_dye"
     },
     {
       "chance": 0.1,
-      "item": {
-        "id": "minecraft:wheat_seeds"
-      }
+      "id": "minecraft:wheat_seeds"
     }
   ]
 }

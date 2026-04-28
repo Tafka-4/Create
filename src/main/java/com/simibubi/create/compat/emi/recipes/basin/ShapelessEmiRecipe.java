@@ -9,7 +9,8 @@ public class ShapelessEmiRecipe extends MixingEmiRecipe {
 
 	public ShapelessEmiRecipe(EmiRecipeCategory category, BasinRecipe recipe) {
 		super(category, recipe);
-		ResourceLocation id = recipe.getId();
-		this.id = new ResourceLocation ("emi", "create/shapeless/" + id.getNamespace() + "/" + id.getPath());
+		ResourceLocation id = recipe.id;
+		if (id != null)
+			this.id = ResourceLocation.fromNamespaceAndPath("emi", "create/shapeless/" + id.getNamespace() + "/" + id.getPath());
 	}
 }

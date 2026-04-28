@@ -67,18 +67,18 @@ public class SequencedAssemblyRecipe implements Recipe<RecipeInput> {
 		loops = 5;
 	}
 
-	public static <I extends RecipeInput, R extends ProcessingRecipe<I>> Optional<RecipeHolder<R>> getRecipe(Level world, I inv,
+	public static <I extends RecipeInput, R extends ProcessingRecipe<I, ?>> Optional<RecipeHolder<R>> getRecipe(Level world, I inv,
 																										   RecipeType<R> type, Class<R> recipeClass) {
 		return getRecipe(world, inv, type, recipeClass, r -> r.value().matches(inv, world));
 	}
 
-	public static <I extends RecipeInput, R extends ProcessingRecipe<I>> Optional<RecipeHolder<R>> getRecipe(Level world, I inv,
+	public static <I extends RecipeInput, R extends ProcessingRecipe<I, ?>> Optional<RecipeHolder<R>> getRecipe(Level world, I inv,
 																											 RecipeType<R> type, Class<R> recipeClass, Predicate<? super RecipeHolder<R>> recipeFilter) {
 		return getRecipes(world, inv.getItem(0), type, recipeClass).filter(recipeFilter)
 			.findFirst();
 	}
 
-	public static <R extends ProcessingRecipe<?>> Optional<RecipeHolder<R>> getRecipe(Level world, ItemStack item,
+	public static <R extends ProcessingRecipe<?, ?>> Optional<RecipeHolder<R>> getRecipe(Level world, ItemStack item,
 																					  RecipeType<R> type, Class<R> recipeClass) {
 		List<RecipeHolder<SequencedAssemblyRecipe>> all = world.getRecipeManager()
 			.getAllRecipesFor(AllRecipeTypes.SEQUENCED_ASSEMBLY.getType());
@@ -86,7 +86,7 @@ public class SequencedAssemblyRecipe implements Recipe<RecipeInput> {
 			if (!sequencedAssemblyRecipe.value().appliesTo(sequencedAssemblyRecipe.id(), item))
 				continue;
 			SequencedRecipe<?> nextRecipe = sequencedAssemblyRecipe.value().getNextRecipe(item);
-			ProcessingRecipe<?> recipe = nextRecipe.getRecipe();
+			ProcessingRecipe<?, ?> recipe = nextRecipe.getRecipe();
 			if (recipe.getType() != type || !recipeClass.isInstance(recipe))
 				continue;
 			recipe.enforceNextResult(() -> sequencedAssemblyRecipe.value().advance(sequencedAssemblyRecipe.id(), item));
@@ -95,7 +95,7 @@ public class SequencedAssemblyRecipe implements Recipe<RecipeInput> {
 		return Optional.empty();
 	}
 
-	public static <R extends ProcessingRecipe<?>> Stream<RecipeHolder<R>> getRecipes(Level world, ItemStack item,
+	public static <R extends ProcessingRecipe<?, ?>> Stream<RecipeHolder<R>> getRecipes(Level world, ItemStack item,
 																					 RecipeType<R> type, Class<R> recipeClass) {
 		List<RecipeHolder<SequencedAssemblyRecipe>> all = world.getRecipeManager()
 			.getAllRecipesFor(AllRecipeTypes.SEQUENCED_ASSEMBLY.getType());
@@ -104,7 +104,7 @@ public class SequencedAssemblyRecipe implements Recipe<RecipeInput> {
 
 		for (RecipeHolder<SequencedAssemblyRecipe> holder : all) {
 			if (holder.value().appliesTo(holder.id(), item)) {
-			ProcessingRecipe<?> recipe = holder.value().getNextRecipe(item).getRecipe();
+			ProcessingRecipe<?, ?> recipe = holder.value().getNextRecipe(item).getRecipe();
 
 				if (recipe.getType() == type && recipeClass.isInstance(recipe)) {
 					recipe.enforceNextResult(() -> holder.value().advance(holder.id(), item));

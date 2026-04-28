@@ -4,6 +4,7 @@ import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import com.google.common.base.Strings;
 import com.simibubi.create.foundation.utility.CreateLang;
@@ -16,8 +17,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-
-import io.github.fabricators_of_create.porting_lib.common.util.MinecraftClientUtil;
 
 public class TooltipHelper {
 
@@ -84,7 +83,7 @@ public class TooltipHelper {
 
 		// Split words
 		List<String> words = new LinkedList<>();
-		BreakIterator iterator = BreakIterator.getLineInstance(MinecraftClientUtil.getLocale());
+		BreakIterator iterator = BreakIterator.getLineInstance(Locale.getDefault());
 		iterator.setText(s);
 		int start = iterator.first();
 		for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator.next()) {
@@ -126,7 +125,7 @@ public class TooltipHelper {
 		boolean currentlyHighlighted = false;
 		for (String string : lines) {
 			MutableComponent currentComponent = lineStart.plainCopy();
-			String[] split = string.split("_");
+			String[] split = string.split("_", -1);
 			for (String part : split) {
                 currentComponent.append(Component.literal(part).withStyle(styles.get(currentlyHighlighted)));
 				currentlyHighlighted = !currentlyHighlighted;

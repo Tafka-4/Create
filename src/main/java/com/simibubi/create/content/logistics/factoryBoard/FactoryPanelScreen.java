@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllBlocks;
@@ -99,13 +99,14 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
 			return;
 		}
 
-		craftingIngredients = convertRecipeToPackageOrderContext(availableCraftingRecipe, inputConfig);
+		craftingIngredients = convertRecipeToPackageOrderContext(availableCraftingRecipe, inputConfig, false);
 	}
 
-	public static List<BigItemStack> convertRecipeToPackageOrderContext(CraftingRecipe availableCraftingRecipe, List<BigItemStack> inputs) {
+	public static List<BigItemStack> convertRecipeToPackageOrderContext(CraftingRecipe availableCraftingRecipe, List<BigItemStack> inputs, boolean respectAmounts) {
 		List<BigItemStack> craftingIngredients = new ArrayList<>();
 		BigItemStack emptyIngredient = new BigItemStack(ItemStack.EMPTY, 1);
 		NonNullList<Ingredient> ingredients = availableCraftingRecipe.getIngredients();
+		List<BigItemStack> mutableInputs = BigItemStack.duplicateWrappers(inputs);
 
 		int width = Math.min(3, ingredients.size());
 		int height = Math.min(3, ingredients.size() / 3 + 1);
@@ -126,14 +127,20 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
 			BigItemStack craftingIngredient = emptyIngredient;
 
 			if (!ingredient.isEmpty())
-				for (BigItemStack bigItemStack : inputs)
-					if (ingredient.test(bigItemStack.stack))
+				for (BigItemStack bigItemStack : mutableInputs)
+					if (bigItemStack.count > 0 && ingredient.test(bigItemStack.stack)) {
 						craftingIngredient = new BigItemStack(bigItemStack.stack, 1);
+						if (respectAmounts)
+							bigItemStack.count -= 1;
+						break;
+					}
+
 			craftingIngredients.add(craftingIngredient);
 
 			if (width < 3 && (i + 1) % width == 0)
 				for (int j = 0; j < 3 - width; j++)
-					craftingIngredients.add(emptyIngredient);
+					if (craftingIngredients.size() < 9)
+						craftingIngredients.add(emptyIngredient);
 		}
 
 		while (craftingIngredients.size() < 9)

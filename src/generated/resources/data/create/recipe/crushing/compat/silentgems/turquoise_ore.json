@@ -20,23 +20,19 @@
   "results": [
     {
       "count": 2,
-      "item": "silentgems:turquoise"
+      "id": "silentgems:turquoise"
     },
     {
       "chance": 0.25,
-      "item": "silentgems:turquoise"
+      "id": "silentgems:turquoise"
     },
     {
       "chance": 0.75,
-      "item": {
-        "id": "create:experience_nugget"
-      }
+      "id": "create:experience_nugget"
     },
     {
       "chance": 0.12,
-      "item": {
-        "id": "minecraft:netherrack"
-      }
+      "id": "minecraft:cobblestone"
     }
   ]
 }

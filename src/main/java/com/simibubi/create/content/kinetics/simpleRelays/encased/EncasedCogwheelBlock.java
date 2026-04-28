@@ -37,6 +37,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -132,7 +133,7 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock
 		if (context.getLevel().isClientSide)
 			return InteractionResult.SUCCESS;
 		context.getLevel()
-			.levelEvent(2001, context.getClickedPos(), Block.getId(state));
+			.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, context.getClickedPos(), Block.getId(state));
 		KineticBlockEntity.switchToBlockState(context.getLevel(), context.getClickedPos(),
 			(isLarge ? AllBlocks.LARGE_COGWHEEL : AllBlocks.COGWHEEL).getDefaultState()
 				.setValue(AXIS, state.getValue(AXIS)));

@@ -9,22 +9,16 @@
   "results": [
     {
       "count": 3,
-      "item": {
-        "id": "minecraft:bone_meal"
-      }
+      "id": "minecraft:bone_meal"
     },
     {
       "chance": 0.25,
-      "item": {
-        "id": "minecraft:white_dye"
-      }
+      "id": "minecraft:white_dye"
     },
     {
       "chance": 0.25,
       "count": 3,
-      "item": {
-        "id": "minecraft:bone_meal"
-      }
+      "id": "minecraft:bone_meal"
     }
   ]
 }

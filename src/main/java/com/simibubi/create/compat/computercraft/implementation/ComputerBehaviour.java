@@ -38,7 +38,6 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
 	public ComputerBehaviour(SmartBlockEntity be) {
 		super(be);
 		this.peripheral = getPeripheralFor(be);
-		this.be = be;
 	}
 
 	public static IPeripheral getPeripheralFor(SmartBlockEntity be) {

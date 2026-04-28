@@ -10,9 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-import io.github.fabricators_of_create.porting_lib.item.BlockUseBypassingItem;
-
-public class FunnelItem extends BlockItem implements BlockUseBypassingItem {
+public class FunnelItem extends BlockItem {
 
 	public FunnelItem(Block p_i48527_1_, Properties p_i48527_2_) {
 		super(p_i48527_1_, p_i48527_2_);
@@ -51,7 +49,6 @@ public class FunnelItem extends BlockItem implements BlockUseBypassingItem {
 		return state;
 	}
 
-	@Override
 	public boolean shouldBypass(BlockState state, BlockPos pos, Level level, Player player, InteractionHand hand) {
 		return true;
 	}

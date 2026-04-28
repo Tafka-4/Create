@@ -11,6 +11,8 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.Recipe;
 
 public abstract class FanEmiRecipe<T extends Recipe<?>> extends CreateEmiRecipe<T> {
@@ -36,11 +38,14 @@ public abstract class FanEmiRecipe<T extends Recipe<?>> extends CreateEmiRecipe<
 	}
 
 	public static EmiStack getFan(String name) {
-		return EmiStack.of(AllBlocks.ENCASED_FAN.asStack()
-				.setHoverName(CreateLang.translateDirect("recipe." + name + ".fan").withStyle(style -> style.withItalic(false))));
+		Component displayName = CreateLang.translateDirect("recipe." + name + ".fan")
+			.withStyle(style -> style.withItalic(false));
+		var stack = AllBlocks.ENCASED_FAN.asStack();
+		stack.set(DataComponents.CUSTOM_NAME, displayName);
+		return EmiStack.of(stack);
 	}
 
-	public static abstract class MultiOutput<T extends ProcessingRecipe<?>> extends FanEmiRecipe<T> {
+	public static abstract class MultiOutput<T extends ProcessingRecipe<?, ?>> extends FanEmiRecipe<T> {
 
 		public MultiOutput(EmiRecipeCategory type, T recipe) {
 			super(type, recipe);

@@ -11,14 +11,14 @@
       "item": "minecraft:gravel"
     },
     {
-      "amount": 8100,
-      "fluid": "minecraft:lava",
-      "nbt": {}
+      "type": "neoforge:single",
+      "amount": 100,
+      "fluid": "minecraft:lava"
     }
   ],
   "results": [
     {
-      "item": "minecraft:andesite"
+      "id": "minecraft:andesite"
     }
   ]
 }

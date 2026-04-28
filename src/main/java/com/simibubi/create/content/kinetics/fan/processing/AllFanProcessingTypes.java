@@ -98,41 +98,6 @@ public class AllFanProcessingTypes {
 		return FanProcessingType.parse(str);
 	}
 
-	public static class NoneType implements FanProcessingType {
-		@Override
-		public boolean isValidAt(Level level, BlockPos pos) {
-			return true;
-		}
-
-		@Override
-		public int getPriority() {
-			return -1000000;
-		}
-
-		@Override
-		public boolean canProcess(ItemStack stack, Level level) {
-			return false;
-		}
-
-		@Override
-		@Nullable
-		public List<ItemStack> process(ItemStack stack, Level level) {
-			return null;
-		}
-
-		@Override
-		public void spawnProcessingParticles(Level level, Vec3 pos) {
-		}
-
-		@Override
-		public void morphAirFlow(AirFlowParticleAccess particleAccess, RandomSource random) {
-		}
-
-		@Override
-		public void affectEntity(Entity entity, Level level) {
-		}
-	}
-
 	public static class BlastingType implements FanProcessingType {
 		@Override
 		public boolean isValidAt(Level level, BlockPos pos) {
@@ -182,18 +147,19 @@ public class AllFanProcessingTypes {
 				.getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(stack), level)
 				.filter(AllRecipeTypes.CAN_BE_AUTOMATED);
 
-			if (!smeltingRecipe.isPresent()) {
+			if (smeltingRecipe.isEmpty()) {
 				smeltingRecipe = level.getRecipeManager()
-					.getRecipeFor(RecipeType.BLASTING, new SingleRecipeInput(stack), level);
+					.getRecipeFor(RecipeType.BLASTING, new SingleRecipeInput(stack), level)
+					.filter(AllRecipeTypes.CAN_BE_AUTOMATED);
 			}
 
 			if (smeltingRecipe.isPresent()) {
 				RegistryAccess registryAccess = level.registryAccess();
-				if (!smokingRecipe.isPresent() || !ItemStack.isSameItem(smokingRecipe.get().value()
+				if (smokingRecipe.isEmpty() || !ItemStack.isSameItem(smokingRecipe.get().value()
 						.getResultItem(registryAccess),
 					smeltingRecipe.get().value()
 						.getResultItem(registryAccess))) {
-					return RecipeApplier.applyRecipeOn(level, stack, smeltingRecipe.get());
+					return RecipeApplier.applyRecipeOn(level, stack, smeltingRecipe.get().value(), false);
 				}
 			}
 
@@ -253,17 +219,17 @@ public class AllFanProcessingTypes {
 
 		@Override
 		public boolean canProcess(ItemStack stack, Level level) {
-			Optional<RecipeHolder<Recipe<SingleRecipeInput>>> recipe = AllRecipeTypes.HAUNTING.find(new SingleRecipeInput(stack), level);
-			return recipe.isPresent();
+			return AllRecipeTypes.HAUNTING.find(new SingleRecipeInput(stack), level)
+				.isPresent();
 		}
 
 		@Override
 		@Nullable
 		public List<ItemStack> process(ItemStack stack, Level level) {
-			Optional<RecipeHolder<Recipe<SingleRecipeInput>>> recipe = AllRecipeTypes.HAUNTING.find(new SingleRecipeInput(stack), level);
-			if (recipe.isPresent())
-				return RecipeApplier.applyRecipeOn(level, stack, recipe.get());
-			return null;
+			return AllRecipeTypes.HAUNTING.find(new SingleRecipeInput(stack), level)
+				.map(RecipeHolder::value)
+				.map(r -> RecipeApplier.applyRecipeOn(level, stack, r, true))
+				.orElse(null);
 		}
 
 		@Override
@@ -334,7 +300,7 @@ public class AllFanProcessingTypes {
 					.isEmpty())
 					horse.spawnAtLocation(horse.getBodyArmorItem());
 
-				skeletonHorse.deserializeNBT(entity.registryAccess(), serializeNBT);
+				skeletonHorse.load(serializeNBT);
 				skeletonHorse.setPos(horse.getPosition(0));
 				level.addFreshEntity(skeletonHorse);
 				horse.discard();
@@ -369,24 +335,21 @@ public class AllFanProcessingTypes {
 
 		@Override
 		public boolean canProcess(ItemStack stack, Level level) {
-			Optional<RecipeHolder<SmokingRecipe>> recipe = level.getRecipeManager()
+			return level.getRecipeManager()
 				.getRecipeFor(RecipeType.SMOKING, new SingleRecipeInput(stack), level)
-				.filter(AllRecipeTypes.CAN_BE_AUTOMATED);
-
-			return recipe.isPresent();
+				.filter(AllRecipeTypes.CAN_BE_AUTOMATED)
+				.isPresent();
 		}
 
 		@Override
 		@Nullable
 		public List<ItemStack> process(ItemStack stack, Level level) {
-			Optional<RecipeHolder<SmokingRecipe>> smokingRecipe = level.getRecipeManager()
+			return level.getRecipeManager()
 				.getRecipeFor(RecipeType.SMOKING, new SingleRecipeInput(stack), level)
-				.filter(AllRecipeTypes.CAN_BE_AUTOMATED);
-
-			if (smokingRecipe.isPresent())
-				return RecipeApplier.applyRecipeOn(level, stack, smokingRecipe.get());
-
-			return null;
+				.filter(AllRecipeTypes.CAN_BE_AUTOMATED)
+				.map(RecipeHolder::value)
+				.map(r -> RecipeApplier.applyRecipeOn(level, stack, r, false))
+				.orElse(null);
 		}
 
 		@Override
@@ -436,17 +399,18 @@ public class AllFanProcessingTypes {
 
 		@Override
 		public boolean canProcess(ItemStack stack, Level level) {
-			Optional<RecipeHolder<Recipe<SingleRecipeInput>>> recipe = AllRecipeTypes.SPLASHING.find(new SingleRecipeInput(stack), level);
-			return recipe.isPresent();
+			return AllRecipeTypes.SPLASHING.find(new SingleRecipeInput(stack), level)
+				.isPresent();
 		}
 
 		@Override
 		@Nullable
 		public List<ItemStack> process(ItemStack stack, Level level) {
 			Optional<RecipeHolder<Recipe<SingleRecipeInput>>> recipe = AllRecipeTypes.SPLASHING.find(new SingleRecipeInput(stack), level);
-			if (recipe.isPresent())
-				return RecipeApplier.applyRecipeOn(level, stack, recipe.get());
-			return null;
+			return AllRecipeTypes.SPLASHING.find(new SingleRecipeInput(stack), level)
+				.map(RecipeHolder::value)
+				.map(r -> RecipeApplier.applyRecipeOn(level, stack, r, true))
+				.orElse(null);
 		}
 
 		@Override

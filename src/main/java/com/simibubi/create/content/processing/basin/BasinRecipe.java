@@ -9,9 +9,8 @@ import javax.annotation.Nonnull;
 
 import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipe;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder.ProcessingRecipeParams;
+import com.simibubi.create.content.processing.recipe.ProcessingRecipeParams;
+import com.simibubi.create.content.processing.recipe.StandardProcessingRecipe;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
@@ -40,7 +39,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 
-public class BasinRecipe extends ProcessingRecipe<RecipeInput> {
+public class BasinRecipe extends StandardProcessingRecipe<RecipeInput> {
 
 	public static boolean match(BasinBlockEntity basin, Recipe<?> recipe) {
 		FilteringBehaviour filter = basin.getFilter();
@@ -140,7 +139,7 @@ public class BasinRecipe extends ProcessingRecipe<RecipeInput> {
 				});
 			}
 
-			CraftingInput remainderInput = new DummyCraftingContainer(availableItems, extractedItemsFromSlot)
+			CraftingInput remainderInput = new DummyCraftingContainer(consumedItems)
 					.asCraftInput();
 
 			if (recipe instanceof BasinRecipe basinRecipe) {
@@ -179,7 +178,7 @@ public class BasinRecipe extends ProcessingRecipe<RecipeInput> {
 
 	public static RecipeHolder<BasinRecipe> convertShapeless(RecipeHolder<?> recipe) {
 		BasinRecipe basinRecipe =
-			new ProcessingRecipeBuilder<>(BasinRecipe::new, recipe.id()).withItemIngredients(recipe.value().getIngredients())
+			new Builder<>(BasinRecipe::new, recipe.id()).withItemIngredients(recipe.value().getIngredients())
 				.withSingleItemOutput(recipe.value().getResultItem(Minecraft.getInstance().level.registryAccess()))
 				.build();
 		return new RecipeHolder<>(recipe.id(), basinRecipe);

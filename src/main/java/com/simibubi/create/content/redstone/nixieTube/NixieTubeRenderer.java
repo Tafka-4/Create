@@ -16,20 +16,16 @@ import net.createmod.catnip.math.AngleHelper;
 import net.createmod.catnip.theme.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.font.glyphs.BakedGlyph;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Style;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-
-import io.github.fabricators_of_create.porting_lib.util.FontRenderUtil;
 
 public class NixieTubeRenderer extends SafeBlockEntityRenderer<NixieTubeBlockEntity> {
 
@@ -116,11 +112,8 @@ public class NixieTubeRenderer extends SafeBlockEntityRenderer<NixieTubeBlockEnt
 		Font fontRenderer = Minecraft.getInstance().font;
 		fontRenderer.drawInBatch(c, 0, 0, color, false, ms.last()
 			.pose(), buffer, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
-		if (buffer instanceof BufferSource) {
-			BakedGlyph texturedglyph = FontRenderUtil.getFontStorage(fontRenderer, Style.DEFAULT_FONT)
-				.whiteGlyph();
-			((BufferSource) buffer).endBatch(texturedglyph.renderType(Font.DisplayMode.NORMAL));
-		}
+		if (buffer instanceof BufferSource bufferSource)
+			bufferSource.endBatch(RenderType.textIntensity(Minecraft.DEFAULT_FONT));
 	}
 
 	private void renderAsSignal(NixieTubeBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer,

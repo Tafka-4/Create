@@ -55,8 +55,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import io.github.fabricators_of_create.porting_lib.enchant.CustomEnchantingBehaviorItem;
-import io.github.fabricators_of_create.porting_lib.item.EntitySwingListenerItem;
-import io.github.fabricators_of_create.porting_lib.item.ReequipAnimationItem;
+import io.github.fabricators_of_create.porting_lib.item.extensions.EntitySwingListenerItem;
+import io.github.fabricators_of_create.porting_lib.item.extensions.ReequipAnimationItem;
 
 public class PotatoCannonItem extends ProjectileWeaponItem implements CustomArmPoseItem, EntitySwingListenerItem, ReequipAnimationItem, CustomEnchantingBehaviorItem {
 
@@ -188,8 +188,8 @@ public class PotatoCannonItem extends ProjectileWeaponItem implements CustomArmP
 			return;
 
 		HolderLookup<Enchantment> lookup = registries.lookupOrThrow(Registries.ENCHANTMENT);
-		int power = stack.getEnchantmentLevel(lookup.getOrThrow(Enchantments.POWER));
-		int punch = stack.getEnchantmentLevel(lookup.getOrThrow(Enchantments.PUNCH));
+		int power = EnchantmentHelper.getItemEnchantmentLevel(lookup.getOrThrow(Enchantments.POWER), stack);
+		int punch = EnchantmentHelper.getItemEnchantmentLevel(lookup.getOrThrow(Enchantments.PUNCH), stack);
 		final float additionalDamageMult = 1 + power * .2f;
 		final float additionalKnockback = punch * .5f;
 
@@ -246,7 +246,6 @@ public class PotatoCannonItem extends ProjectileWeaponItem implements CustomArmP
 		return 15;
 	}
 
-	@Override
 	public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {
 		if (enchantment.is(Enchantments.POWER))
 			return true;
@@ -258,7 +257,7 @@ public class PotatoCannonItem extends ProjectileWeaponItem implements CustomArmP
 			return true;
 		if (enchantment.is(AllEnchantments.POTATO_RECOVERY))
 			return true;
-		return super.supportsEnchantment(stack, enchantment);
+		return false;
 	}
 
 	@Override
@@ -281,7 +280,7 @@ public class PotatoCannonItem extends ProjectileWeaponItem implements CustomArmP
 	}
 
 	@Override
-	public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
+	public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
 		return false;
 	}
 

@@ -227,6 +227,7 @@ public class LinkedControllerClientHandler {
 		poseStack.pushPose();
 		Screen tooltipScreen = new Screen(CommonComponents.EMPTY) {
 		};
+		Window window = mc.getWindow();
 		tooltipScreen.init(mc, window.getGuiScaledWidth(), window.getGuiScaledHeight());
 
 		Object[] keys = new Object[6];

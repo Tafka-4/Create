@@ -12,10 +12,10 @@ import com.simibubi.create.content.trains.track.BezierConnection.SegmentAngles;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 
 import dev.engine_room.flywheel.api.visualization.VisualizationManager;
-import net.createmod.catnip.render.CachedBuffers;
 import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.math.VecHelper;
 import net.createmod.catnip.math.AngleHelper;
+import net.createmod.catnip.math.VecHelper;
+import net.createmod.catnip.render.CachedBuffers;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -85,10 +85,10 @@ public class TrackRenderer extends SafeBlockEntityRenderer<TrackBlockEntity> {
 			return;
 
 		BlockState air = Blocks.AIR.defaultBlockState();
-		GirderAngles[] girders = bc.getBakedGirders();
+		GirderAngles[] segments = bc.getBakedGirders();
 
-		for (int i = 1; i < girders.length; i++) {
-			GirderAngles segment = girders[i];
+		for (int i = 1; i < segments.length; i++) {
+			GirderAngles segment = segments[i];
 			int light = LevelRenderer.getLightColor(level, segment.lightPosition.offset(tePosition));
 
 			for (boolean first : Iterate.trueAndFalse) {

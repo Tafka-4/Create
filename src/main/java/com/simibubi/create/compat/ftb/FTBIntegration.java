@@ -25,11 +25,11 @@ public class FTBIntegration {
 				return;
 
 			// grab initial button state to re-apply it on close
-			int buttonState = FTBLibraryClient.showButtons;
-			FTBLibraryClient.showButtons = 0;
+			boolean buttonsEnabled = FTBLibraryClientConfig.SIDEBAR_ENABLED.get();
+			FTBLibraryClientConfig.SIDEBAR_ENABLED.set(false);
 			Event<Remove> event = ScreenEvents.remove(screen);
 			event.addPhaseOrdering(Event.DEFAULT_PHASE, late);
-			event.register(late, closingScreen -> FTBLibraryClient.showButtons = buttonState);
+			event.register(late, closingScreen -> FTBLibraryClientConfig.SIDEBAR_ENABLED.set(buttonsEnabled));
 		});
 	}
 

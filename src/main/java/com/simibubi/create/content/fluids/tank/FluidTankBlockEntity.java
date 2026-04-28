@@ -40,7 +40,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
-import io.github.fabricators_of_create.porting_lib.block.CustomRenderBoundingBoxBlockEntity;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.CustomRenderBoundingBoxBlockEntity;
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidTank;
@@ -82,19 +82,6 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IHaveGoggl
 		boiler = new BoilerData();
 //		refreshCapability(); // fabric: lazy init to prevent access too early
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.FluidHandler.BLOCK,
-				AllBlockEntityTypes.FLUID_TANK.get(),
-				(be, context) -> {
-					if (be.fluidCapability == null)
-						be.refreshCapability();
-					return be.fluidCapability;
-				}
-		);
-	}
-
 	protected SmartFluidTank createInventory() {
 		return new SmartFluidTank(getCapacityMultiplier(), this::onFluidStackChanged);
 	}

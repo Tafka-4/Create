@@ -13,6 +13,9 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 public interface ISyncPersistentData {
 
 	void onPersistentDataUpdated();
@@ -29,14 +32,14 @@ public interface ISyncPersistentData {
 		);
 
 		public PersistentDataPacket(Entity entity) {
-			this(entity.getId(), entity.getPersistentData());
+			this(entity.getId(), entity.getCustomData());
 		}
 
 		@Override
 		@Environment(EnvType.CLIENT)
 		public void handle(LocalPlayer player) {
 			Entity entityByID = player.clientLevel.getEntity(entityId);
-			CompoundTag data = entityByID.getPersistentData();
+			CompoundTag data = entityByID.getCustomData();
 			new HashSet<>(data.getAllKeys()).forEach(data::remove);
 			data.merge(readData);
 			if (!(entityByID instanceof ISyncPersistentData))

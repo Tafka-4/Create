@@ -11,14 +11,14 @@
       "item": "minecraft:calcite"
     },
     {
-      "amount": 8100,
-      "fluid": "minecraft:lava",
-      "nbt": {}
+      "type": "neoforge:single",
+      "amount": 100,
+      "fluid": "minecraft:lava"
     }
   ],
   "results": [
     {
-      "item": "minecraft:diorite"
+      "id": "minecraft:diorite"
     }
   ]
 }

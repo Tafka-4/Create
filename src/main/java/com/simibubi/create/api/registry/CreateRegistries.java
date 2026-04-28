@@ -1,8 +1,6 @@
 package com.simibubi.create.api.registry;
 
 import com.mojang.serialization.MapCodec;
-import com.simibubi.create.content.logistics.packagePort.PackagePortTargetType;
-
 import com.simibubi.create.Create;
 import com.simibubi.create.api.behaviour.display.DisplaySource;
 import com.simibubi.create.api.behaviour.display.DisplayTarget;
@@ -16,6 +14,7 @@ import com.simibubi.create.api.equipment.potatoCannon.PotatoProjectileRenderMode
 import com.simibubi.create.content.kinetics.fan.processing.FanProcessingType;
 import com.simibubi.create.content.kinetics.mechanicalArm.ArmInteractionPointType;
 import com.simibubi.create.content.logistics.item.filter.attribute.ItemAttributeType;
+import com.simibubi.create.content.logistics.packagePort.PackagePortTargetType;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -42,5 +41,9 @@ public class CreateRegistries {
 
 	private static <T> ResourceKey<Registry<T>> key(String name) {
 		return ResourceKey.createRegistryKey(Create.asResource(name));
+	}
+
+	private CreateRegistries() {
+		throw new AssertionError("This class should not be instantiated");
 	}
 }

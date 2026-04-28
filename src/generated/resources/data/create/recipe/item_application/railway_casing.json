@@ -5,12 +5,12 @@
       "item": "create:brass_casing"
     },
     {
-      "tag": "c:obsidian_plates"
+      "tag": "c:plates/obsidian"
     }
   ],
   "results": [
     {
-      "item": "create:railway_casing"
+      "id": "create:railway_casing"
     }
   ]
 }

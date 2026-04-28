@@ -37,7 +37,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
@@ -62,7 +62,7 @@ public class SeatBlock extends Block implements ProperWaterloggedBlock {
 		super(properties);
 		this.color = color;
 		registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
-		LandPathNodeTypesRegistry.register(this, BlockPathTypes.RAIL, null);
+		LandPathNodeTypesRegistry.register(this, PathType.RAIL, null);
 	}
 
 	@Override
@@ -200,7 +200,7 @@ public class SeatBlock extends Block implements ProperWaterloggedBlock {
 	public static void sitDown(Level world, BlockPos pos, Entity entity) {
 		if (world.isClientSide)
 			return;
-		SeatEntity seat = new SeatEntity(world, pos);
+		SeatEntity seat = new SeatEntity(world);
 		seat.setPos(pos.getX() + .5f, pos.getY(), pos.getZ() + .5f);
 		world.addFreshEntity(seat);
 		entity.startRiding(seat, true);

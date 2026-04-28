@@ -157,6 +157,6 @@ public class FluidTankItem extends BlockItem {
 
 	public static boolean checkPlacingNbt(BlockPlaceContext ctx) {
 		ItemStack item = ctx.getItemInHand();
-		return BlockItem.getBlockEntityData(item) != null;
+		return item.get(DataComponents.BLOCK_ENTITY_DATA) != null;
 	}
 }

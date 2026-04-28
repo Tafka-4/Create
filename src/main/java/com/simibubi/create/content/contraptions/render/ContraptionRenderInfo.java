@@ -86,15 +86,10 @@ public class ContraptionRenderInfo {
 		BlockPos origin = c.anchor;
 		int minBuildHeight = contraptionWorld.getMinBuildHeight();
 		int height = contraptionWorld.getHeight();
-		VirtualRenderWorld renderWorld = new VirtualRenderWorld(level, minBuildHeight, height, origin) {
+		VirtualRenderWorld renderWorld = new VirtualRenderWorld(level, minBuildHeight, height, origin, () -> {}) {
 			@Override
 			public boolean supportsVisualization() {
 				return VisualizationManager.supportsVisualization(level);
-			}
-
-			@Override
-			public ModelData getModelData(BlockPos pos) {
-				return c.modelData.getOrDefault(pos, ModelData.EMPTY);
 			}
 		};
 

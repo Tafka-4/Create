@@ -1,6 +1,6 @@
 package com.simibubi.create.foundation.blockEntity;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidTank;
 

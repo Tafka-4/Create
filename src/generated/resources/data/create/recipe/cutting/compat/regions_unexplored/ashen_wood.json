@@ -19,7 +19,7 @@
   "processing_time": 50,
   "results": [
     {
-      "item": "regions_unexplored:stripped_dead_wood"
+      "id": "regions_unexplored:stripped_dead_wood"
     }
   ]
 }

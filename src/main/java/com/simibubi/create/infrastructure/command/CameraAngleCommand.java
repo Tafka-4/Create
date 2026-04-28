@@ -19,30 +19,30 @@ public class CameraAngleCommand {
 
 	public static ArgumentBuilder<CommandSourceStack, ?> register() {
 		return Commands.literal("angle")
-				.requires(cs -> cs.hasPermission(2))
-				.then(Commands.argument("players", EntityArgument.players())
-						.then(Commands.literal("yaw")
-								.then(Commands.argument("degrees", FloatArgumentType.floatArg())
-										.executes(context -> updateCameraAngle(context, true))
-								)
-						).then(Commands.literal("pitch")
-								.then(Commands.argument("degrees", FloatArgumentType.floatArg())
-										.executes(context -> updateCameraAngle(context, false))
-								)
-						).then(Commands.literal("mode")
-								.then(Commands.literal("linear")
-										.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.LINEAR.name()))
-										.then(Commands.argument("speed", FloatArgumentType.floatArg(0))
-												.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.LINEAR.name(), FloatArgumentType.getFloat(context, "speed")))
-										)
-								).then(Commands.literal("exponential")
-										.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.EXPONENTIAL.name()))
-										.then(Commands.argument("speed", FloatArgumentType.floatArg(0))
-												.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.EXPONENTIAL.name(), FloatArgumentType.getFloat(context, "speed")))
-										)
-								)
+			.requires(cs -> cs.hasPermission(2))
+			.then(Commands.argument("players", EntityArgument.players())
+				.then(Commands.literal("yaw")
+					.then(Commands.argument("degrees", FloatArgumentType.floatArg())
+						.executes(context -> updateCameraAngle(context, true))
+					)
+				).then(Commands.literal("pitch")
+					.then(Commands.argument("degrees", FloatArgumentType.floatArg())
+						.executes(context -> updateCameraAngle(context, false))
+					)
+				).then(Commands.literal("mode")
+					.then(Commands.literal("linear")
+						.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.LINEAR.name()))
+						.then(Commands.argument("speed", FloatArgumentType.floatArg(0))
+							.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.LINEAR.name(), FloatArgumentType.getFloat(context, "speed")))
 						)
-				);
+					).then(Commands.literal("exponential")
+						.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.EXPONENTIAL.name()))
+						.then(Commands.argument("speed", FloatArgumentType.floatArg(0))
+							.executes(context -> updateCameraAnimationMode(context, CameraAngleAnimationService.Mode.EXPONENTIAL.name(), FloatArgumentType.getFloat(context, "speed")))
+						)
+					)
+				)
+			);
 	}
 
 	private static int updateCameraAngle(CommandContext<CommandSourceStack> ctx, boolean yaw) throws CommandSyntaxException {
@@ -53,7 +53,6 @@ public class CameraAngleCommand {
 
 		getPlayersFromContext(ctx).forEach(player -> {
 			CatnipServices.NETWORK.simpleActionToClient(player, optionName, String.valueOf(angleTarget));
-
 			targets.incrementAndGet();
 		});
 
@@ -65,7 +64,6 @@ public class CameraAngleCommand {
 
 		getPlayersFromContext(ctx).forEach(player -> {
 			CatnipServices.NETWORK.simpleActionToClient(player, "camAngleFunction", value);
-
 			targets.incrementAndGet();
 		});
 
@@ -77,7 +75,6 @@ public class CameraAngleCommand {
 
 		getPlayersFromContext(ctx).forEach(player -> {
 			CatnipServices.NETWORK.simpleActionToClient(player, "camAngleFunction", value + ":" + speed);
-
 			targets.incrementAndGet();
 		});
 

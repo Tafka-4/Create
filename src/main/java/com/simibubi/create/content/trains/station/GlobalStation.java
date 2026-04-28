@@ -168,13 +168,6 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
 		return this.nearestTrain.get();
 	}
 
-	// Package Port integration
-	public static class GlobalPackagePort {
-		public String address = "";
-		public ItemStackHandler offlineBuffer = new ItemStackHandler(18);
-		public boolean primed = false;
-	}
-
 	public void runMailTransfer() {
 		Train train = getPresentTrain();
 		if (train == null || connectedPorts.isEmpty())

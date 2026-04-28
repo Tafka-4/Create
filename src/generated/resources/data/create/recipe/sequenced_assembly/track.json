@@ -3,10 +3,9 @@
   "ingredient": {
     "tag": "create:sleepers"
   },
-  "loops": 1,
   "results": [
     {
-      "item": "create:track"
+      "id": "create:track"
     }
   ],
   "sequence": [
@@ -18,16 +17,16 @@
         },
         [
           {
-            "tag": "c:iron_nuggets"
+            "tag": "c:nuggets/iron"
           },
           {
-            "tag": "c:zinc_nuggets"
+            "tag": "c:nuggets/zinc"
           }
         ]
       ],
       "results": [
         {
-          "item": "create:incomplete_track"
+          "id": "create:incomplete_track"
         }
       ]
     },
@@ -39,16 +38,16 @@
         },
         [
           {
-            "tag": "c:iron_nuggets"
+            "tag": "c:nuggets/iron"
           },
           {
-            "tag": "c:zinc_nuggets"
+            "tag": "c:nuggets/zinc"
           }
         ]
       ],
       "results": [
         {
-          "item": "create:incomplete_track"
+          "id": "create:incomplete_track"
         }
       ]
     },
@@ -61,12 +60,12 @@
       ],
       "results": [
         {
-          "item": "create:incomplete_track"
+          "id": "create:incomplete_track"
         }
       ]
     }
   ],
-  "transitionalItem": {
-    "item": "create:incomplete_track"
+  "transitional_item": {
+    "id": "create:incomplete_track"
   }
 }

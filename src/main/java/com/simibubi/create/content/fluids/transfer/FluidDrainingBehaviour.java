@@ -6,16 +6,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.fluid.FluidHelper;
-
+import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
-import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionCallback;
 
 import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.math.BBHelper;
@@ -40,15 +38,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
-
-import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.LiquidBlockAccessor;
-import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionCallback;
 
 public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
 
@@ -170,7 +160,7 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
 			} else if (blockState.getBlock() instanceof LiquidBlock flowingFluid) {
 				emptied = Blocks.AIR.defaultBlockState();
 				if (blockState.getValue(LiquidBlock.LEVEL) == 0)
-					fluid = flowingFluid.fluid;
+					fluid = ((LiquidBlockAccessor) flowingFluid).port_lib$getFluid();
 				else {
 					affectedArea = BBHelper.encapsulate(affectedArea, BoundingBox.fromCorners(currentPos, currentPos));
 					if (!blockEntity.isVirtual())
@@ -349,7 +339,7 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
 		}
 
 		int maxBlocks = maxBlocks();
-		if (visited.size() > maxBlocks && canDrainInfinitely(fluid) && !queue.isEmpty()) {
+		if (visited.size() >= maxBlocks && canDrainInfinitely(fluid) && !queue.isEmpty()) {
 			infinite = true;
 			BlockPos firstValid = queue.first()
 				.pos();
@@ -379,7 +369,7 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
 		}
 
 		int maxBlocks = maxBlocks();
-		if (validationVisited.size() > maxBlocks && canDrainInfinitely(fluid)) {
+		if (validationVisited.size() >= maxBlocks && canDrainInfinitely(fluid)) {
 			if (!infinite)
 				reset(null);
 			validationFrontier.clear();

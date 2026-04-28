@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-import io.github.fabricators_of_create.porting_lib.item.EntityTickListenerItem;
+import io.github.fabricators_of_create.porting_lib.item.extensions.EntityTickListenerItem;
 
 public class NoGravMagicalDohickyItem extends Item implements EntityTickListenerItem {
 

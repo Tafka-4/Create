@@ -19,7 +19,7 @@
   "processing_time": 50,
   "results": [
     {
-      "item": "minecraft:stripped_birch_log"
+      "id": "minecraft:stripped_birch_log"
     }
   ]
 }

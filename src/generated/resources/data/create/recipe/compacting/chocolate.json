@@ -2,16 +2,14 @@
   "type": "create:compacting",
   "ingredients": [
     {
-      "type": "fluid_stack",
+      "type": "neoforge:single",
       "amount": 250,
       "fluid": "create:chocolate"
     }
   ],
   "results": [
     {
-      "item": {
-        "id": "create:bar_of_chocolate"
-      }
+      "id": "create:bar_of_chocolate"
     }
   ]
 }

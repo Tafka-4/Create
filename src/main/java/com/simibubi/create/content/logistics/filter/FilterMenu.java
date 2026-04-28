@@ -49,7 +49,7 @@ public class FilterMenu extends AbstractFilterMenu {
 
 	@Override
 	protected ItemStackHandler createGhostInventory() {
-		return FilterItem.getFilterItems(contentHolder);
+		return ((ListFilterItem) contentHolder.getItem()).getFilterItemHandler(contentHolder);
 	}
 
 	@Override

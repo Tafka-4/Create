@@ -11,6 +11,7 @@ import com.tterrag.registrate.util.nullness.NonNullFunction;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Block;
 
 public class CustomBlockModels {

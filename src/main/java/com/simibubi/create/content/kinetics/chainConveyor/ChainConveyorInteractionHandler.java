@@ -34,8 +34,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-
 public class ChainConveyorInteractionHandler {
 
 	public static WorldAttached<Cache<BlockPos, List<ChainConveyorShape>>> loadedChains =
@@ -59,7 +57,7 @@ public class ChainConveyorInteractionHandler {
 		boolean dismantling = isWrench && mc.player.isShiftKeyDown();
 		double range = mc.player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 1;
 
-		Vec3 from = RaycastHelper.getTraceOrigin(mc.player);
+		Vec3 from = mc.player.getEyePosition();
 		Vec3 to = RaycastHelper.getTraceTarget(mc.player, range, from);
 		HitResult hitResult = mc.hitResult;
 
@@ -147,7 +145,7 @@ public class ChainConveyorInteractionHandler {
 
 		if (PackageItem.isPackage(mainHandItem)) {
 			CatnipServices.NETWORK.sendToServer(new ChainPackageInteractionPacket(selectedLift, selectedConnection, selectedChainPosition,
-				mainHandItem));
+				false));
 			return true;
 		}
 

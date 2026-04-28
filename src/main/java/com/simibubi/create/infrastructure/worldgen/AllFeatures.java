@@ -1,21 +1,25 @@
 package com.simibubi.create.infrastructure.worldgen;
 
+import java.util.function.Supplier;
+
 import com.simibubi.create.Create;
 
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.Feature;
-
-import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
 
 import org.jetbrains.annotations.ApiStatus.Internal;
 
 public class AllFeatures {
-	private static final LazyRegistrar<Feature<?>> REGISTER = LazyRegistrar.create(BuiltInRegistries.FEATURE, Create.ID);
+	private static final ResourceLocation LAYERED_ORE_ID = Create.asResource("layered_ore");
+	private static LayeredOreFeature layeredOre;
 
-	public static final DeferredHolder<Feature<?>, LayeredOreFeature> LAYERED_ORE = REGISTER.register("layered_ore", () -> new LayeredOreFeature());
+	public static final Supplier<LayeredOreFeature> LAYERED_ORE = () -> layeredOre;
 
 	@Internal
 	public static void register() {
-		REGISTER.register();
+		if (layeredOre == null)
+			layeredOre = Registry.register(BuiltInRegistries.FEATURE, LAYERED_ORE_ID, new LayeredOreFeature());
 	}
 }

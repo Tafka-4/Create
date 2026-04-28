@@ -17,23 +17,26 @@ import net.minecraft.world.level.saveddata.SavedData;
 
 public class SavedDataUtil {
 	public static <T extends SavedData> void saveWithDatOld(T savedData, File file, HolderLookup.Provider registries) {
-		if (savedData.isDirty()) {
-			CompoundTag compoundtag = new CompoundTag();
-			compoundtag.put("data", savedData.save(new CompoundTag(), registries));
-			NbtUtils.addCurrentDataVersion(compoundtag);
+		if (!savedData.isDirty())
+			return;
 
-			String savedDataName = file.getName().split("\\.")[0];
+		CompoundTag compound = new CompoundTag();
+		compound.put("data", savedData.save(new CompoundTag(), registries));
+		NbtUtils.addCurrentDataVersion(compound);
 
-			try {
-				Path temp = Files.createTempFile(file.getParentFile().toPath(), savedDataName, ".dat");
-				NbtIo.writeCompressed(compoundtag, temp);
-				Path oldFile = Paths.get(file.getParent(), savedDataName + ".dat_old");
-				Util.safeReplaceFile(file.toPath(), temp, oldFile);
-			} catch (IOException ioexception) {
-				Create.LOGGER.error("Could not save data {}", savedData, ioexception);
-			}
+		String savedDataName = file.getName()
+			.split("\\.")[0];
 
-			savedData.setDirty(false);
+		try {
+			Path temp = Files.createTempFile(file.getParentFile()
+				.toPath(), savedDataName, ".dat");
+			NbtIo.writeCompressed(compound, temp);
+			Path oldFile = Paths.get(file.getParent(), savedDataName + ".dat_old");
+			Util.safeReplaceFile(file.toPath(), temp, oldFile);
+		} catch (IOException e) {
+			Create.LOGGER.error("Could not save data {}", savedData, e);
 		}
+
+		savedData.setDirty(false);
 	}
 }

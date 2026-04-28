@@ -10,7 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.simibubi.create.Create;
 import com.simibubi.create.api.stress.BlockStressValues;
 
-import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.createmod.catnip.config.ConfigBase;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -58,7 +58,7 @@ public class AllConfigs {
 		server = register(CServer::new, ModConfig.Type.SERVER);
 
 		for (Entry<ModConfig.Type, ConfigBase> pair : CONFIGS.entrySet())
-			ForgeConfigRegistry.INSTANCE.register(Create.ID, pair.getKey(), pair.getValue().specification);
+			NeoForgeConfigRegistry.INSTANCE.register(Create.ID, pair.getKey(), pair.getValue().specification);
 
 		CStress stress = server().kinetics.stressValues;
 		BlockStressValues.IMPACTS.registerProvider(stress::getImpact);

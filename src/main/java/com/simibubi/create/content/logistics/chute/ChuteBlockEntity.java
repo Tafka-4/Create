@@ -7,7 +7,6 @@ import java.util.function.Predicate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.AllBlockEntityTypes;
@@ -32,7 +31,7 @@ import com.simibubi.create.foundation.utility.BlockHelper;
 import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 
-import io.github.fabricators_of_create.porting_lib.block.CustomRenderBoundingBoxBlockEntity;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.CustomRenderBoundingBoxBlockEntity;
 
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 
@@ -57,7 +56,6 @@ import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -75,7 +73,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
-import io.github.fabricators_of_create.porting_lib.block.CustomRenderBoundingBoxBlockEntity;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.CustomRenderBoundingBoxBlockEntity;
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 
 import io.github.fabricators_of_create.porting_lib.util.StorageProvider;
@@ -107,7 +105,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 
 	VersionedInventoryTrackerBehaviour invVersionTracker;
 
-	private final EnumMap<Direction, BlockCapabilityCache<IItemHandler, @Nullable Direction>> capCaches = new EnumMap<>(Direction.class);
+	private final EnumMap<Direction, StorageProvider<ItemVariant>> storageProviders = new EnumMap<>(Direction.class);
 
 	public ChuteBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -123,8 +121,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 	@Override
 	public void setLevel(Level level) {
 		super.setLevel(level);
-		capAbove = StorageProvider.createForItems(level, worldPosition.above());
-		capBelow = StorageProvider.createForItems(level, worldPosition.below());
+		storageProviders.clear();
 	}
 
 	@Override
@@ -537,7 +534,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 		return true;
 	}
 
-	private @Nullable IItemHandler grabCapability(@NotNull Direction side) {
+	private @Nullable Storage<ItemVariant> grabCapability(Direction side) {
 		BlockPos pos = this.worldPosition.relative(side);
 		if (level == null)
 			return null;
@@ -546,22 +543,8 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 			if (side != Direction.DOWN || !(be instanceof SmartChuteBlockEntity) || getItemMotion() > 0)
 				return null;
 		}
-		if (capCaches.get(side) == null) {
-			if (level instanceof ServerLevel serverLevel) {
-				BlockCapabilityCache<IItemHandler, @Nullable Direction> cache = BlockCapabilityCache.create(
-						Capabilities.ItemHandler.BLOCK,
-						serverLevel,
-						pos,
-						side.getOpposite()
-				);
-				capCaches.put(side, cache);
-				return cache.getCapability();
-			} else {
-				return level.getCapability(Capabilities.ItemHandler.BLOCK, pos, side.getOpposite());
-			}
-		} else {
-			return capCaches.get(side).getCapability();
-		}
+		return storageProviders.computeIfAbsent(side, direction -> StorageProvider.createForItems(level, pos))
+			.get(side.getOpposite());
 	}
 
 	public void setItem(ItemStack stack) {

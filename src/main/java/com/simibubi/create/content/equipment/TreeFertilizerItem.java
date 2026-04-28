@@ -2,6 +2,7 @@ package com.simibubi.create.content.equipment;
 
 
 import net.createmod.catnip.levelWrappers.PlacementSimulationServerLevel;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
@@ -68,6 +69,7 @@ public class TreeFertilizerItem extends Item {
 						.isEmpty())
 					continue;
 
+				context.getLevel().destroyBlock(actualPos, true);
 				context.getLevel()
 					.setBlockAndUpdate(actualPos, newState);
 			}
@@ -115,6 +117,16 @@ public class TreeFertilizerItem extends Item {
 			if (newState.getBlock() == Blocks.PODZOL)
 				return true;
 			return super.setBlock(pos, newState, flags);
+		}
+
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		@Override
+		public SnapshotParticipant snapshotParticipant() {
+			if (level instanceof io.github.fabricators_of_create.porting_lib.extensions.common.LevelExtensions extensions)
+				return extensions.snapshotParticipant();
+			if (level instanceof io.github.fabricators_of_create.porting_lib.extensions.extensions.LevelExtensions extensions)
+				return extensions.snapshotParticipant();
+			throw new UnsupportedOperationException("Wrapped level does not expose a Porting Lib snapshot participant");
 		}
 	}
 

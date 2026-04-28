@@ -8,15 +8,11 @@
   "processing_time": 500,
   "results": [
     {
-      "item": {
-        "id": "create:powdered_obsidian"
-      }
+      "id": "create:powdered_obsidian"
     },
     {
       "chance": 0.75,
-      "item": {
-        "id": "minecraft:obsidian"
-      }
+      "id": "minecraft:obsidian"
     }
   ]
 }

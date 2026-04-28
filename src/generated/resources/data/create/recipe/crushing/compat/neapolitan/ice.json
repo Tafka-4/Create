@@ -17,12 +17,12 @@
   "results": [
     {
       "count": 3,
-      "item": "neapolitan:ice_cubes"
+      "id": "neapolitan:ice_cubes"
     },
     {
       "chance": 0.25,
       "count": 3,
-      "item": "neapolitan:ice_cubes"
+      "id": "neapolitan:ice_cubes"
     }
   ]
 }

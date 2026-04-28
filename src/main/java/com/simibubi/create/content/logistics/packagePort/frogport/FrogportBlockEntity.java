@@ -81,15 +81,6 @@ public class FrogportBlockEntity extends PackagePortBlockEntity implements IHave
 			.chase(0, 0.35, Chaser.LINEAR);
 		goggles = false;
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-			Capabilities.ItemHandler.BLOCK,
-			AllBlockEntityTypes.PACKAGE_FROGPORT.get(),
-			(be, context) -> be.itemHandler
-		);
-	}
-
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		behaviours.add(advancements = new AdvancementBehaviour(this, AllAdvancements.FROGPORT));
@@ -247,7 +238,7 @@ public class FrogportBlockEntity extends PackagePortBlockEntity implements IHave
 		failedLastExport = false;
 		Storage<ItemVariant> inventory = this.exposedInventory;
 
-		if (itemHandler == null)
+		if (inventory == null)
 			return;
 
 		if (!inventory.nonEmptyViews().iterator().hasNext())

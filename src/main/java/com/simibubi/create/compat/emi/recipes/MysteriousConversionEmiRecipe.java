@@ -7,7 +7,7 @@ import org.apache.commons.compress.utils.Lists;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.compat.emi.CreateEmiPlugin;
-import com.simibubi.create.compat.rei.ConversionRecipe;
+import com.simibubi.create.compat.recipeViewerCommon.ConversionRecipe;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 
 import dev.emi.emi.api.widget.WidgetHolder;

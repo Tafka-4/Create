@@ -7,21 +7,19 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.ImmutableMap;
-
-import com.simibubi.create.foundation.data.recipe.Mods;
-
 import org.jetbrains.annotations.ApiStatus;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
 import com.simibubi.create.Create;
+import com.simibubi.create.content.kinetics.fan.processing.SplashingRecipe;
 import com.simibubi.create.content.kinetics.saw.CuttingRecipe;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipe;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipeSerializer;
+import com.simibubi.create.content.processing.recipe.StandardProcessingRecipe;
+import com.simibubi.create.foundation.data.recipe.Mods;
+import com.simibubi.create.foundation.mixin.accessor.ConcretePowderBlockAccessor;
 import com.simibubi.create.foundation.pack.DynamicPack;
 import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
 
@@ -35,8 +33,10 @@ import net.minecraft.tags.TagFile;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ConcretePowderBlock;
 
-import net.neoforged.neoforge.common.conditions.WithConditions;
+import io.github.fabricators_of_create.porting_lib.resources.conditions.WithConditions;
 
 @ApiStatus.Internal
 public class RuntimeDataGenerator {
@@ -55,8 +55,10 @@ public class RuntimeDataGenerator {
 		.build();
 
 	public static void insertIntoPack(DynamicPack dynamicPack) {
-		for (ResourceLocation itemId : BuiltInRegistries.ITEM.keySet())
+		for (ResourceLocation itemId : BuiltInRegistries.ITEM.keySet()) {
 			cuttingRecipes(itemId);
+			washingRecipes(itemId);
+		}
 
 		Create.LOGGER.info("Created {} recipes which will be injected into the game", JSON_FILES.size());
 		JSON_FILES.forEach(dynamicPack::put);
@@ -64,7 +66,7 @@ public class RuntimeDataGenerator {
 		Create.LOGGER.info("Created {} tags which will be injected into the game", TAGS.size());
 		for (Map.Entry<ResourceLocation, Collection<TagEntry>> tags : TAGS.asMap().entrySet()) {
 			TagFile tagFile = new TagFile(new ArrayList<>(tags.getValue()), false);
-			dynamicPack.put(tags.getKey().withPrefix("tags/items/"), TagFile.CODEC.encodeStart(JsonOps.INSTANCE, tagFile).result().orElseThrow());
+			dynamicPack.put(tags.getKey().withPrefix("tags/item/"), TagFile.CODEC.encodeStart(JsonOps.INSTANCE, tagFile).result().orElseThrow());
 		}
 
 		JSON_FILES.clear();
@@ -119,7 +121,10 @@ public class RuntimeDataGenerator {
 			int planksCount = type.contains("block") ? 3 : 6;
 
 			if (!noStrippedVariant) {
-				simpleWoodRecipe(nonStrippedId, itemId);
+				// Catch mods like JNE that have a non-stripped log prefixed but not the stripped log
+				if (BuiltInRegistries.ITEM.containsKey(nonStrippedId)) {
+					simpleWoodRecipe(nonStrippedId, itemId);
+				}
 				simpleWoodRecipe(itemId, planksId, planksCount);
 			} else if (BuiltInRegistries.ITEM.containsKey(planksId)) {
 				ResourceLocation tag = Create.asResource("runtime_generated/compat/" + itemId.getNamespace() + "/" + base.getPath());
@@ -142,6 +147,14 @@ public class RuntimeDataGenerator {
 		}
 	}
 
+	private static void washingRecipes(ResourceLocation itemId) {
+		Block block = BuiltInRegistries.BLOCK.get(itemId);
+		if (block instanceof ConcretePowderBlock concretePowderBlock) {
+			Block concreteBlock = ((ConcretePowderBlockAccessor) concretePowderBlock).create$getConcrete();
+			simpleSplashingRecipe(itemId, BuiltInRegistries.BLOCK.getKey(concreteBlock));
+		}
+	}
+
 	private static void insertIntoTag(ResourceLocation tag, ResourceLocation itemId) {
 		if (BuiltInRegistries.ITEM.containsKey(itemId))
 			TAGS.put(tag, TagEntry.optionalElement(itemId));
@@ -153,7 +166,7 @@ public class RuntimeDataGenerator {
 
 	private static void simpleWoodRecipe(ResourceLocation inputId, ResourceLocation outputId, int amount) {
 		if (BuiltInRegistries.ITEM.containsKey(outputId)) {
-			new Builder<>(inputId.getNamespace(), CuttingRecipe::new, inputId.getPath(), outputId.getPath())
+			new StandardBuilder<>(inputId.getNamespace(), CuttingRecipe::new, inputId.getPath(), outputId.getPath())
 				.require(BuiltInRegistries.ITEM.get(inputId))
 				.output(BuiltInRegistries.ITEM.get(outputId), amount)
 				.duration(50)
@@ -163,7 +176,7 @@ public class RuntimeDataGenerator {
 
 	private static void simpleWoodRecipe(TagKey<Item> inputTag, ResourceLocation outputId, int amount) {
 		if (BuiltInRegistries.ITEM.containsKey(outputId)) {
-			new Builder<>(inputTag.location().getNamespace(), CuttingRecipe::new, "tag_" + inputTag.location().getPath(), outputId.getPath())
+			new StandardBuilder<>(inputTag.location().getNamespace(), CuttingRecipe::new, "tag_" + inputTag.location().getPath(), outputId.getPath())
 				.require(inputTag)
 				.output(BuiltInRegistries.ITEM.get(outputId), amount)
 				.duration(50)
@@ -171,8 +184,15 @@ public class RuntimeDataGenerator {
 		}
 	}
 
-	private static class Builder<T extends ProcessingRecipe<?>> extends ProcessingRecipeBuilder<T> {
-		public Builder(String modid, ProcessingRecipeBuilder.ProcessingRecipeFactory<T> factory, String from, String to) {
+	private static void simpleSplashingRecipe(ResourceLocation first, ResourceLocation second) {
+		new StandardBuilder<>(first.getNamespace(), SplashingRecipe::new, first.getPath(), second.getPath())
+			.require(BuiltInRegistries.BLOCK.get(first))
+			.output(BuiltInRegistries.BLOCK.get(second))
+			.build();
+	}
+
+	private static class StandardBuilder<T extends StandardProcessingRecipe<?>> extends StandardProcessingRecipe.Builder<T> {
+		public StandardBuilder(String modid, StandardProcessingRecipe.Factory<T> factory, String from, String to) {
 			super(factory, Create.asResource("runtime_generated/compat/" + modid + "/" + from + "_to_" + to));
 		}
 
@@ -183,13 +203,13 @@ public class RuntimeDataGenerator {
 			IRecipeTypeInfo recipeType = recipe.getTypeInfo();
 			ResourceLocation typeId = recipeType.getId();
 
-			if (!(recipeType.getSerializer() instanceof ProcessingRecipeSerializer))
+			if (!(recipeType.getSerializer() instanceof StandardProcessingRecipe.Serializer))
 				throw new IllegalStateException("Cannot datagen ProcessingRecipe of type: " + typeId);
 
-			ResourceLocation id = ResourceLocation.fromNamespaceAndPath(recipe.id.getNamespace(),
-				typeId.getPath() + "/" + recipe.id.getPath());
+			ResourceLocation id = ResourceLocation.fromNamespaceAndPath(recipeId.getNamespace(),
+				typeId.getPath() + "/" + recipeId.getPath());
 
-			Optional<JsonElement> serialized = CatnipCodecUtils.encode(Recipe.CONDITIONAL_CODEC, JsonOps.INSTANCE, Optional.of(new WithConditions<>(recipe)));
+			Optional<JsonElement> serialized = CatnipCodecUtils.encode(Recipe.CODEC, JsonOps.INSTANCE, recipe);
 			serialized.ifPresent(r -> JSON_FILES.put(id.withPrefix("recipe/"), r));
 			return recipe;
 		}

@@ -43,6 +43,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -149,19 +150,19 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
 	}
 
 	public void sendCarriageDataUpdate() {
-		AllPackets.getChannel().sendToClientsTracking(new CarriageDataUpdatePacket(this), this);
+		CatnipServices.NETWORK.sendToClientsTrackingEntity(this, new CarriageDataUpdatePacket(this));
 	}
 
 	// fabric: initial carriageData sync since that's not handled by tracked data anymore
 
 	@Override
-	public void writeSpawnData(FriendlyByteBuf buffer) {
+	public void writeSpawnData(RegistryFriendlyByteBuf buffer) {
 		super.writeSpawnData(buffer);
 		carriageData.write(buffer);
 	}
 
 	@Override
-	public void readSpawnData(FriendlyByteBuf additionalData) {
+	public void readSpawnData(RegistryFriendlyByteBuf additionalData) {
 		super.readSpawnData(additionalData);
 		carriageData.read(additionalData);
 	}

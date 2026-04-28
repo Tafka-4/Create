@@ -9,6 +9,8 @@ import com.simibubi.create.AllShapes;
 import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.item.ItemHelper;
+import com.simibubi.create.infrastructure.config.AllConfigs;
+
 import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.nbt.NBTHelper;
 import net.minecraft.core.BlockPos;
@@ -16,7 +18,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
@@ -40,7 +41,7 @@ import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import io.github.fabricators_of_create.porting_lib.block.CustomRunningEffectsBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.CustomRunningEffectsBlock;
 
 public class CrushingWheelControllerBlock extends DirectionalBlock implements IBE<CrushingWheelControllerBlockEntity>, CustomRunningEffectsBlock {
 
@@ -158,7 +159,7 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
 				be.sendData();
 
 				cwbe.award(AllAdvancements.CRUSHING_WHEEL);
-				if (cwbe.getSpeed() > 255)
+				if (Math.abs(cwbe.getSpeed()) > AllConfigs.server().kinetics.maxRotationSpeed.get() - 1)
 					cwbe.award(AllAdvancements.CRUSHER_MAXED);
 				break;
 			}
@@ -177,7 +178,7 @@ public class CrushingWheelControllerBlock extends DirectionalBlock implements IB
 		if (entity == null)
 			return standardShape;
 
-		CompoundTag data = entity.getPersistentData();
+		CompoundTag data = entity.getCustomData();
 		if (pos.equals(NBTHelper.readBlockPos(data, "BypassCrushingWheel")))
 			if (state.getValue(FACING) != Direction.UP) // Allow output items to land on top of the block rather
 				return Shapes.empty();					// than falling back through.

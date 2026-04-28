@@ -1,6 +1,6 @@
 package com.simibubi.create.content.equipment.bell;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.AllShapes;
 import com.simibubi.create.foundation.block.IBE;
@@ -47,7 +47,7 @@ public abstract class AbstractBellBlock<BE extends AbstractBellBlockEntity> exte
 		boolean shouldPower = pLevel.hasNeighborSignal(pPos);
 		if (shouldPower == pState.getValue(POWERED))
 			return;
-		pLevel.setBlock(pPos, pState.setValue(POWERED, shouldPower), 3);
+		pLevel.setBlock(pPos, pState.setValue(POWERED, shouldPower), Block.UPDATE_ALL);
 		if (!shouldPower)
 			return;
 		Direction facing = pState.getValue(FACING);

@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
@@ -41,7 +41,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 
 import io.github.fabricators_of_create.porting_lib.entity.events.EntityEvents;
-import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
+import io.github.fabricators_of_create.porting_lib.entity.events.living.LivingChangeTargetEvent;
 import io.github.fabricators_of_create.porting_lib.util.UsernameCache;
 
 public class DeployerFakePlayer extends FakePlayer {
@@ -139,7 +139,7 @@ public class DeployerFakePlayer extends FakePlayer {
 		return i;
 	}
 
-	public static void entitiesDontRetaliate(LivingEntityEvents.ChangeTarget.ChangeTargetEvent event) {
+	public static void entitiesDontRetaliate(LivingChangeTargetEvent event) {
 		if (!(event.getOriginalTarget() instanceof DeployerFakePlayer))
 			return;
 		LivingEntity entityLiving = (LivingEntity) event.getEntity();

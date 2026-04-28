@@ -17,15 +17,11 @@
   "processing_time": 400,
   "results": [
     {
-      "item": {
-        "id": "create:crushed_raw_platinum"
-      }
+      "id": "create:crushed_raw_platinum"
     },
     {
       "chance": 0.75,
-      "item": {
-        "id": "create:experience_nugget"
-      }
+      "id": "create:experience_nugget"
     }
   ]
 }

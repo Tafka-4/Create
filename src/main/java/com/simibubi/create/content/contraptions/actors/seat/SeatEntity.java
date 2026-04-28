@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -31,23 +30,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-
-import io.github.fabricators_of_create.porting_lib.entity.IEntityAdditionalSpawnData;
+import io.github.fabricators_of_create.porting_lib.entity.IEntityWithComplexSpawn;
 import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
 
-import net.neoforged.neoforge.common.util.FakePlayer;
-import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
-
 public class SeatEntity extends Entity implements IEntityWithComplexSpawn {
-
-	public SeatEntity(EntityType<?> p_i48580_1_, Level p_i48580_2_) {
-		super(p_i48580_1_, p_i48580_2_);
+	public SeatEntity(EntityType<?> entityType, Level level) {
+		super(entityType, level);
 	}
 
-	public SeatEntity(Level world, BlockPos pos) {
-		this(AllEntityTypes.SEAT.get(), world);
+	public SeatEntity(Level level) {
+		this(AllEntityTypes.SEAT.get(), level);
 		noPhysics = true;
 	}
 
@@ -74,6 +66,11 @@ public class SeatEntity extends Entity implements IEntityWithComplexSpawn {
 		pCallback.accept(pEntity, this.getX(), 1.0 / 16.0 + heightOffset + getCustomEntitySeatOffset(pEntity), this.getZ());
 	}
 
+	@Override
+	public void onPassengerTurned(Entity entity) {
+		entity.setYHeadRot(entity.getYRot());
+	}
+
 	public static double getCustomEntitySeatOffset(Entity entity) {
 		if (entity instanceof Slime)
 			return 0.0f;
@@ -95,7 +92,8 @@ public class SeatEntity extends Entity implements IEntityWithComplexSpawn {
 	}
 
 	@Override
-	public void setDeltaMovement(Vec3 p_213317_1_) {}
+	public void setDeltaMovement(Vec3 vec) {
+	}
 
 	@Override
 	public void tick() {
@@ -131,10 +129,12 @@ public class SeatEntity extends Entity implements IEntityWithComplexSpawn {
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {}
 
 	@Override
-	protected void readAdditionalSaveData(CompoundTag p_70037_1_) {}
+	protected void readAdditionalSaveData(CompoundTag tag) {
+	}
 
 	@Override
-	protected void addAdditionalSaveData(CompoundTag p_213281_1_) {}
+	protected void addAdditionalSaveData(CompoundTag tag) {
+	}
 
 	public static class Render extends EntityRenderer<SeatEntity> {
 
@@ -143,13 +143,13 @@ public class SeatEntity extends Entity implements IEntityWithComplexSpawn {
 		}
 
 		@Override
-		public boolean shouldRender(SeatEntity p_225626_1_, Frustum p_225626_2_, double p_225626_3_, double p_225626_5_,
+		public boolean shouldRender(SeatEntity seatEntity, Frustum frustum, double p_225626_3_, double p_225626_5_,
 			double p_225626_7_) {
 			return false;
 		}
 
 		@Override
-		public ResourceLocation getTextureLocation(SeatEntity p_110775_1_) {
+		public ResourceLocation getTextureLocation(SeatEntity seatEntity) {
 			return null;
 		}
 	}

@@ -97,8 +97,8 @@ public class AllPotatoProjectileEntityHitActions {
 			Entity entity = ray.getEntity();
 			if (entity.level().isClientSide)
 				return true;
-			if (entity instanceof LivingEntity)
-				applyEffect((LivingEntity) entity, new MobEffectInstance(effect, ticks, level - 1));
+			if (entity instanceof LivingEntity livingEntity)
+				applyEffect(livingEntity, new MobEffectInstance(effect, ticks, level - 1));
 			return !recoverable;
 		}
 

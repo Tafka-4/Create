@@ -4,12 +4,12 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.simibubi.create.api.unpacking.UnpackingHandler;
+import com.simibubi.create.api.packager.unpacking.UnpackingHandler;
 import com.simibubi.create.content.kinetics.crafter.ConnectedInputHandler.ConnectedInput;
 import com.simibubi.create.content.kinetics.crafter.MechanicalCrafterBlockEntity;
 import com.simibubi.create.content.kinetics.crafter.MechanicalCrafterBlockEntity.Inventory;
 import com.simibubi.create.content.logistics.BigItemStack;
-import com.simibubi.create.content.logistics.stockTicker.PackageOrder;
+import com.simibubi.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,8 +27,8 @@ public enum CrafterUnpackingHandler implements UnpackingHandler {
 	INSTANCE;
 
 	@Override
-	public boolean unpack(Level level, BlockPos pos, BlockState state, Direction side, List<ItemStack> items, @Nullable PackageOrder order, boolean simulate) {
-		if (order == null) {
+	public boolean unpack(Level level, BlockPos pos, BlockState state, Direction side, List<ItemStack> items, @Nullable PackageOrderWithCrafts orderContext, boolean simulate) {
+		if (orderContext == null) {
 			return DEFAULT.unpack(level, pos, state, side, items, null, simulate);
 		}
 
@@ -42,6 +42,7 @@ public enum CrafterUnpackingHandler implements UnpackingHandler {
 			return false;
 
 		try (Transaction t = Transaction.openOuter()) {
+			var order = orderContext.orderedStacks();
 			// insert in the order's defined ordering
 			int max = Math.min(inventories.size(), order.stacks().size());
 			outer: for (int i = 0; i < max; i++) {

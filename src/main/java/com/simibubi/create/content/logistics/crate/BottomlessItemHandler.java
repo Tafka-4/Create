@@ -6,8 +6,6 @@ import java.util.function.Supplier;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
-
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandlerSlot;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -29,7 +27,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
-import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandlerSlot;
 
 @MethodsReturnNonnullByDefault
@@ -130,7 +128,6 @@ public class BottomlessItemHandler extends ItemStackHandler implements SingleSlo
 		protected void setStack(ItemStack stack) {
 		}
 
-		@Override
 		@Nullable
 		public CompoundTag save() {
 			return null;

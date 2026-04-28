@@ -15,7 +15,8 @@ import com.simibubi.create.AllBlockEntityTypes;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.Create;
-import com.simibubi.create.api.unpacking.UnpackingHandler;
+import com.simibubi.create.api.packager.InventoryIdentifier;
+import com.simibubi.create.api.packager.unpacking.UnpackingHandler;
 import com.simibubi.create.content.contraptions.actors.psi.PortableStorageInterfaceBlockEntity;
 import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.content.logistics.box.PackageItem;
@@ -24,13 +25,12 @@ import com.simibubi.create.content.logistics.factoryBoard.FactoryPanelBehaviour;
 import com.simibubi.create.content.logistics.factoryBoard.FactoryPanelBlock;
 import com.simibubi.create.content.logistics.factoryBoard.FactoryPanelBlockEntity;
 import com.simibubi.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
-import com.simibubi.create.content.logistics.packager.fabric.InventoryIdentifier;
 import com.simibubi.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour.RequestType;
 import com.simibubi.create.content.logistics.packagerLink.PackagerLinkBlock;
 import com.simibubi.create.content.logistics.packagerLink.PackagerLinkBlockEntity;
 import com.simibubi.create.content.logistics.packagerLink.RequestPromiseQueue;
 import com.simibubi.create.content.logistics.packagerLink.WiFiEffectPacket;
-import com.simibubi.create.content.logistics.stockTicker.PackageOrder;
+import com.simibubi.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.simibubi.create.foundation.advancement.AdvancementBehaviour;
 import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -79,6 +79,8 @@ public class PackagerBlockEntity extends SmartBlockEntity implements SidedStorag
 	public boolean redstonePowered;
 	public int buttonCooldown;
 	public String signBasedAddress;
+	public boolean hasCustomComputerAddress;
+	public String customComputerAddress;
 
 	public InvManipulationBehaviour targetInventory;
 	public ItemStack heldBox;
@@ -110,17 +112,10 @@ public class PackagerBlockEntity extends SmartBlockEntity implements SidedStorag
 		animationInward = true;
 		queuedExitingPackages = new LinkedList<>();
 		signBasedAddress = "";
+		customComputerAddress = "";
+		hasCustomComputerAddress = false;
 		buttonCooldown = 0;
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-			Capabilities.ItemHandler.BLOCK,
-			AllBlockEntityTypes.PACKAGER.get(),
-			(be, context) -> be.inventory
-		);
-	}
-
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		behaviours.add(targetInventory = new InvManipulationBehaviour(this, InterfaceProvider.oppositeOfBlockFacing())
@@ -362,7 +357,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements SidedStorag
 		if (items.isEmpty())
 			return true;
 
-		PackageOrder orderContext = PackageItem.getOrderContext(box);
+		PackageOrderWithCrafts orderContext = PackageItem.getOrderContext(box);
 
 		Direction facing = getBlockState().getOptionalValue(PackagerBlock.FACING).orElse(Direction.UP);
 		BlockPos target = worldPosition.relative(facing.getOpposite());
@@ -410,7 +405,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements SidedStorag
 		boolean finalLinkInOrder = false;
 		int packageIndexAtLink = 0;
 		boolean finalPackageAtLink = false;
-		PackageOrder orderContext = null;
+		PackageOrderWithCrafts orderContext = null;
 		boolean requestQueue = queuedRequests != null;
 
 		if (requestQueue && !queuedRequests.isEmpty()) {
@@ -534,13 +529,16 @@ public class PackagerBlockEntity extends SmartBlockEntity implements SidedStorag
 		notifyUpdate();
 	}
 
-	protected void updateSignAddress() {
+	public void updateSignAddress() {
 		signBasedAddress = "";
 		for (Direction side : Iterate.directions) {
 			String address = getSign(side);
 			if (address == null || address.isBlank())
 				continue;
 			signBasedAddress = address;
+		}
+		if (hasCustomComputerAddress) {
+			signBasedAddress = customComputerAddress;
 		}
 	}
 
@@ -571,6 +569,8 @@ public class PackagerBlockEntity extends SmartBlockEntity implements SidedStorag
 		animationInward = compound.getBoolean("AnimationInward");
 		animationTicks = compound.getInt("AnimationTicks");
 		signBasedAddress = compound.getString("SignAddress");
+		customComputerAddress = compound.getString("ComputerAddress");
+		hasCustomComputerAddress = compound.getBoolean("HasComputerAddress");
 		heldBox = ItemStack.parseOptional(registries, compound.getCompound("HeldBox"));
 		previouslyUnwrapped = ItemStack.parseOptional(registries, compound.getCompound("InsertedBox"));
 		if (clientPacket)
@@ -588,6 +588,8 @@ public class PackagerBlockEntity extends SmartBlockEntity implements SidedStorag
 		compound.putBoolean("AnimationInward", animationInward);
 		compound.putInt("AnimationTicks", animationTicks);
 		compound.putString("SignAddress", signBasedAddress);
+		compound.putString("ComputerAddress", customComputerAddress);
+		compound.putBoolean("HasComputerAddress", hasCustomComputerAddress);
 		compound.put("HeldBox", heldBox.saveOptional(registries));
 		compound.put("InsertedBox", previouslyUnwrapped.saveOptional(registries));
 		if (clientPacket)
@@ -625,11 +627,10 @@ public class PackagerBlockEntity extends SmartBlockEntity implements SidedStorag
 		return animationTicks >= CYCLE / 2 ? ItemStack.EMPTY : heldBox;
 	}
 
-	// fabric: forge's approach is not viable. Introduced InventoryIdentifier. Will upstream soon
 	public boolean isTargetingSameInventory(@Nullable InventoryIdentifier identifier) {
 		if (identifier == null || !this.targetInventory.hasInventory())
 			return false;
-		BlockFace target = this.targetInventory.getTarget();
+		BlockFace target = this.targetInventory.getTarget().getOpposite();
 		return identifier.contains(target);
 	}
 

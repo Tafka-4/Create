@@ -11,6 +11,7 @@ import com.simibubi.create.content.kinetics.belt.behaviour.DirectBeltInputBehavi
 import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.item.ItemHelper;
+import com.simibubi.create.foundation.item.RecipeInputItemStackHandlerContainer;
 import com.simibubi.create.foundation.sound.SoundScapes;
 import com.simibubi.create.foundation.sound.SoundScapes.AmbienceGroup;
 
@@ -48,21 +49,20 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.ViewOnlyWrappedStorageView;
 import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandlerContainer;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandlerSlot;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MillstoneBlockEntity extends KineticBlockEntity implements SidedStorageBlockEntity {
 
-	public ItemStackHandlerContainer inputInv;
+	public RecipeInputItemStackHandlerContainer inputInv;
 	public ItemStackHandler outputInv;
 	public MillstoneInventoryHandler capability;
 	public int timer;
@@ -70,7 +70,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity implements SidedSto
 
 	public MillstoneBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		inputInv = new ItemStackHandlerContainer(1);
+		inputInv = new RecipeInputItemStackHandlerContainer(1);
 		outputInv = new ItemStackHandler(9);
 		capability = new MillstoneInventoryHandler();
 	}
@@ -124,7 +124,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity implements SidedSto
 			.isEmpty())
 			return;
 
-		RecipeWrapper inventoryIn = new RecipeWrapper(inputInv);
+		RecipeInputItemStackHandlerContainer inventoryIn = inputInv;
 		if (lastRecipe == null || !lastRecipe.matches(inventoryIn, level)) {
 			Optional<RecipeHolder<MillingRecipe>> recipe = AllRecipeTypes.MILLING.find(inventoryIn, level);
 			if (!recipe.isPresent()) {
@@ -155,7 +155,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity implements SidedSto
 	}
 
 	private void process() {
-		RecipeWrapper inventoryIn = new RecipeWrapper(inputInv);
+		RecipeInputItemStackHandlerContainer inventoryIn = inputInv;
 
 		if (lastRecipe == null || !lastRecipe.matches(inventoryIn, level)) {
 			Optional<RecipeHolder<MillingRecipe>> recipe = AllRecipeTypes.MILLING.find(inventoryIn, level);
@@ -165,7 +165,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity implements SidedSto
 		}
 
 		try (Transaction t = Transaction.openOuter()) {
-			ItemStackHandlerSlot slot = inputInv.getSlot(0);
+			SingleSlotStorage<ItemVariant> slot = inputInv.getSlot(0);
 			slot.extract(slot.getResource(), 1, t);
 			lastRecipe.rollResults().forEach(stack -> outputInv.insert(ItemVariant.of(stack), stack.getCount(), t));
 			t.commit();
@@ -219,7 +219,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity implements SidedSto
 	}
 
 	private boolean canProcess(ItemStack stack) {
-		ItemStackHandlerContainer tester = new ItemStackHandlerContainer(1);
+		RecipeInputItemStackHandlerContainer tester = new RecipeInputItemStackHandlerContainer(1);
 		tester.setStackInSlot(0, stack);
 
 		if (lastRecipe != null && lastRecipe.matches(tester, level))
@@ -228,7 +228,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity implements SidedSto
 			.isPresent();
 	}
 
-	private class MillstoneInventoryHandler extends CombinedStorage<ItemVariant, io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler> {
+	private class MillstoneInventoryHandler extends CombinedStorage<ItemVariant, Storage<ItemVariant>> {
 
 		public MillstoneInventoryHandler() {
 			super(List.of(inputInv, outputInv));

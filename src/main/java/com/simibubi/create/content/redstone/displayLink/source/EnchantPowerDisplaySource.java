@@ -3,7 +3,7 @@ package com.simibubi.create.content.redstone.displayLink.source;
 import com.simibubi.create.content.redstone.displayLink.DisplayLinkContext;
 import com.simibubi.create.content.redstone.displayLink.target.DisplayTargetStats;
 
-import io.github.fabricators_of_create.porting_lib.enchant.EnchantmentBonusBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.EnchantmentBonusBlock;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -14,11 +14,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.EnchantmentTableBlock;
-import net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity;
+import net.minecraft.world.level.block.EnchantingTableBlock;
+import net.minecraft.world.level.block.entity.EnchantingTableBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-
-import io.github.fabricators_of_create.porting_lib.enchant.EnchantmentBonusBlock;
 
 public class EnchantPowerDisplaySource extends NumericSingleLineDisplaySource {
 
@@ -34,7 +32,7 @@ public class EnchantPowerDisplaySource extends NumericSingleLineDisplaySource {
 		Level level = context.level();
 		float enchantPower = 0;
 
-		for(BlockPos offset : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
+		for (BlockPos offset : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
 			if (!EnchantingTableBlock.isValidBookShelf(level, pos, offset))
 				continue;
 			BlockPos bookPos = pos.offset(offset);

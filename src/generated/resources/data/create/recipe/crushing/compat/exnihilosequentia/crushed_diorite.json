@@ -20,9 +20,7 @@
   "results": [
     {
       "chance": 0.25,
-      "item": {
-        "id": "minecraft:quartz"
-      }
+      "id": "minecraft:quartz"
     }
   ]
 }

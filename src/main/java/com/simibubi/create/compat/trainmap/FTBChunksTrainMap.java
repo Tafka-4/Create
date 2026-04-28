@@ -102,7 +102,7 @@ public class FTBChunksTrainMap {
 			Mth.floor(largeMapScreen.width / regionTileSize), Mth.floor(largeMapScreen.height / regionTileSize));
 
 		List<FormattedText> tooltip = TrainMapManager.renderAndPick(graphics, Mth.floor(mouseX), Mth.floor(mouseY),
-			partialTicks, linearFiltering, bounds);
+			linearFiltering, bounds);
 
 		pose.popPose();
 

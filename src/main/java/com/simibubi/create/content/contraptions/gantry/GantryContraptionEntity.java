@@ -65,7 +65,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
 
 		double prevAxisMotion = axisMotion;
 		if (level().isClientSide) {
-			clientOffsetDiff *= .75f;
+			clientOffsetDiff *= .75;
 			updateClientMotion();
 		}
 
@@ -136,7 +136,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
 		double nextCoord = direction.getAxis()
 			.choose(nextPosition.x, nextPosition.y, nextPosition.z);
 
-		if ((Mth.floor(currentCoord) + .5f < nextCoord != (pinionMovementSpeed * direction.getAxisDirection()
+		if ((Mth.floor(currentCoord) + .5 < nextCoord != (pinionMovementSpeed * direction.getAxisDirection()
 			.getStep() < 0)))
 			if (!gantryShaftBlockEntity.canAssembleOn()) {
 				setContraptionMotion(Vec3.ZERO);
@@ -217,7 +217,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
 		float modifier = movementAxis.getAxisDirection()
 			.getStep();
 		Vec3 motion = Vec3.atLowerCornerOf(movementAxis.getNormal())
-			.scale((axisMotion + clientOffsetDiff * modifier / 2f) * ServerSpeedProvider.get());
+			.scale((axisMotion + clientOffsetDiff * modifier / 2d) * ServerSpeedProvider.get());
 		if (sequencedOffsetLimit >= 0)
 			motion = VecHelper.clampComponentWise(motion, (float) sequencedOffsetLimit);
 		setContraptionMotion(motion);

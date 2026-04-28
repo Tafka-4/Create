@@ -21,6 +21,10 @@ public class CreateMixinPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+		if (mixinClassName.contains(".fabric.gametest.")) {
+			return Boolean.getBoolean("fabric-api.gametest");
+		}
+
 		if (mixinClassName.contains("ftbchunks")) {
 			return Mods.FTBCHUNKS.isLoaded();
 		}

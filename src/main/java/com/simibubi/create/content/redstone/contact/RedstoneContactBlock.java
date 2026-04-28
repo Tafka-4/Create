@@ -1,6 +1,6 @@
 package com.simibubi.create.content.redstone.contact;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.simibubi.create.AllBlocks;
@@ -28,7 +28,7 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
-import io.github.fabricators_of_create.porting_lib.block.ConnectableRedstoneBlock;
+import io.github.fabricators_of_create.porting_lib.blocks.extensions.ConnectableRedstoneBlock;
 import com.simibubi.create.infrastructure.fabric.block.WeakPowerCheckingBlock;
 
 @ParametersAreNonnullByDefault

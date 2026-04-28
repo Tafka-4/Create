@@ -9,28 +9,20 @@
   "results": [
     {
       "count": 2,
-      "item": {
-        "id": "create:crushed_raw_gold"
-      }
+      "id": "create:crushed_raw_gold"
     },
     {
       "chance": 0.25,
-      "item": {
-        "id": "create:crushed_raw_gold"
-      }
+      "id": "create:crushed_raw_gold"
     },
     {
       "chance": 0.75,
       "count": 2,
-      "item": {
-        "id": "create:experience_nugget"
-      }
+      "id": "create:experience_nugget"
     },
     {
       "chance": 0.125,
-      "item": {
-        "id": "minecraft:cobbled_deepslate"
-      }
+      "id": "minecraft:cobbled_deepslate"
     }
   ]
 }

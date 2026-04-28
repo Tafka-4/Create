@@ -2,12 +2,12 @@
   "type": "create:splashing",
   "ingredients": [
     {
-      "tag": "c:stained_glass"
+      "tag": "c:glass_blocks"
     }
   ],
   "results": [
     {
-      "item": "minecraft:glass"
+      "id": "minecraft:glass"
     }
   ]
 }

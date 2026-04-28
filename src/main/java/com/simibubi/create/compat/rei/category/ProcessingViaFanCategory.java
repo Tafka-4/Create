@@ -90,7 +90,7 @@ public abstract class ProcessingViaFanCategory<T extends Recipe<?>> extends Crea
 
 	protected abstract void renderAttachedBlock(GuiGraphics graphics);
 
-	public static abstract class MultiOutput<T extends ProcessingRecipe<?>> extends ProcessingViaFanCategory<T> {
+	public static abstract class MultiOutput<T extends ProcessingRecipe<?, ?>> extends ProcessingViaFanCategory<T> {
 
 		public MultiOutput(Info<T> info) {
 			super(info);

@@ -23,6 +23,7 @@ import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour;
+import com.simibubi.create.foundation.item.RecipeInputItemStackHandlerContainer;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import com.simibubi.create.foundation.utility.CreateLang;
 
@@ -74,9 +75,6 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
-
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandlerContainer;
-
 
 public class DeployerBlockEntity extends KineticBlockEntity implements SidedStorageBlockEntity {
 
@@ -134,19 +132,6 @@ public class DeployerBlockEntity extends KineticBlockEntity implements SidedStor
 		animatedOffset = LerpedFloat.linear()
 			.startWithValue(0);
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.ItemHandler.BLOCK,
-				AllBlockEntityTypes.DEPLOYER.get(),
-				(be, context) ->  {
-					if (be.invHandler == null)
-						be.initHandler();
-					return be.invHandler;
-				}
-		);
-	}
-
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		super.addBehaviours(behaviours);
@@ -586,7 +571,7 @@ public class DeployerBlockEntity extends KineticBlockEntity implements SidedStor
 		animatedOffset.setValue(offset);
 	}
 
-	ItemStackHandlerContainer recipeInv = new ItemStackHandlerContainer(2);
+	RecipeInputItemStackHandlerContainer recipeInv = new RecipeInputItemStackHandlerContainer(2);
 
 	@Nullable
 	public RecipeHolder<? extends Recipe<? extends RecipeInput>> getRecipe(ItemStack stack) {

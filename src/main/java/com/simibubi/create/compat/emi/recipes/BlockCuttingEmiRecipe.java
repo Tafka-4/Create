@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
 
 public class BlockCuttingEmiRecipe extends CreateEmiRecipe<CondensedBlockCuttingRecipe> {
@@ -52,7 +53,7 @@ public class BlockCuttingEmiRecipe extends CreateEmiRecipe<CondensedBlockCutting
 		private List<ItemStack> outputs = Lists.newArrayList();
 
 		public CondensedBlockCuttingRecipe(Ingredient ingredient) {
-			super(new ResourceLocation(""), "", ingredient, ItemStack.EMPTY);
+			super("", ingredient, ItemStack.EMPTY);
 		}
 
 		public void addOutput(ItemStack stack) {
@@ -86,11 +87,11 @@ public class BlockCuttingEmiRecipe extends CreateEmiRecipe<CondensedBlockCutting
 			return true;
 		}
 
-		@SuppressWarnings("rawtypes")
-		public static List<CondensedBlockCuttingRecipe> condenseRecipes(List<? extends Recipe> recipes, String name) {
+		public static List<CondensedBlockCuttingRecipe> condenseRecipes(List<? extends RecipeHolder<? extends Recipe<?>>> recipes, String name) {
 			List<CondensedBlockCuttingRecipe> condensed = Lists.newArrayList();
 			outer:
-			for (Recipe<?> recipe : recipes) {
+			for (RecipeHolder<? extends Recipe<?>> holder : recipes) {
+				Recipe<?> recipe = holder.value();
 				Ingredient ingredient = recipe.getIngredients().get(0);
 				if (ingredient.isEmpty()) {
 					continue;

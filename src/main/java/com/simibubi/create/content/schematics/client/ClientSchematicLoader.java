@@ -20,6 +20,7 @@ import com.simibubi.create.Create;
 import com.simibubi.create.content.schematics.packet.SchematicUploadPacket;
 import net.createmod.catnip.platform.CatnipServices;
 import com.simibubi.create.foundation.utility.CreateLang;
+import com.simibubi.create.foundation.utility.CreatePaths;
 import com.simibubi.create.foundation.utility.FilesHelper;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 
@@ -160,7 +161,7 @@ public class ClientSchematicLoader {
 	}
 
 	public void refresh() {
-		FilesHelper.createFolderIfMissing("schematics");
+		FilesHelper.createFolderIfMissing(CreatePaths.SCHEMATICS_DIR);
 		availableSchematics.clear();
 
 		try {

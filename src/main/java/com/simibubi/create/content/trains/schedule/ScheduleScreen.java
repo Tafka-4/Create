@@ -456,7 +456,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
 			if (h <= 0)
 				continue;
 
-			startStencil(graphics, leftPos + 43, topPos + y1, 161, h);
+			startStencil(graphics, leftPos + 43, Mth.floor(topPos + y1), 161, Mth.ceil(h));
 			matrixStack.pushPose();
 			matrixStack.translate(0, scrollOffset, 0);
 			renderScheduleConditions(graphics, scheduleEntry, cardY, mouseX, mouseY, partialTicks, cardHeight, i);

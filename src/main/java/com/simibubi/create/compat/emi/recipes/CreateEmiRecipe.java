@@ -47,7 +47,7 @@ public abstract class CreateEmiRecipe<T extends Recipe<?>> implements EmiRecipe 
 	public CreateEmiRecipe(EmiRecipeCategory category, T recipe, int width, int height) {
 		this.category = category;
 		this.recipe = recipe;
-		this.id = recipe.getId();
+		this.id = recipe instanceof ProcessingRecipe<?, ?> processing ? processing.id : null;
 		this.width = width;
 		this.height = height;
 		if (recipe instanceof BasinRecipe basin) {
@@ -88,7 +88,7 @@ public abstract class CreateEmiRecipe<T extends Recipe<?>> implements EmiRecipe 
 			this.input = input.build();
 		} else {
 			this.input = recipe.getIngredients().stream().map(EmiIngredient::of).toList();
-			if (recipe instanceof ProcessingRecipe<?> processing) {
+			if (recipe instanceof ProcessingRecipe<?, ?> processing) {
 				ImmutableList.Builder<EmiStack> builder = ImmutableList.builder();
 				for (ProcessingOutput output : processing.getRollableResults()) {
 					builder.add(EmiStack.of(output.getStack()).setChance(output.getChance()));
@@ -103,10 +103,15 @@ public abstract class CreateEmiRecipe<T extends Recipe<?>> implements EmiRecipe 
 	public CreateEmiRecipe(EmiRecipeCategory category, T recipe, int width, int height, Consumer<CreateEmiRecipe<T>> setup) {
 		this.category = category;
 		this.recipe = recipe;
-		this.id = recipe.getId();
+		this.id = recipe instanceof ProcessingRecipe<?, ?> processing ? processing.id : null;
 		this.width = width;
 		this.height = height;
 		setup.accept(this);
+	}
+
+	public CreateEmiRecipe<T> setRecipeId(@Nullable ResourceLocation id) {
+		this.id = id;
+		return this;
 	}
 
 	@Override

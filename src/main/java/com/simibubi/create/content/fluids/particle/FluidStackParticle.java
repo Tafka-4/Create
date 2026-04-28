@@ -103,7 +103,9 @@ public class FluidStackParticle extends TextureSheetParticle {
 		if (!onGround && level.random.nextFloat() < 1 / 8f)
 			return;
 
-		Color color = new Color(clientFluid.getTintColor(fluid));
+		FluidVariantRenderHandler handler = FluidVariantRendering.getHandlerOrDefault(fluid.getFluid());
+		int tint = handler.getColor(fluid.getVariant(), level, BlockPos.containing(x, y, z));
+		Color color = new Color(tint);
 		level.addParticle(ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, color.getRedAsFloat(), color.getGreenAsFloat(), color.getBlueAsFloat()), x, y, z, 0, 0, 0);
 	}
 

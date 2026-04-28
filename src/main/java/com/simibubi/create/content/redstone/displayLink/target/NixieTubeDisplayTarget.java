@@ -33,7 +33,8 @@ public class NixieTubeDisplayTarget extends SingleLineDisplayTarget {
 	@Override
 	protected int getWidth(DisplayLinkContext context) {
 		MutableInt count = new MutableInt(0);
-		NixieTubeBlock.walkNixies(context.level(), context.getTargetPos(), (currentPos, rowPosition) -> count.add(2));
+		NixieTubeBlock.walkNixies(context.level(), context.getTargetPos(),
+				(currentPos, rowPosition) -> count.add(2));
 		return count.intValue();
 	}
 

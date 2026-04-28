@@ -20,15 +20,20 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.item.ItemSlots;
+import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
 
 import net.createmod.catnip.nbt.NBTHelper;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import io.github.fabricators_of_create.porting_lib.transfer.callbacks.TransactionCallback;
@@ -41,6 +46,9 @@ public class ToolboxInventory extends ItemStackHandler {
 		ItemSlots.maxSizeCodec(8).fieldOf("items").forGetter(ItemSlots::fromHandler),
 		ItemStack.CODEC.listOf().fieldOf("filters").forGetter(toolbox -> toolbox.filters)
 	).apply(instance, ToolboxInventory::deserialize));
+	public static final Codec<ToolboxInventory> BACKWARDS_COMPAT_CODEC = CODEC;
+	public static final StreamCodec<RegistryFriendlyByteBuf, ToolboxInventory> STREAM_CODEC =
+		ByteBufCodecs.fromCodecWithRegistries(CODEC);
 
 	public static final int STACKS_PER_COMPARTMENT = 4;
 	List<ItemStack> filters;
@@ -190,7 +198,7 @@ public class ToolboxInventory extends ItemStackHandler {
 				break;
 		}
 
-		return ItemHandlerHelper.copyStackWithSize(stack, toInsert - inserted);
+		return stack.copyWithCount(toInsert - inserted);
 	}
 
 	public ItemStack takeFromCompartment(int amount, int compartment, TransactionContext ctx) {
@@ -201,7 +209,7 @@ public class ToolboxInventory extends ItemStackHandler {
 		int extracted = 0;
 		for (int i = STACKS_PER_COMPARTMENT - 1; i >= 0; i--) {
 			int slot = compartment * STACKS_PER_COMPARTMENT + i;
-			ItemStackHandlerSlot handlerSlot = getSlot(slot);
+			SingleSlotStorage<ItemVariant> handlerSlot = getSlot(slot);
 			if (handlerSlot.isResourceBlank())
 				continue;
 			if (toExtract == null)

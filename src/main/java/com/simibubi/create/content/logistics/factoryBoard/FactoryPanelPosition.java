@@ -3,12 +3,14 @@ package com.simibubi.create.content.logistics.factoryBoard;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.content.logistics.factoryBoard.FactoryPanelBlock.PanelSlot;
+import com.simibubi.create.foundation.gui.menu.MenuOpeningData;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
-public record FactoryPanelPosition(BlockPos pos, PanelSlot slot) {
+public record FactoryPanelPosition(BlockPos pos, PanelSlot slot) implements MenuOpeningData {
 	public static final Codec<FactoryPanelPosition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		BlockPos.CODEC.fieldOf("pos").forGetter(FactoryPanelPosition::pos),
 		PanelSlot.CODEC.fieldOf("slot").forGetter(FactoryPanelPosition::slot)
@@ -19,4 +21,9 @@ public record FactoryPanelPosition(BlockPos pos, PanelSlot slot) {
 		PanelSlot.STREAM_CODEC, FactoryPanelPosition::slot,
 	    FactoryPanelPosition::new
 	);
+
+	@Override
+	public void write(RegistryFriendlyByteBuf buffer) {
+		STREAM_CODEC.encode(buffer, this);
+	}
 }

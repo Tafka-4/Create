@@ -8,8 +8,7 @@ import javax.annotation.Nullable;
 
 import com.simibubi.create.AllBlockEntityTypes;
 import com.simibubi.create.api.connectivity.ConnectivityHandler;
-import com.simibubi.create.content.logistics.packager.fabric.InventoryIdentifier;
-import com.simibubi.create.content.logistics.packager.fabric.InventoryIdentifier.MultiBlock;
+import com.simibubi.create.api.packager.InventoryIdentifier;
 import com.simibubi.create.foundation.ICapabilityProvider;
 import com.simibubi.create.foundation.blockEntity.IMultiBlockEntityContainer;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -292,7 +291,7 @@ public class ItemVaultBlockEntity extends SmartBlockEntity implements IMultiBloc
 		Storage<ItemVariant> combinedInvWrapper = new CombinedStorage<>(List.of(invs));
 		combinedInvWrapper = new VersionedInventoryWrapper(combinedInvWrapper);
 		itemCapability = combinedInvWrapper;
-		this.invId = new MultiBlock(vaultPositions);
+		this.invId = face -> vaultPositions.contains(face.getPos());
 	}
 
 	public static int getMaxLength(int radius) {

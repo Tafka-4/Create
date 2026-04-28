@@ -68,9 +68,6 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.SpecialPlantable;
-import net.neoforged.neoforge.event.level.BlockDropsEvent;
 
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -218,14 +215,6 @@ public class BlockHelper {
 			.getBoolean(GameRules.RULE_DOBLOCKDROPS)
 			&& (player == null || !player.isCreative())) {
 			List<ItemStack> drops = Block.getDrops(state, serverLevel, pos, blockEntity, player, usedTool);
-			if (player != null) {
-				BlockDropsEvent event = new BlockDropsEvent(serverLevel, pos, state, blockEntity, List.of(), player, usedTool);
-				NeoForge.EVENT_BUS.post(event);
-				if (!event.isCanceled()) {
-					if ( event.getDroppedExperience() > 0)
-						state.getBlock().popExperience(serverLevel, pos, event.getDroppedExperience());
-				}
-			}
 			for (ItemStack itemStack : drops) {
 				if (itemStack.isEmpty())
 					continue;
@@ -236,7 +225,7 @@ public class BlockHelper {
 			// entities as a side-effect
 			Registry<Enchantment> enchantmentRegistry = world.registryAccess().registryOrThrow(Registries.ENCHANTMENT);
 			if (state.getBlock() instanceof IceBlock
-				&& EnchantmentHelper.getItemEnchantmentLevel(enchantmentRegistry.getHolderOrThrow(Enchantments.SILK_TOUCH, usedTool)) == 0) {
+				&& EnchantmentHelper.getItemEnchantmentLevel(enchantmentRegistry.getHolderOrThrow(Enchantments.SILK_TOUCH), usedTool) == 0) {
 				if (world.dimensionType()
 					.ultraWarm())
 					return;
@@ -292,11 +281,11 @@ public class BlockHelper {
 			.getBlock(), target.below());
 	}
 
-	public static CompoundTag prepareBlockEntityData(BlockState blockState, BlockEntity blockEntity) {
+	public static CompoundTag prepareBlockEntityData(Level level, BlockState blockState, BlockEntity blockEntity) {
 		CompoundTag data = null;
 		if (blockEntity == null)
 			return null;
-		RegistryAccess access = blockEntity.getLevel().registryAccess();
+		RegistryAccess access = level.registryAccess();
 		SafeNbtWriter writer = SafeNbtWriterRegistry.REGISTRY.get(blockEntity.getType());
 		if (AllBlockTags.SAFE_NBT.matches(blockState)) {
 			data = blockEntity.saveWithFullMetadata(access);
@@ -333,10 +322,6 @@ safeNbtBE.writeSafe(data, access);
 
 		if (block == Blocks.COMPOSTER) {
 			state = Blocks.COMPOSTER.defaultBlockState();
-		} else if (block != Blocks.SEA_PICKLE && block instanceof SpecialPlantable specialPlantable) {
-			alreadyPlaced = true;
-			if (specialPlantable.canPlacePlantAtPosition(stack, world, target, null))
-				specialPlantable.spawnPlantAtPosition(stack, world, target, null);
 		} else if (state.is(BlockTags.CAULDRONS)) {
 			state = Blocks.CAULDRON.defaultBlockState();
 		}

@@ -17,6 +17,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -62,6 +63,7 @@ import com.simibubi.create.content.contraptions.pulley.PulleyBlock;
 import com.simibubi.create.content.contraptions.pulley.PulleyBlock.MagnetBlock;
 import com.simibubi.create.content.contraptions.pulley.PulleyBlock.RopeBlock;
 import com.simibubi.create.content.contraptions.pulley.PulleyBlockEntity;
+import com.simibubi.create.content.contraptions.render.ClientContraption;
 import com.simibubi.create.content.decoration.slidingDoor.SlidingDoorBlock;
 import com.simibubi.create.content.kinetics.base.BlockBreakingMovementBehaviour;
 import com.simibubi.create.content.kinetics.base.IRotate;
@@ -132,6 +134,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.HashMapPaletteAccessor;
 import io.github.fabricators_of_create.porting_lib.util.StickinessUtil;
+import it.unimi.dsi.fastutil.objects.Object2BooleanArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 
 public abstract class Contraption {
 
@@ -146,6 +150,7 @@ public abstract class Contraption {
 
 	protected Map<BlockPos, StructureBlockInfo> blocks;
 	protected Map<BlockPos, CompoundTag> updateTags;
+	public Object2BooleanMap<BlockPos> isLegacy;
 	protected List<MutablePair<StructureBlockInfo, MovementContext>> actors;
 	protected Map<BlockPos, MovingInteractionBehaviour> interactors;
 	protected List<ItemStack> disabledActors;
@@ -166,6 +171,7 @@ public abstract class Contraption {
 	// Client
 	public Map<BlockPos, BlockEntity> presentBlockEntities;
 	public List<BlockEntity> renderedBlockEntities;
+	private final AtomicReference<ClientContraption> clientContraption = new AtomicReference<>();
 
 	protected ContraptionWorld world;
 	public boolean deferInvalidate;
@@ -173,6 +179,7 @@ public abstract class Contraption {
 	public Contraption() {
 		blocks = new HashMap<>();
 		updateTags = new HashMap<>();
+		isLegacy = new Object2BooleanArrayMap<>();
 		seats = new ArrayList<>();
 		actors = new ArrayList<>();
 		disabledActors = new ArrayList<>();
@@ -728,6 +735,7 @@ public abstract class Contraption {
 
 	public void readNBT(Level world, CompoundTag nbt, boolean spawnData) {
 		blocks.clear();
+		isLegacy.clear();
 		presentBlockEntities.clear();
 		renderedBlockEntities.clear();
 
@@ -981,6 +989,7 @@ public abstract class Contraption {
 					usePalettedDeserialization ? readStructureBlockInfo(c, finalPalette) : legacyReadStructureBlockInfo(c, holderGetter);
 
 			this.blocks.put(info.pos(), info);
+			this.isLegacy.put(info.pos(), c.contains("Legacy"));
 
 			if (c.contains("UpdateTag", Tag.TAG_COMPOUND)) {
 				CompoundTag updateTag = c.getCompound("UpdateTag");
@@ -1462,6 +1471,10 @@ public abstract class Contraption {
 		return actors;
 	}
 
+	public Object2BooleanMap<BlockPos> getIsLegacy() {
+		return isLegacy;
+	}
+
 	@Nullable
 	public MutablePair<StructureBlockInfo, MovementContext> getActorAt(BlockPos localPos) {
 		for (MutablePair<StructureBlockInfo, MovementContext> pair : actors)
@@ -1554,6 +1567,45 @@ public abstract class Contraption {
 
 	public Collection<BlockEntity> getRenderedBEs() {
 		return renderedBlockEntities;
+	}
+
+	public final ClientContraption getOrCreateClientContraptionLazy() {
+		ClientContraption out = clientContraption.getAcquire();
+		if (out == null) {
+			clientContraption.compareAndExchangeRelease(null, createClientContraption());
+			out = clientContraption.getAcquire();
+		}
+		return out;
+	}
+
+	protected ClientContraption createClientContraption() {
+		return new ClientContraption(this);
+	}
+
+	public void resetClientContraption() {
+		ClientContraption maybeClientContraption = clientContraption.getAcquire();
+		if (maybeClientContraption != null)
+			maybeClientContraption.resetRenderLevel();
+	}
+
+	public void invalidateClientContraptionStructure() {
+		ClientContraption maybeClientContraption = clientContraption.getAcquire();
+		if (maybeClientContraption != null)
+			maybeClientContraption.invalidateStructure();
+	}
+
+	public void invalidateClientContraptionChildren() {
+		ClientContraption maybeClientContraption = clientContraption.getAcquire();
+		if (maybeClientContraption != null)
+			maybeClientContraption.invalidateChildren();
+	}
+
+	@Nullable
+	public BlockEntity getBlockEntityClientSide(BlockPos localPos) {
+		ClientContraption maybeClientContraption = clientContraption.getAcquire();
+		if (maybeClientContraption == null)
+			return null;
+		return maybeClientContraption.getBlockEntity(localPos);
 	}
 
 	public boolean isHiddenInPortal(BlockPos localPos) {

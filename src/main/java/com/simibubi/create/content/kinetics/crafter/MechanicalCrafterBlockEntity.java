@@ -28,6 +28,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.edgeInteraction.EdgeInteractionBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.simibubi.create.foundation.item.SmartInventory;
+import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
 
 import net.createmod.catnip.math.BlockFace;
 import net.createmod.catnip.math.Pointing;
@@ -69,7 +70,7 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
 			super(1, blockEntity, 1, false);
 			this.blockEntity = blockEntity;
 			forbidExtraction();
-			whenContentsChanged(() -> {
+			whenContentsChanged(slot -> {
 				if (getStackInSlot(0).isEmpty()) // fabric: only has one slot, this is safe
 					return;
 				if (blockEntity.phase == Phase.IDLE)
@@ -118,22 +119,6 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
 		// Does not get serialized due to active checking in tick
 		wasPoweredBefore = true;
 	}
-
-	public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(
-				Capabilities.ItemHandler.BLOCK,
-				AllBlockEntityTypes.MECHANICAL_CRAFTER.get(),
-				(be, context) -> be.getInvCapability()
-		);
-	}
-
-	protected IItemHandler getInvCapability() {
-		if (invCap == null) {
-			invCap = input.getItemHandler(getLevel(), getBlockPos());
-		}
-		return invCap;
-	}
-
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		super.addBehaviours(behaviours);

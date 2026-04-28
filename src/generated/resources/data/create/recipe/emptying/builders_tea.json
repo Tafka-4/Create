@@ -7,11 +7,11 @@
   ],
   "results": [
     {
-      "item": "minecraft:glass_bottle"
+      "id": "minecraft:glass_bottle"
     },
     {
-      "amount": 27000,
-      "fluid": "create:tea"
+      "amount": 250,
+      "id": "create:tea"
     }
   ]
 }

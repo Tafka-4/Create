@@ -31,6 +31,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.simibubi.create.foundation.item.SmartInventory;
+import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
 
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
@@ -617,7 +618,7 @@ public class AllArmInteractionPointTypes {
 				return ItemStack.EMPTY;
 			if (!(level.getBlockEntity(pos) instanceof JukeboxBlockEntity jukeboxBE))
 				return ItemStack.EMPTY;
-			ItemStack record = jukeboxBE.getFirstItem();
+			ItemStack record = jukeboxBE.getTheItem().copy();
 			if (record.isEmpty())
 				return ItemStack.EMPTY;
 			level.updateSnapshots(ctx);

@@ -1,34 +1,37 @@
 {
-  "fabric:load_conditions": [
+  "neoforge:conditions": [
     {
-      "condition": "fabric:all_mods_loaded",
-      "values": [
-        "aether"
-      ]
+      "type": "neoforge:mod_loaded",
+      "modid": "aether"
     }
   ],
   "type": "create:crushing",
   "ingredients": [
     {
-      "item": "aether:ambrosium_ore"
+      "type": "neoforge:compound",
+      "ingredients": [
+        {
+          "item": "aether:ambrosium_ore"
+        }
+      ]
     }
   ],
-  "processingTime": 150,
+  "processing_time": 150,
   "results": [
     {
-      "item": "aether:ambrosium_shard"
+      "id": "aether:ambrosium_shard"
     },
     {
       "chance": 0.75,
-      "item": "aether:ambrosium_shard"
+      "id": "aether:ambrosium_shard"
     },
     {
       "chance": 0.125,
-      "item": "aether:holystone"
+      "id": "aether:holystone"
     },
     {
       "chance": 0.75,
-      "item": "create:experience_nugget"
+      "id": "create:experience_nugget"
     }
   ]
 }

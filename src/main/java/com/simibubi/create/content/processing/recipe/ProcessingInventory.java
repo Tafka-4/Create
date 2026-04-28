@@ -3,24 +3,21 @@ package com.simibubi.create.content.processing.recipe;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeInput;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import io.github.fabricators_of_create.porting_lib.transfer.ViewOnlyWrappedIterator;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandlerContainer;
+import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
 
-public class ProcessingInventory extends ItemStackHandlerContainer {
+public class ProcessingInventory extends ItemStackHandler implements RecipeInput {
 	public float remainingTime;
 	public float recipeDuration;
 	public boolean appliedRecipe;
@@ -47,6 +44,16 @@ public class ProcessingInventory extends ItemStackHandlerContainer {
 		remainingTime = 0;
 		recipeDuration = 0;
 		appliedRecipe = false;
+	}
+
+	@Override
+	public ItemStack getItem(int index) {
+		return getStackInSlot(index);
+	}
+
+	@Override
+	public int size() {
+		return getSlotCount();
 	}
 
 	// moved from insertItem

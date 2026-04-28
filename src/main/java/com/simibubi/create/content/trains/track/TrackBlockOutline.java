@@ -164,7 +164,7 @@ public class TrackBlockOutline {
 		ms.popPose();
 	}
 
-	public static boolean drawCustomBlockSelection(LevelRenderer context, Camera info, HitResult hitResult, float partialTicks, PoseStack ms, MultiBufferSource buffers) {
+	public static boolean drawCustomBlockSelection(LevelRenderer context, Camera info, HitResult hitResult, net.minecraft.client.DeltaTracker partialTicks, PoseStack ms, MultiBufferSource buffers) {
 		if (!(hitResult instanceof BlockHitResult))
 			return false;
 		Minecraft mc = Minecraft.getInstance();
