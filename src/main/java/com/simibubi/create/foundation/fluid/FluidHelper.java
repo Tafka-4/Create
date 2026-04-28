@@ -116,6 +116,8 @@ public class FluidHelper {
 		Storage<FluidVariant> tank = FluidStorage.SIDED.find(worldIn, be.getBlockPos(), null, be, side);
 		FluidStack fluidStack = emptyingResult.getFirst();
 
+		if (fluidStack.isEmpty())
+			return false;
 		if (tank == null)
 			return false;
 		if (worldIn.isClientSide)
@@ -129,6 +131,7 @@ public class FluidHelper {
 			ItemStack copyOfHeld = heldItem.copy();
 			emptyingResult = GenericItemEmptying.emptyItem(worldIn, copyOfHeld, false, t);
 			t.commit();
+			be.notifyUpdate();
 
 			if (!player.isCreative() && !(be instanceof CreativeFluidTankBlockEntity)) {
 				if (copyOfHeld.isEmpty())

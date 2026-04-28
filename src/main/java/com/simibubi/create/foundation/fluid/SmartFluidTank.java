@@ -4,8 +4,6 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
-
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
@@ -35,6 +33,5 @@ public class SmartFluidTank extends FluidTank {
 		if (ctx != null) updateSnapshots(ctx);
 		super.setFluid(stack);
 		if (ctx == null) updateCallback.accept(stack);
-		else TransactionSuccessCallback.register(ctx, () -> updateCallback.accept(stack));
 	}
 }

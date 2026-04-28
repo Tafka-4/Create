@@ -246,37 +246,46 @@ public class ItemDrainBlockEntity extends SmartBlockEntity implements IHaveGoggl
 
 		Pair<FluidStack, ItemStack> emptyItem = GenericItemEmptying.emptyItem(level, heldItem.stack, true);
 		FluidStack fluidFromItem = emptyItem.getFirst();
+		if (fluidFromItem.isEmpty())
+			return false;
 
 		try (Transaction t = Transaction.openOuter()) {
 			if (processingTicks > 5) {
 				internalTank.allowInsertion();
-				try (Transaction nested = t.openNested()) {
-					if (!fluidFromItem.isEmpty()) {
+				try {
+					try (Transaction nested = t.openNested()) {
 						long inserted = internalTank.getPrimaryHandler().insert(fluidFromItem.getVariant(), fluidFromItem.getAmount(), nested);
 						if (inserted != fluidFromItem.getAmount()) {
-							internalTank.forbidInsertion();
 							processingTicks = FILLING_TIME;
 							return true;
 						}
 					}
+				} finally {
+					internalTank.forbidInsertion();
 				}
-				internalTank.forbidInsertion();
 				return true;
 			}
 
 			emptyItem = GenericItemEmptying.emptyItem(level, heldItem.stack.copy(), false, t);
-			award(AllAdvancements.DRAIN);
+			ItemStack out = emptyItem.getSecond();
+
+			internalTank.allowInsertion();
+			long inserted;
+			try {
+				inserted = TransferUtil.insert(internalTank.getPrimaryHandler(), fluidFromItem, t);
+			} finally {
+				internalTank.forbidInsertion();
+			}
+			if (inserted != fluidFromItem.getAmount())
+				return false;
 
 			// Process finished
-			ItemStack out = emptyItem.getSecond();
 			if (!out.isEmpty())
 				heldItem.stack = out;
 			else
 				heldItem = null;
-			internalTank.allowInsertion();
-			TransferUtil.insert(internalTank.getPrimaryHandler(), fluidFromItem, t);
+			award(AllAdvancements.DRAIN);
 			t.commit();
-			internalTank.forbidInsertion();
 			notifyUpdate();
 			return true;
 		}
