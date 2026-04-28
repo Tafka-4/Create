@@ -1,26 +1,23 @@
 package com.simibubi.create.foundation.data;
 
-import java.util.Objects;
 import java.util.function.Predicate;
 
-import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.builders.EntityBuilder;
-import com.tterrag.registrate.fabric.EnvExecutor;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 
-import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import dev.engine_room.flywheel.lib.visualization.SimpleEntityVisualizer;
 import net.createmod.catnip.platform.CatnipServices;
+
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.fabricmc.api.EnvType;
 
 @ParametersAreNonnullByDefault
 public class CreateEntityBuilder<T extends Entity, P> extends EntityBuilder<T, P> {
@@ -41,6 +38,15 @@ public class CreateEntityBuilder<T extends Entity, P> extends EntityBuilder<T, P
 		return visual(visualFactory, true);
 	}
 
+	public CreateEntityBuilder<T, P> visual(String visualClassName) {
+		return visual(visualClassName, true);
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public CreateEntityBuilder<T, P> visual(String visualClassName, boolean renderNormally) {
+		return visual((NonNullSupplier) () -> CreateRegistrateClient.entityVisual(visualClassName), renderNormally);
+	}
+
 	public CreateEntityBuilder<T, P> visual(NonNullSupplier<SimpleEntityVisualizer.Factory<T>> visualFactory, boolean renderNormally) {
 		return visual(visualFactory, entity -> renderNormally);
 	}
@@ -54,6 +60,12 @@ public class CreateEntityBuilder<T extends Entity, P> extends EntityBuilder<T, P
 		this.renderNormally = renderNormally;
 
 		return this;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public CreateEntityBuilder<T, P> renderer(String rendererClassName) {
+		return (CreateEntityBuilder<T, P>) super.renderer((NonNullSupplier) () ->
+			CreateRegistrateClient.entityRenderer(rendererClassName));
 	}
 
 	protected void registerVisualizer() {

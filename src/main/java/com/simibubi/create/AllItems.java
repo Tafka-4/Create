@@ -25,7 +25,6 @@ import com.simibubi.create.content.equipment.armor.BacktankItem;
 import com.simibubi.create.content.equipment.armor.BacktankItem.BacktankBlockItem;
 import com.simibubi.create.content.equipment.armor.BaseArmorItem;
 import com.simibubi.create.content.equipment.armor.CardboardArmorItem;
-import com.simibubi.create.content.equipment.armor.CardboardArmorStealthOverlay;
 import com.simibubi.create.content.equipment.armor.DivingBootsItem;
 import com.simibubi.create.content.equipment.armor.DivingHelmetItem;
 import com.simibubi.create.content.equipment.armor.TrimmableArmorModelGenerator;
@@ -60,16 +59,17 @@ import com.simibubi.create.content.trains.schedule.ScheduleItem;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.BuilderTransformers;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import com.simibubi.create.foundation.data.CreateRegistrateClient;
 import com.simibubi.create.foundation.data.recipe.CompatMetals;
 import com.simibubi.create.foundation.item.CombustibleItem;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.TagDependentIngredientItem;
-import com.simibubi.create.infrastructure.fabric.HelmetOverlay;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 
+import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -350,7 +350,9 @@ public class AllItems {
 			.onRegister(i -> FuelRegistry.INSTANCE.add(i, 1000))
 			.onRegisterAfter(Registries.ITEM, v -> ItemDescription.useKey(v, "item.create.cardboard_armor"))
 			.model(TrimmableArmorModelGenerator::generate)
-			.onRegister(item -> HelmetOverlay.REGISTRY.register(item, new CardboardArmorStealthOverlay()))
+			.onRegister(item -> CatnipServices.PLATFORM.executeOnClientOnly(() -> () ->
+				CreateRegistrateClient.registerHelmetOverlay(item,
+					"com.simibubi.create.content.equipment.armor.CardboardArmorStealthOverlay")))
 			.register(),
 
 		CARDBOARD_CHESTPLATE =

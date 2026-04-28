@@ -20,6 +20,7 @@ import com.simibubi.create.content.logistics.box.PackageStyles;
 import com.simibubi.create.content.logistics.packagePort.postbox.PostboxBlock;
 import com.simibubi.create.content.logistics.tableCloth.TableClothBlock;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import com.simibubi.create.foundation.data.CreateRegistrateClient;
 import com.simibubi.create.foundation.item.TagDependentIngredientItem;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.entry.ItemEntry;
@@ -32,9 +33,6 @@ import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.createmod.catnip.platform.CatnipServices;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -53,8 +51,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 
 public class AllCreativeModeTabs {
@@ -91,19 +87,9 @@ public class AllCreativeModeTabs {
 
 		static {
 			MutableObject<Predicate<Item>> isItem3d = new MutableObject<>(item -> false);
-			if (CatnipServices.PLATFORM.getEnv().isClient())
-				isItem3d.setValue(makeClient3dItemPredicate());
+			CatnipServices.PLATFORM.executeOnClientOnly(() -> () ->
+				isItem3d.setValue(CreateRegistrateClient.makeClient3dItemPredicate()));
 			IS_ITEM_3D_PREDICATE = isItem3d.getValue();
-		}
-
-		@Environment(EnvType.CLIENT)
-		private static Predicate<Item> makeClient3dItemPredicate() {
-			return item -> {
-				ItemRenderer itemRenderer = Minecraft.getInstance()
-					.getItemRenderer();
-				BakedModel model = itemRenderer.getModel(new ItemStack(item), null, null, 0);
-				return model.isGui3d();
-			};
 		}
 
 		private final boolean addItems;
