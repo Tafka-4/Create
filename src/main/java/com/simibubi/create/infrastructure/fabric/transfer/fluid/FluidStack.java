@@ -198,7 +198,13 @@ public final class FluidStack implements DataComponentHolder {
 	}
 
 	public static FluidStack parseOptional(HolderLookup.Provider registries, CompoundTag tag) {
-		return tag.isEmpty() ? EMPTY : parse(registries, tag).orElse(EMPTY);
+		if (tag.isEmpty())
+			return EMPTY;
+		if (tag.contains("Fluid", Tag.TAG_COMPOUND) && !tag.contains("fluid"))
+			return parseOptional(registries, tag.getCompound("Fluid"));
+		if (tag.contains("FluidName", Tag.TAG_STRING))
+			return loadFluidStackFromNBT(tag);
+		return parse(registries, tag).orElse(EMPTY);
 	}
 
 	public static FluidStack loadFluidStackFromNBT(CompoundTag tag) {
