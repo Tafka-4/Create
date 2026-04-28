@@ -11,6 +11,7 @@ import com.simibubi.create.foundation.fluid.FluidHelper;
 import com.simibubi.create.foundation.mixin.accessor.FlowingFluidAccessor;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 
+import com.simibubi.create.infrastructure.fabric.transfer.LevelSnapshots;
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 
 import io.github.tropheusj.milk.Milk;
@@ -139,7 +140,7 @@ public class OpenEndedPipe extends FlowSource {
 		if (FluidHelper.isWater(stack.getFluid()))
 			AdvancementBehaviour.tryAward(world, pos, AllAdvancements.WATER_SUPPLY);
 
-		world.updateSnapshots(ctx);
+		LevelSnapshots.updateSnapshots(world, ctx);
 		if (waterlog) {
 			world.setBlock(outputPos, state.setValue(WATERLOGGED, false), 3);
 			TransactionCallback.onSuccess(ctx, () -> world.scheduleTick(outputPos, Fluids.WATER, 1));
@@ -231,7 +232,7 @@ public class OpenEndedPipe extends FlowSource {
 			return true;
 		}
 
-		world.updateSnapshots(ctx);
+		LevelSnapshots.updateSnapshots(world, ctx);
 		if (waterlog) {
 			world.setBlock(outputPos, state.setValue(WATERLOGGED, true), 3);
 			TransactionCallback.onSuccess(ctx, () -> world.scheduleTick(outputPos, Fluids.WATER, 1));

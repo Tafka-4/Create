@@ -31,6 +31,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.simibubi.create.foundation.item.SmartInventory;
+import com.simibubi.create.infrastructure.fabric.transfer.LevelSnapshots;
 import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
 
 import net.createmod.catnip.math.VecHelper;
@@ -621,7 +622,7 @@ public class AllArmInteractionPointTypes {
 			ItemStack record = jukeboxBE.getTheItem().copy();
 			if (record.isEmpty())
 				return ItemStack.EMPTY;
-			level.updateSnapshots(ctx);
+			LevelSnapshots.updateSnapshots(level, ctx);
 			level.setBlock(pos, cachedState.setValue(JukeboxBlock.HAS_RECORD, false), 2);
 			TransactionSuccessCallback.register(ctx, () -> {
 				level.levelEvent(1010, pos, 0);

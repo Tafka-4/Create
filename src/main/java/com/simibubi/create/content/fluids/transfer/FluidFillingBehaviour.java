@@ -14,6 +14,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.fluid.FluidHelper;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 
+import com.simibubi.create.infrastructure.fabric.transfer.LevelSnapshots;
 import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
 
 import net.createmod.catnip.data.Iterate;
@@ -221,7 +222,7 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
 				BlockState blockState = world.getBlockState(currentPos);
 
 				if (!blockEntity.isVirtual())
-					world.updateSnapshots(ctx);
+					LevelSnapshots.updateSnapshots(world, ctx);
 
 				new SnapshotParticipant<Unit>() { // can't be a typical TransactionCallback because ordering refuses to cooperate
 					@Override protected Unit createSnapshot() { return Unit.INSTANCE; }

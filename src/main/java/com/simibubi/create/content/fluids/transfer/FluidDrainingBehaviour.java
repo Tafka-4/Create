@@ -12,6 +12,7 @@ import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.fluid.FluidHelper;
+import com.simibubi.create.infrastructure.fabric.transfer.LevelSnapshots;
 import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 
@@ -201,7 +202,7 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
 			});
 
 			if (!blockEntity.isVirtual()) {
-				world.updateSnapshots(ctx);
+				LevelSnapshots.updateSnapshots(world, ctx);
 				world.setBlock(currentPos, emptied, 2 | 16);
 
 				BlockState stateAbove = world.getBlockState(currentPos.above());
