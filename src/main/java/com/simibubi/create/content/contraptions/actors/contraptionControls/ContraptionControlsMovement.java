@@ -86,7 +86,7 @@ public class ContraptionControlsMovement implements MovementBehaviour {
 		}
 
 		if (!(ctx.temporaryData instanceof ElevatorFloorSelection))
-			ctx.temporaryData = new ElevatorFloorSelection();
+			ctx.temporaryData = createFloorSelection(ec);
 
 		ElevatorFloorSelection efs = (ElevatorFloorSelection) ctx.temporaryData;
 		tickFloorSelection(efs, ec);
@@ -144,6 +144,20 @@ public class ContraptionControlsMovement implements MovementBehaviour {
 		if (ec.isTargetUnreachable(efs.currentTargetY))
 			efs.currentLongName = CreateLang.translate("contraption.controls.floor_unreachable")
 				.string();
+	}
+
+	public static ElevatorFloorSelection createFloorSelection(ElevatorContraption ec) {
+		ElevatorFloorSelection efs = new ElevatorFloorSelection();
+		efs.currentIndex = getFloorIndex(ec, ec.clientYTarget);
+		return efs;
+	}
+
+	public static int getFloorIndex(ElevatorContraption ec, int targetY) {
+		for (int i = 0; i < ec.namesList.size(); i++)
+			if (ec.namesList.get(i)
+				.getFirst() == targetY)
+				return i;
+		return 0;
 	}
 
 	@Override

@@ -112,7 +112,7 @@ public class ElevatorControlsHandler {
 			}
 
 			if (!(ctx.temporaryData instanceof ElevatorFloorSelection))
-				ctx.temporaryData = new ElevatorFloorSelection();
+				ctx.temporaryData = ContraptionControlsMovement.createFloorSelection(ec);
 
 			ElevatorFloorSelection efs = (ElevatorFloorSelection) ctx.temporaryData;
 			int prev = efs.currentIndex;

@@ -41,15 +41,25 @@ public class InputEvents {
 		RadialWrenchHandler.onKeyInput(key, pressed);
 	}
 
-	public static boolean onMouseScrolled(double deltaX, double delta /* Y */) {
+	public static boolean onMouseScrolled(double rawDelta, double delta /* Y */) {
 		if (Minecraft.getInstance().screen != null)
 			return false;
 
 //		CollisionDebugger.onScroll(delta);
+		delta = signedScrollDelta(rawDelta, delta);
 		boolean cancelled = CreateClient.SCHEMATIC_HANDLER.mouseScrolled(delta)
 			|| CreateClient.SCHEMATIC_AND_QUILL_HANDLER.mouseScrolled(delta) || TrainHUD.onScroll(delta)
 			|| ElevatorControlsHandler.onScroll(delta);
 		return cancelled;
+	}
+
+	private static double signedScrollDelta(double rawDelta, double delta) {
+		// Porting Lib's 1.21.1 hook can expose a processed magnitude separately from the raw wheel direction.
+		if (rawDelta == 0)
+			return delta;
+		if (delta == 0)
+			return rawDelta;
+		return Math.copySign(Math.abs(delta), rawDelta);
 	}
 
 	public static boolean onMouseInput(int button, int modifiers, Action action) {

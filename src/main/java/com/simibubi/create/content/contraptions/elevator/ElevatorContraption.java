@@ -11,6 +11,7 @@ import com.simibubi.create.AllContraptionTypes;
 import com.simibubi.create.api.contraption.ContraptionType;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.AssemblyException;
+import com.simibubi.create.content.contraptions.actors.contraptionControls.ContraptionControlsMovement;
 import com.simibubi.create.content.contraptions.actors.contraptionControls.ContraptionControlsMovement.ElevatorFloorSelection;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
 import com.simibubi.create.content.contraptions.elevator.ElevatorColumn.ColumnCoords;
@@ -192,9 +193,21 @@ public class ElevatorContraption extends PulleyContraption {
 	}
 
 	public void setAllControlsToFloor(int floorIndex) {
-		for (MutablePair<StructureBlockInfo, MovementContext> pair : actors)
-			if (pair.right != null && pair.right.temporaryData instanceof ElevatorFloorSelection efs)
-				efs.currentIndex = floorIndex;
+		for (MutablePair<StructureBlockInfo, MovementContext> pair : actors) {
+			if (pair.right == null)
+				continue;
+			if (!AllBlocks.CONTRAPTION_CONTROLS.has(pair.left.state()))
+				continue;
+
+			ElevatorFloorSelection efs;
+			if (pair.right.temporaryData instanceof ElevatorFloorSelection existing)
+				efs = existing;
+			else
+				pair.right.temporaryData = efs = ContraptionControlsMovement.createFloorSelection(this);
+
+			efs.currentIndex = floorIndex;
+			ContraptionControlsMovement.tickFloorSelection(efs, this);
+		}
 	}
 
 }
