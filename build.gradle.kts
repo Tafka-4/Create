@@ -603,6 +603,126 @@ fun copyLegacyTagDirectories(outputDir: File) {
 	}
 }
 
+fun copyLegacyRecipeDirectories(outputDir: File) {
+	val dataDir = outputDir.resolve("data")
+	dataDir.listFiles { file -> file.isDirectory }?.forEach { namespaceDir ->
+		val oldDir = namespaceDir.resolve("recipes")
+		if (!oldDir.isDirectory)
+			return@forEach
+
+		oldDir.walkTopDown()
+			.filter { it.isFile }
+			.forEach { oldFile ->
+				val newFile = namespaceDir.resolve("recipe/${oldFile.relativeTo(oldDir).invariantSeparatorsPath}")
+				if (!newFile.exists()) {
+					newFile.parentFile.mkdirs()
+					oldFile.copyTo(newFile)
+				}
+			}
+	}
+}
+
+fun mergeTagFile(file: File, values: List<String>) {
+	val json = if (file.isFile) JsonSlurper().parse(file) as? Map<*, *> else null
+	val existingValues = (json?.get("values") as? List<*>) ?: emptyList<Any?>()
+	val mergedValues = (existingValues + values)
+		.distinctBy { it.toString() }
+	val replace = json?.get("replace") as? Boolean ?: false
+
+	file.parentFile.mkdirs()
+	writeJson(file, linkedMapOf(
+		"replace" to replace,
+		"values" to mergedValues
+	))
+}
+
+fun addCommonTagAliases(outputDir: File) {
+	val tagsDir = outputDir.resolve("data/c/tags")
+
+	val itemAliases = linkedMapOf<String, List<String>>(
+		"cobblestone" to listOf("#c:cobblestones"),
+		"colorless_sand" to listOf("#c:sands/colorless"),
+		"copper_blocks" to listOf("#c:storage_blocks/copper"),
+		"copper_ingots" to listOf("#c:ingots/copper"),
+		"copper_raw_materials" to listOf("#c:raw_materials/copper"),
+		"doughs" to listOf("create:dough"),
+		"doughs/wheat" to listOf("create:dough"),
+		"flours" to listOf("create:wheat_flour"),
+		"flours/wheat" to listOf("create:wheat_flour"),
+		"gold_ingots" to listOf("#c:ingots/gold"),
+		"gold_raw_materials" to listOf("#c:raw_materials/gold"),
+		"gunpowder" to listOf("#c:gunpowders"),
+		"ingots/brass" to listOf("create:brass_ingot"),
+		"ingots/zinc" to listOf("create:zinc_ingot"),
+		"iron_blocks" to listOf("#c:storage_blocks/iron"),
+		"iron_ingots" to listOf("#c:ingots/iron"),
+		"iron_nuggets" to listOf("#c:nuggets/iron"),
+		"iron_raw_materials" to listOf("#c:raw_materials/iron"),
+		"lapis" to listOf("#c:gems/lapis"),
+		"leather" to listOf("#c:leathers"),
+		"netherite_ingots" to listOf("#c:ingots/netherite"),
+		"netherrack" to listOf("#c:netherracks"),
+		"nuggets/zinc" to listOf("create:zinc_nugget"),
+		"obsidian" to listOf("#c:obsidians"),
+		"plates/brass" to listOf("create:brass_sheet"),
+		"plates/copper" to listOf("create:copper_sheet"),
+		"plates/gold" to listOf("create:golden_sheet"),
+		"plates/iron" to listOf("create:iron_sheet"),
+		"plates/obsidian" to listOf("create:sturdy_sheet"),
+		"quartz" to listOf("#c:gems/quartz"),
+		"raw_copper_blocks" to listOf("#c:storage_blocks/raw_copper"),
+		"raw_gold_blocks" to listOf("#c:storage_blocks/raw_gold"),
+		"raw_iron_blocks" to listOf("#c:storage_blocks/raw_iron"),
+		"raw_materials/zinc" to listOf("create:raw_zinc"),
+		"raw_zinc_blocks" to listOf("create:raw_zinc_block"),
+		"red_sand" to listOf("#c:sands/red"),
+		"slimeballs" to listOf("#c:slime_balls"),
+		"stone" to listOf("#c:stones"),
+		"storage_blocks/brass" to listOf("create:brass_block"),
+		"storage_blocks/raw_zinc" to listOf("create:raw_zinc_block"),
+		"storage_blocks/zinc" to listOf("create:zinc_block"),
+		"string" to listOf("#c:strings"),
+		"wooden_barrels" to listOf("#c:barrels/wooden"),
+		"wooden_chests" to listOf("#c:chests/wooden"),
+		"wooden_rods" to listOf("#c:rods/wooden")
+	).apply {
+		listOf(
+			"black", "blue", "brown", "cyan", "gray", "green", "light_blue", "light_gray",
+			"lime", "magenta", "orange", "pink", "purple", "red", "white", "yellow"
+		).forEach { color ->
+			put("${color}_dyes", listOf("#c:dyes/$color"))
+		}
+	}
+
+	val blockAliases = linkedMapOf<String, List<String>>(
+		"brass_blocks" to listOf("create:brass_block"),
+		"cobblestone" to listOf("#c:cobblestones"),
+		"copper_blocks" to listOf("#c:storage_blocks/copper"),
+		"iron_blocks" to listOf("#c:storage_blocks/iron"),
+		"obsidian" to listOf("#c:obsidians"),
+		"raw_copper_blocks" to listOf("#c:storage_blocks/raw_copper"),
+		"raw_gold_blocks" to listOf("#c:storage_blocks/raw_gold"),
+		"raw_iron_blocks" to listOf("#c:storage_blocks/raw_iron"),
+		"raw_zinc_blocks" to listOf("create:raw_zinc_block"),
+		"stone" to listOf("#c:stones"),
+		"storage_blocks/brass" to listOf("create:brass_block"),
+		"storage_blocks/raw_zinc" to listOf("create:raw_zinc_block"),
+		"storage_blocks/zinc" to listOf("create:zinc_block"),
+		"zinc_blocks" to listOf("create:zinc_block")
+	)
+
+	itemAliases.forEach { (path, values) ->
+		listOf("item", "items").forEach { type ->
+			mergeTagFile(tagsDir.resolve("$type/$path.json"), values)
+		}
+	}
+	blockAliases.forEach { (path, values) ->
+		listOf("block", "blocks").forEach { type ->
+			mergeTagFile(tagsDir.resolve("$type/$path.json"), values)
+		}
+	}
+}
+
 tasks.named("processIncludeJars") {
 	dependsOn(tasks.named("compileJava"))
 	doLast {
@@ -692,8 +812,10 @@ tasks.named<ProcessResources>("processResources") {
                 .forEach(::normalizeResourceJson)
         }
 
-        copyLegacyTagDirectories(destinationDir)
-    }
+		copyLegacyRecipeDirectories(destinationDir)
+		copyLegacyTagDirectories(destinationDir)
+		addCommonTagAliases(destinationDir)
+	}
 }
 
 java {
