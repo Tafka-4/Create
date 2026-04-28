@@ -97,9 +97,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.game.DebugPackets;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.item.ItemStack;
@@ -1136,27 +1134,7 @@ public abstract class Contraption {
 //				continue;
 
 			int flags = Block.UPDATE_MOVE_BY_PISTON | Block.UPDATE_ALL;
-			world.sendBlockUpdated(add, block.state(), Blocks.AIR.defaultBlockState(), flags);
-
-			// when the blockstate is set to air, the block's POI data is removed, but
-			// markAndNotifyBlock tries to
-			// remove it again, so to prevent an error from being logged by double-removal
-			// we add the POI data back now
-			// (code copied from ServerWorld.onBlockStateChange)
-			ServerLevel serverWorld = (ServerLevel) world;
-			PoiTypes.forState(block.state())
-				.ifPresent(poiType -> {
-					world.getServer()
-						.execute(() -> {
-							serverWorld.getPoiManager()
-								.add(add, poiType);
-							DebugPackets.sendPoiAddedPacket(serverWorld, add);
-						});
-				});
-
-			world.markAndNotifyBlock(add, world.getChunkAt(add), block.state(), Blocks.AIR.defaultBlockState(), flags,
-					512);
-			block.state().updateIndirectNeighbourShapes(world, add, flags & -2);
+			BlockHelper.updateAfterBlockChange(world, add, block.state(), world.getBlockState(add), flags, 512);
 		}
 	}
 
@@ -1264,7 +1242,8 @@ public abstract class Contraption {
 			if (!shouldUpdateAfterMovement(block))
 				continue;
 			BlockPos targetPos = transform.apply(block.pos());
-			world.markAndNotifyBlock(targetPos, world.getChunkAt(targetPos), block.state(), block.state(),
+			BlockState state = world.getBlockState(targetPos);
+			BlockHelper.updateAfterBlockChange(world, targetPos, state, state,
 					Block.UPDATE_MOVE_BY_PISTON | Block.UPDATE_ALL, 512);
 		}
 

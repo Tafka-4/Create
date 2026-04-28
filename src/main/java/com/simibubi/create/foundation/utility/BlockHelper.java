@@ -274,11 +274,29 @@ public class BlockHelper {
 		BlockState old = chunksection.setBlockState(SectionPos.sectionRelative(target.getX()),
 			SectionPos.sectionRelative(target.getY()), SectionPos.sectionRelative(target.getZ()), state);
 		chunk.setUnsaved(true);
-		world.markAndNotifyBlock(target, chunk, old, state, 82, 512);
+		updateAfterBlockChange(world, target, old, state, 82, 512);
 
 		world.setBlock(target, state, 82);
 		world.neighborChanged(target, world.getBlockState(target.below())
 			.getBlock(), target.below());
+	}
+
+	public static void updateAfterBlockChange(Level world, BlockPos pos, BlockState oldState, BlockState newState,
+											  int flags, int recursionLeft) {
+		if ((flags & Block.UPDATE_CLIENTS) != 0)
+			world.sendBlockUpdated(pos, oldState, newState, flags);
+		if ((flags & Block.UPDATE_NEIGHBORS) != 0) {
+			world.updateNeighborsAt(pos, oldState.getBlock());
+			if (!world.isClientSide && newState.hasAnalogOutputSignal())
+				world.updateNeighbourForOutputSignal(pos, newState.getBlock());
+		}
+		if ((flags & Block.UPDATE_KNOWN_SHAPE) != 0 || recursionLeft <= 0)
+			return;
+
+		int shapeFlags = flags & -34;
+		oldState.updateIndirectNeighbourShapes(world, pos, shapeFlags, recursionLeft - 1);
+		newState.updateNeighbourShapes(world, pos, shapeFlags, recursionLeft - 1);
+		newState.updateIndirectNeighbourShapes(world, pos, shapeFlags, recursionLeft - 1);
 	}
 
 	public static CompoundTag prepareBlockEntityData(Level level, BlockState blockState, BlockEntity blockEntity) {
