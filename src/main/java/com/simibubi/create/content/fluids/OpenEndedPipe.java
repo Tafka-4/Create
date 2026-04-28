@@ -165,6 +165,29 @@ public class OpenEndedPipe extends FlowSource {
 		return stack;
 	}
 
+	private FluidStack getFluidInSpace() {
+		FluidStack empty = FluidStack.EMPTY;
+		if (world == null)
+			return empty;
+		if (!world.isLoaded(outputPos))
+			return empty;
+
+		BlockState state = world.getBlockState(outputPos);
+		FluidStack drainBlock = VanillaFluidTargets.getDrainableFluid(state);
+		if (!drainBlock.isEmpty())
+			return drainBlock;
+
+		FluidState fluidState = state.getFluidState();
+		boolean waterlog = state.hasProperty(WATERLOGGED);
+
+		if (!waterlog && !state.canBeReplaced())
+			return empty;
+		if (fluidState.isEmpty() || !fluidState.isSource())
+			return empty;
+
+		return new FluidStack(fluidState.getType(), FluidConstants.BUCKET);
+	}
+
 	private boolean provideFluidToSpace(FluidStack fluid, TransactionContext ctx) {
 		if (world == null)
 			return false;
@@ -320,10 +343,7 @@ public class OpenEndedPipe extends FlowSource {
 		@Override
 		public FluidVariant getResource() {
 			if (!super.isResourceBlank()) return super.getResource();
-			try (Transaction t = Transaction.openOuter()) {
-				FluidStack stack = removeFluidFromSpace(t);
-				return stack.getVariant();
-			}
+			return getFluidInSpace().getVariant();
 		}
 
 		@Override
