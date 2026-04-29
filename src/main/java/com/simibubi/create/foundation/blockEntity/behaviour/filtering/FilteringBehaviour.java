@@ -8,8 +8,10 @@ import com.simibubi.create.infrastructure.fabric.item.ItemUtils;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 
 import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
@@ -232,6 +234,10 @@ public class FilteringBehaviour extends BlockEntityBehaviour implements ValueSet
 
 	public boolean test(FluidStack stack) {
 		return !isActive() || filter.test(blockEntity.getLevel(), stack);
+	}
+
+	public boolean test(FluidStack stack, @Nullable TransactionContext transaction) {
+		return !isActive() || filter.test(blockEntity.getLevel(), stack, true, transaction);
 	}
 
 	@Override

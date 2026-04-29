@@ -31,6 +31,10 @@ import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandle
 public class GenericItemEmptying {
 
 	public static boolean canItemBeEmptied(Level world, ItemStack stack) {
+		return canItemBeEmptied(world, stack, null);
+	}
+
+	public static boolean canItemBeEmptied(Level world, ItemStack stack, @Nullable TransactionContext transaction) {
 		if (PotionFluidHandler.isPotionItem(stack))
 			return true;
 
@@ -38,7 +42,7 @@ public class GenericItemEmptying {
 			.isPresent())
 			return true;
 
-		return TransferUtil.getFluidContained(stack).isPresent();
+		return TransferUtil.getFluidContained(stack, transaction).isPresent();
 	}
 
 	public static Pair<FluidStack, ItemStack> emptyItem(Level world, ItemStack stack, boolean simulate) {

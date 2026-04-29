@@ -1,6 +1,7 @@
 package com.simibubi.create.content.fluids;
 
 import java.lang.ref.WeakReference;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
@@ -16,6 +17,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
@@ -28,11 +30,15 @@ public abstract class FlowSource {
 	}
 
 	public FluidStack provideFluid(Predicate<FluidStack> extractionPredicate) {
+		return provideFluid((fluid, transaction) -> extractionPredicate.test(fluid));
+	}
+
+	public FluidStack provideFluid(BiPredicate<FluidStack, @Nullable TransactionContext> extractionPredicate) {
 		Storage<FluidVariant> tank = provideHandler();
 		if (tank == null)
 			return FluidStack.EMPTY;
 		try (Transaction t = Transaction.openOuter()) {
-			Predicate<FluidVariant> test = v -> extractionPredicate.test(new FluidStack(v, 1));
+			Predicate<FluidVariant> test = v -> extractionPredicate.test(new FluidStack(v, 1), t);
 			ResourceAmount<FluidVariant> resource = TransferUtil.extractMatching(tank, test, 1, t);
 			return resource == null ? FluidStack.EMPTY : new FluidStack(resource.resource(), resource.amount());
 		}
@@ -99,11 +105,16 @@ public abstract class FlowSource {
 
 		@Override
 		public FluidStack provideFluid(Predicate<FluidStack> extractionPredicate) {
+			return provideFluid((fluid, transaction) -> extractionPredicate.test(fluid));
+		}
+
+		@Override
+		public FluidStack provideFluid(BiPredicate<FluidStack, @Nullable TransactionContext> extractionPredicate) {
 			if (cached == null || cached.get() == null)
 				return FluidStack.EMPTY;
 			FluidTransportBehaviour behaviour = cached.get();
 			FluidStack providedOutwardFluid = behaviour.getProvidedOutwardFluid(location.getOppositeFace());
-			return extractionPredicate.test(providedOutwardFluid) ? providedOutwardFluid : FluidStack.EMPTY;
+			return extractionPredicate.test(providedOutwardFluid, null) ? providedOutwardFluid : FluidStack.EMPTY;
 		}
 
 		@Override

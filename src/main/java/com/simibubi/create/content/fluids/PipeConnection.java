@@ -1,7 +1,7 @@
 package com.simibubi.create.content.fluids;
 
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.tterrag.registrate.fabric.EnvExecutor;
@@ -17,6 +17,7 @@ import net.createmod.catnip.animation.LerpedFloat;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -99,7 +100,7 @@ public class PipeConnection {
 	}
 
 	public boolean manageFlows(Level world, BlockPos pos, FluidStack internalFluid,
-		Predicate<FluidStack> extractionPredicate) {
+		BiPredicate<FluidStack, TransactionContext> extractionPredicate) {
 
 		// Only keep network if still valid
 		Optional<FluidNetwork> retainedNetwork = network;

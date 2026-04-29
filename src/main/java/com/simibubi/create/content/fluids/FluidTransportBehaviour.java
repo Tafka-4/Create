@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 
 import javax.annotation.Nullable;
 
@@ -25,6 +25,8 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
+
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 
@@ -48,6 +50,11 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour {
 
 	public boolean canPullFluidFrom(FluidStack fluid, BlockState state, Direction direction) {
 		return true;
+	}
+
+	public boolean canPullFluidFrom(FluidStack fluid, BlockState state, Direction direction,
+		@Nullable TransactionContext transaction) {
+		return canPullFluidFrom(fluid, state, direction);
 	}
 
 	public abstract boolean canHaveFlowToward(BlockState state, Direction direction);
@@ -129,8 +136,8 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour {
 			boolean sendUpdate = false;
 			for (PipeConnection connection : connections) {
 				FluidStack internalFluid = singleSource != connection ? availableFlow : FluidStack.EMPTY;
-				Predicate<FluidStack> extractionPredicate =
-					extracted -> canPullFluidFrom(extracted, blockEntity.getBlockState(), connection.side);
+				BiPredicate<FluidStack, TransactionContext> extractionPredicate =
+					(extracted, transaction) -> canPullFluidFrom(extracted, blockEntity.getBlockState(), connection.side, transaction);
 				sendUpdate |= connection.manageFlows(world, pos, internalFluid, extractionPredicate);
 			}
 

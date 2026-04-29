@@ -16,6 +16,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringB
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import net.createmod.catnip.math.VecHelper;
 import net.createmod.catnip.math.AngleHelper;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -62,8 +63,9 @@ public class SmartFluidPipeBlockEntity extends SmartBlockEntity implements PipeA
 		}
 
 		@Override
-		public boolean canPullFluidFrom(FluidStack fluid, BlockState state, Direction direction) {
-			if (fluid.isEmpty() || filter != null && filter.test(fluid))
+		public boolean canPullFluidFrom(FluidStack fluid, BlockState state, Direction direction,
+			@Nullable TransactionContext transaction) {
+			if (fluid.isEmpty() || filter != null && filter.test(fluid, transaction))
 				return super.canPullFluidFrom(fluid, state, direction);
 			return false;
 		}

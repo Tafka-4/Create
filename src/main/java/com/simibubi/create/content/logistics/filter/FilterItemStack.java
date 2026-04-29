@@ -18,6 +18,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+
+import org.jetbrains.annotations.Nullable;
+
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
 
@@ -96,12 +100,16 @@ public class FilterItemStack {
 	}
 
 	public boolean test(Level world, FluidStack stack, boolean matchNBT) {
+		return test(world, stack, matchNBT, null);
+	}
+
+	public boolean test(Level world, FluidStack stack, boolean matchNBT, @Nullable TransactionContext transaction) {
 		if (isEmpty())
 			return true;
 		if (stack.isEmpty())
 			return false;
 
-		resolveFluid(world);
+		resolveFluid(world, transaction);
 
 		if (filterFluidStack.isEmpty())
 			return false;
@@ -114,10 +122,14 @@ public class FilterItemStack {
 	//
 
 	private void resolveFluid(Level world) {
+		resolveFluid(world, null);
+	}
+
+	private void resolveFluid(Level world, @Nullable TransactionContext transaction) {
 		if (!fluidExtracted) {
 			fluidExtracted = true;
-			if (GenericItemEmptying.canItemBeEmptied(world, filterItemStack))
-				filterFluidStack = GenericItemEmptying.emptyItem(world, filterItemStack, true)
+			if (GenericItemEmptying.canItemBeEmptied(world, filterItemStack, transaction))
+				filterFluidStack = GenericItemEmptying.emptyItem(world, filterItemStack, true, transaction)
 					.getFirst();
 		}
 	}
@@ -162,8 +174,13 @@ public class FilterItemStack {
 
 		@Override
 		public boolean test(Level world, FluidStack stack, boolean matchNBT) {
+			return test(world, stack, matchNBT, null);
+		}
+
+		@Override
+		public boolean test(Level world, FluidStack stack, boolean matchNBT, @Nullable TransactionContext transaction) {
 			for (FilterItemStack filterItemStack : containedItems)
-				if (filterItemStack.test(world, stack, shouldRespectNBT))
+				if (filterItemStack.test(world, stack, shouldRespectNBT, transaction))
 					return !isBlacklist;
 			return isBlacklist;
 		}
@@ -193,6 +210,11 @@ public class FilterItemStack {
 
 		@Override
 		public boolean test(Level world, FluidStack stack, boolean matchNBT) {
+			return false;
+		}
+
+		@Override
+		public boolean test(Level world, FluidStack stack, boolean matchNBT, @Nullable TransactionContext transaction) {
 			return false;
 		}
 
@@ -255,6 +277,11 @@ public class FilterItemStack {
 
 		@Override
 		public boolean test(Level world, FluidStack stack, boolean matchNBT) {
+			return false;
+		}
+
+		@Override
+		public boolean test(Level world, FluidStack stack, boolean matchNBT, @Nullable TransactionContext transaction) {
 			return false;
 		}
 

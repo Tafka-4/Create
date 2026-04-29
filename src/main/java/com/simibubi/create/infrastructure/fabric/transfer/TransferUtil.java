@@ -81,10 +81,14 @@ public class TransferUtil {
 	}
 
 	public static Optional<FluidStack> getFluidContained(ItemStack stack) {
+		return getFluidContained(stack, null);
+	}
+
+	public static Optional<FluidStack> getFluidContained(ItemStack stack, @Nullable TransactionContext ctx) {
 		Storage<FluidVariant> storage = ContainerItemContext.withConstant(stack).find(FluidStorage.ITEM);
 		if (storage == null)
 			return Optional.empty();
-		ResourceAmount<FluidVariant> content = simulate(t -> StorageUtil.findExtractableContent(storage, t));
+		ResourceAmount<FluidVariant> content = simulate(t -> StorageUtil.findExtractableContent(storage, t), ctx);
 		if (content == null || content.amount() <= 0 || content.resource().isBlank())
 			return Optional.empty();
 		return Optional.of(new FluidStack(content));
@@ -236,6 +240,14 @@ public class TransferUtil {
 	public static <T> T simulate(Function<TransactionContext, T> function) {
 		try (Transaction t = Transaction.openOuter()) {
 			return function.apply(t);
+		}
+	}
+
+	public static <T> T simulate(Function<TransactionContext, T> function, @Nullable TransactionContext ctx) {
+		if (ctx == null)
+			return simulate(function);
+		try (Transaction nested = ctx.openNested()) {
+			return function.apply(nested);
 		}
 	}
 }
