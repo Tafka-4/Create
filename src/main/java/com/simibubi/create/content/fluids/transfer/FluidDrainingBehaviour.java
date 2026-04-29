@@ -421,12 +421,13 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
 	}
 
 	public FluidStack getDrainableFluid(BlockPos rootPos, TransactionContext transaction) {
-		Fluid drainableFluid;
+		Fluid drainableFluid = fluid;
+		if (drainableFluid == null || drainableFluid == Fluids.EMPTY)
+			return FluidStack.EMPTY;
 		try (Transaction t = transaction.openNested()) { // simulate pullNext
-			if (fluid == null || isSearching() || !pullNext(rootPos, t)) {
+			if (isSearching() || !pullNext(rootPos, t)) {
 				return FluidStack.EMPTY;
 			}
-			drainableFluid = fluid;
 		}
 		return new FluidStack(drainableFluid, FluidConstants.BUCKET);
 	}
