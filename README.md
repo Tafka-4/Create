@@ -50,3 +50,5 @@ Five Maven repos are required:
 
 All you need dependency-wise is a dependency on `com.simibubi.create:create-fabric:<version>`. Everything else will be pulled in transitively.
 Check [Modrinth](https://modrinth.com/mod/create-fabric/versions) to find the right version number.
+---
+Note: I made this for Create 1.21.1 on fabric. Check 1.21.1/fabric/beta branch or release file.
