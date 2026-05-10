@@ -22,4 +22,10 @@ public class FanProcessingTypeRegistry {
 		CreateBuiltInRegistries.FAN_PROCESSING_TYPE.forEach(SORTED_TYPES::add);
 		SORTED_TYPES.sort((t1, t2) -> t2.getPriority() - t1.getPriority());
 	}
+
+	public static void ensureInitialized() {
+		if (SORTED_TYPES.isEmpty()) {
+			init();
+		}
+	}
 }

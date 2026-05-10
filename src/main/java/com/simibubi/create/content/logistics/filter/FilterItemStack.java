@@ -128,9 +128,8 @@ public class FilterItemStack {
 	private void resolveFluid(Level world, @Nullable TransactionContext transaction) {
 		if (!fluidExtracted) {
 			fluidExtracted = true;
-			if (GenericItemEmptying.canItemBeEmptied(world, filterItemStack, transaction))
-				filterFluidStack = GenericItemEmptying.emptyItem(world, filterItemStack, true, transaction)
-					.getFirst();
+			filterFluidStack = GenericItemEmptying.emptyItem(world, filterItemStack, true, transaction)
+				.getFirst();
 		}
 	}
 

@@ -13,6 +13,7 @@ import com.google.gson.GsonBuilder;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.api.registrate.CreateRegistrateRegistrationCallback;
 import com.simibubi.create.compat.Mods;
+import com.simibubi.create.compat.accessories.Accessories;
 import com.simibubi.create.compat.computercraft.ComputerCraftProxy;
 import com.simibubi.create.compat.trinkets.Trinkets;
 import com.simibubi.create.content.decoration.palettes.AllPaletteBlocks;
@@ -154,6 +155,7 @@ public class Create implements ModInitializer {
 
 		// causes class loading issues or something
 		// noinspection Convert2MethodRef
+		Mods.ACCESSORIES.executeIfInstalled(() -> () -> Accessories.init());
 		Mods.TRINKETS.executeIfInstalled(() -> () -> Trinkets.init());
 
 		// fabric exclusive

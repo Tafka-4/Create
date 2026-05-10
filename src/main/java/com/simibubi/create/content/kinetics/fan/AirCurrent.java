@@ -237,6 +237,9 @@ public class AirCurrent {
 			if (shouldAlwaysPass(copycatState.isAir() ? state : copycatState)) {
 				continue;
 			}
+			if (FanProcessingType.getAt(world, currentPos) != null) {
+				continue;
+			}
 
 			VoxelShape shape = state.getCollisionShape(world, currentPos);
 			if (shape.isEmpty()) {

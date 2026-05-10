@@ -1,5 +1,6 @@
 package com.simibubi.create;
 
+import static com.simibubi.create.AllTags.NameSpace.ACCESSORIES;
 import static com.simibubi.create.AllTags.NameSpace.COMMON;
 import static com.simibubi.create.AllTags.NameSpace.MOD;
 import static com.simibubi.create.AllTags.NameSpace.QUARK;
@@ -57,6 +58,7 @@ public class AllTags {
 		TIC("tconstruct"),
 		QUARK("quark"),
 		GS("galosphere"),
+		ACCESSORIES("accessories"),
 		// fabric: Trinkets compat is used instead
 		CURIOS("curios"),
 		TRINKETS("trinkets");
@@ -223,6 +225,7 @@ public class AllTags {
 		FOODS_DOUGH_WHEAT(COMMON, "foods/dough/wheat"),
 
 		UA_CORAL(MOD, "upgrade_aquatic/coral"),
+		ACCESSORIES_FACE(ACCESSORIES, "face"),
 		// fabric: Trinkets compat is used instead
 		//CURIOS_HEAD(CURIOS, "head"),
 		TRINKETS_FACE(TRINKETS, "head/face");

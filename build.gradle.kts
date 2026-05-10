@@ -49,6 +49,8 @@ val sandwichableVersion = "1.3.1+1.20.1"
 val sodiumVersion = "mc1.21.1-0.6.9-fabric"
 // https://github.com/emilyploszaj/trinkets/releases/
 val trinketsVersion = "3.10.0"
+// https://modrinth.com/mod/accessories/versions
+val accessoriesVersion = "1.1.0-beta.53+1.21.1"
 // for Trinkets - https://modrinth.com/mod/cardinal-components-api/versions
 val ccaVersion = "6.1.3"
 // https://modrinth.com/mod/journeymap
@@ -91,6 +93,8 @@ repositories {
         content { includeGroupAndSubgroups("maven.modrinth") }
     }
     maven("https://maven.terraformersmc.com") // Mod Menu, Trinkets
+    maven("https://maven.wispforest.io/releases") // Accessories
+    maven("https://maven.su5ed.dev/releases") // Accessories transitive deps
     maven("https://maven.squiddev.cc") // CC:T
     maven("https://modmaven.dev") // Botania
     maven("https://maven.jamieswhiteshirt.com/libs-release") { // Reach Entity Attributes
@@ -185,6 +189,7 @@ dependencies {
     modCompileOnly("maven.modrinth:sodium:$sodiumVersion")
 
     modCompileOnly("dev.emi:trinkets:$trinketsVersion")
+    modCompileOnly("io.wispforest:accessories-fabric:$accessoriesVersion")
     // for Trinkets
     modCompileOnly("dev.onyxstudios.cardinal-components-api:cardinal-components-base:$ccaVersion")
     modCompileOnly("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:$ccaVersion")

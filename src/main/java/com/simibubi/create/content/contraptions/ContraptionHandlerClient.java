@@ -154,6 +154,8 @@ public class ContraptionHandlerClient {
 		Vec3 localOrigin = contraptionEntity.toLocalVector(origin, 1);
 		Vec3 localTarget = contraptionEntity.toLocalVector(target, 1);
 		Contraption contraption = contraptionEntity.getContraption();
+		if (contraption == null)
+			return null;
 
 		MutableObject<BlockHitResult> mutableResult = new MutableObject<>();
 		PredicateTraceResult predicateResult = RaycastHelper.rayTraceUntil(localOrigin, localTarget, p -> {
