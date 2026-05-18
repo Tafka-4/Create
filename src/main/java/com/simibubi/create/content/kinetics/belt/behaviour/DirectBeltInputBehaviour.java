@@ -84,7 +84,7 @@ public class DirectBeltInputBehaviour extends BlockEntityBehaviour {
 		if (storage == null)
 			return inserted.stack;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			long trying = inserted.stack.getCount();
 			long successful = storage.insert(ItemVariant.of(inserted.stack), inserted.stack.getCount(), t);
 			if (trying == successful) {

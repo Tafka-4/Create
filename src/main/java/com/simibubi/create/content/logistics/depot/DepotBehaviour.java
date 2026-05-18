@@ -411,7 +411,7 @@ public class DepotBehaviour extends BlockEntityBehaviour {
 		transportedStack.insertedFrom = side;
 		transportedStack.prevSideOffset = transportedStack.sideOffset;
 		transportedStack.prevBeltPosition = transportedStack.beltPosition;
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			snapshotParticipant.updateSnapshots(t);
 			ItemStack remainder = insert(transportedStack, t);
 			if (remainder.getCount() != size)

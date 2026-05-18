@@ -32,8 +32,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class TransferUtil {
+	@SuppressWarnings("deprecation")
+	public static Transaction openNestedOrOuter() {
+		return Transaction.openNested(Transaction.getCurrentUnsafe());
+	}
+
 	public static long insert(Storage<FluidVariant> storage, FluidStack stack) {
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = openNestedOrOuter()) {
 			long inserted = insert(storage, stack, t);
 			t.commit();
 			return inserted;
@@ -41,7 +46,7 @@ public class TransferUtil {
 	}
 
 	public static long insert(Storage<ItemVariant> storage, ItemStack stack) {
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = openNestedOrOuter()) {
 			long inserted = insert(storage, stack, t);
 			t.commit();
 			return inserted;
@@ -106,7 +111,7 @@ public class TransferUtil {
 
 	public static List<ItemStack> extractAllAsStacks(Storage<ItemVariant> storage) {
 		List<ItemStack> stacks = new ArrayList<>();
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = openNestedOrOuter()) {
 			for (StorageView<ItemVariant> view : storage.nonEmptyViews()) {
 				ItemVariant resource = view.getResource();
 				long extracted = view.extract(resource, view.getAmount(), t);
@@ -221,7 +226,7 @@ public class TransferUtil {
 	}
 
 	public static <T> void clear(Storage<T> storage) {
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = openNestedOrOuter()) {
 			for (StorageView<T> view : storage.nonEmptyViews()) {
 				view.extract(view.getResource(), view.getAmount(), t);
 			}
@@ -230,7 +235,7 @@ public class TransferUtil {
 	}
 
 	public static <T> T commit(Function<TransactionContext, T> function) {
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = openNestedOrOuter()) {
 			T value = function.apply(t);
 			t.commit();
 			return value;
@@ -238,7 +243,7 @@ public class TransferUtil {
 	}
 
 	public static <T> T simulate(Function<TransactionContext, T> function) {
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = openNestedOrOuter()) {
 			return function.apply(t);
 		}
 	}
