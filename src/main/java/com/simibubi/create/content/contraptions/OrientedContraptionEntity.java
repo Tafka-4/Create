@@ -618,7 +618,8 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
 
 	@Environment(EnvType.CLIENT)
 	public static void handleRelocationPacket(ContraptionRelocationPacket packet) {
-		if (Minecraft.getInstance().level.getEntity(packet.entityId()) instanceof OrientedContraptionEntity oce)
+		var level = Minecraft.getInstance().level;
+		if (level != null && level.getEntity(packet.entityId()) instanceof OrientedContraptionEntity oce)
 			oce.nonDamageTicks = 10;
 	}
 }

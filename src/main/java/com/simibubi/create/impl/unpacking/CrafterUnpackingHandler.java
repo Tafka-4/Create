@@ -1,5 +1,7 @@
 package com.simibubi.create.impl.unpacking;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
@@ -10,6 +12,7 @@ import com.simibubi.create.content.kinetics.crafter.MechanicalCrafterBlockEntity
 import com.simibubi.create.content.kinetics.crafter.MechanicalCrafterBlockEntity.Inventory;
 import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.content.logistics.stockTicker.PackageOrderWithCrafts;
+import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -41,7 +44,7 @@ public enum CrafterUnpackingHandler implements UnpackingHandler {
 		if (inventories.isEmpty())
 			return false;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			var order = orderContext.orderedStacks();
 			// insert in the order's defined ordering
 			int max = Math.min(inventories.size(), order.stacks().size());
@@ -67,17 +70,17 @@ public enum CrafterUnpackingHandler implements UnpackingHandler {
 					}
 				}
 			}
-		}
 
-		// if anything is still non-empty insertion failed
-		for (ItemStack item : items) {
-			if (!item.isEmpty()) {
-				return false;
+			// if anything is still non-empty insertion failed
+			for (ItemStack item : items) {
+				if (!item.isEmpty())
+					return false;
 			}
-		}
 
-		if (!simulate) {
-			crafter.checkCompletedRecipe(true);
+			if (!simulate) {
+				TransactionSuccessCallback.register(t, () -> crafter.checkCompletedRecipe(true));
+				t.commit();
+			}
 		}
 
 		return true;

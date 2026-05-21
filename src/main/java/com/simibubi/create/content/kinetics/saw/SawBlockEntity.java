@@ -416,7 +416,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements S
 			return;
 
 		inventory.clear();
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			ItemStack contained = entity.getItem();
 			long inserted = inventory.insert(ItemVariant.of(contained), contained.getCount(), t);
 			if (contained.getCount() == inserted)

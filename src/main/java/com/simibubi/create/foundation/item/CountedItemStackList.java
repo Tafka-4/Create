@@ -22,20 +22,12 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-
-import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
-import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
-
 public class CountedItemStackList {
 
 	Map<Item, Set<ItemStackEntry>> items = new HashMap<>();
 
 	public CountedItemStackList(Storage<ItemVariant> inventory, FilteringBehaviour filteringBehaviour) {
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (StorageView<ItemVariant> view : inventory.nonEmptyViews()) {
 				ItemVariant resource = view.getResource();
 				ItemStack stack = resource.toStack();

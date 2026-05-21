@@ -238,7 +238,7 @@ public class BlueprintOverlayRenderer {
 		List<ItemStack> newlyMissing = new ArrayList<>();
 		boolean invalid = false;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			do {
 				craftingGrid.clear();
 				newlyAdded.clear();

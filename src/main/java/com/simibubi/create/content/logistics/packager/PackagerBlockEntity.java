@@ -1,5 +1,7 @@
 package com.simibubi.create.content.logistics.packager;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -202,7 +204,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements SidedStorag
 			return availableItems;
 		}
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (StorageView<ItemVariant> view : targetInv.nonEmptyViews()) {
 				ItemVariant resource = view.getResource();
 				long amount = scanInputSlots ? view.getAmount() : view.extract(resource, view.getAmount(), t);
@@ -363,24 +365,26 @@ public class PackagerBlockEntity extends SmartBlockEntity implements SidedStorag
 		BlockPos target = worldPosition.relative(facing.getOpposite());
 		BlockState targetState = level.getBlockState(target);
 
-			UnpackingHandler handler = UnpackingHandler.REGISTRY.get(targetState);
+		UnpackingHandler handler = UnpackingHandler.REGISTRY.get(targetState);
 		UnpackingHandler toUse = handler != null ? handler : UnpackingHandler.DEFAULT;
 
-		// fabric: copy the items to actually unpack later
+		// fabric: copy the items before simulation, since handlers may modify the passed items.
 		List<ItemStack> copy = items.stream().map(ItemStack::copy).toList();
 
 		// note: handler may modify the passed items
 		boolean unpacked = toUse.unpack(level, target, targetState, facing, items, orderContext, true);
+		if (!unpacked)
+			return false;
 
-		if (unpacked) {
-			TransactionSuccessCallback.register(ctx, () -> {
-				toUse.unpack(level, target, targetState, facing, copy, orderContext, false);
-				previouslyUnwrapped = box;
-				animationInward = true;
-				animationTicks = CYCLE;
-				notifyUpdate();
-			});
-		}
+		if (!toUse.unpack(level, target, targetState, facing, copy, orderContext, false))
+			return false;
+
+		TransactionSuccessCallback.register(ctx, () -> {
+			previouslyUnwrapped = box;
+			animationInward = true;
+			animationTicks = CYCLE;
+			notifyUpdate();
+		});
 
 		return true;
 	}
@@ -427,7 +431,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements SidedStorag
 				continuePacking = false;
 
 				for (StorageView<ItemVariant> view : targetInv.nonEmptyViews()) {
-					try (Transaction t = Transaction.openOuter()) {
+					try (Transaction t = TransferUtil.openNestedOrOuter()) {
 						ItemVariant resource = view.getResource();
 						boolean bulky = !resource.getItem().canFitInsideContainerItems();
 						if (bulky && anyItemPresent)

@@ -53,7 +53,7 @@ public class FluidAmountDisplaySource extends SingleLineDisplaySource {
 			return EMPTY_LINE;
 
 		long collected = 0;
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (StorageView<FluidVariant> view : handler.nonEmptyViews()) {
 				FluidStack stack = new FluidStack(view);
 				if (!filteringBehaviour.test(stack))

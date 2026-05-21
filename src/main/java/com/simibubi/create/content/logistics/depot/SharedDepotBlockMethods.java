@@ -74,7 +74,7 @@ public class SharedDepotBlockMethods {
 				1f + level.getRandom().nextFloat());
 		}
 		ItemStackHandler outputs = behaviour.processingOutputBuffer;
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (StorageView<ItemVariant> view : outputs.nonEmptyViews()) {
 				ItemVariant var = view.getResource();
 				long extracted = view.extract(var, 64, t);

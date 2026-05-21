@@ -4,6 +4,8 @@ import java.util.Iterator;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
@@ -29,7 +31,7 @@ public class ItemHandlerWrapper implements Storage<ItemVariant> {
 	}
 
 	public long simulateInsert(ItemVariant resource, long maxAmount, @Nullable TransactionContext transaction) {
-		try (Transaction nested = transaction == null ? Transaction.openOuter() : transaction.openNested()) {
+		try (Transaction nested = transaction == null ? TransferUtil.openNestedOrOuter() : transaction.openNested()) {
 			return wrapped.insert(resource, maxAmount, nested);
 		}
 	}
@@ -45,7 +47,7 @@ public class ItemHandlerWrapper implements Storage<ItemVariant> {
 	}
 
 	public long simulateExtract(ItemVariant resource, long maxAmount, @Nullable TransactionContext transaction) {
-		try (Transaction nested = transaction == null ? Transaction.openOuter() : transaction.openNested()) {
+		try (Transaction nested = transaction == null ? TransferUtil.openNestedOrOuter() : transaction.openNested()) {
 			return wrapped.extract(resource, maxAmount, nested);
 		}
 	}

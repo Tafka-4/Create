@@ -74,7 +74,7 @@ public class GenericItemEmptying {
 		Storage<FluidVariant> tank = FluidStorage.ITEM.find(split, ctx);
 		if (tank == null)
 			return Pair.of(resultingFluid, resultingItem);
-		try (Transaction t = transaction == null ? Transaction.openOuter() : transaction.openNested()) {
+		try (Transaction t = transaction == null ? TransferUtil.openNestedOrOuter() : transaction.openNested()) {
 			resultingFluid = TransferUtil.extractAnyFluid(tank, FluidConstants.BUCKET, t);
 			if (resultingFluid.isEmpty())
 				return Pair.of(resultingFluid, resultingItem);

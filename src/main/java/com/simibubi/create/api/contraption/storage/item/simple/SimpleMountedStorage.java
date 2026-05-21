@@ -1,5 +1,7 @@
 package com.simibubi.create.api.contraption.storage.item.simple;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import java.util.function.Function;
 
 import com.mojang.serialization.MapCodec;
@@ -59,7 +61,7 @@ public class SimpleMountedStorage extends WrapperMountedItemStorage<ItemStackHan
 	public void unmount(Level level, BlockState state, BlockPos pos, @Nullable BlockEntity be) {
 		Storage<ItemVariant> storage = ItemStorage.SIDED.find(level, pos, state, be, null);
 		if (storage instanceof SlottedStorage<ItemVariant> slotted && this.validate(slotted)) {
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				for (int i = 0; i < slotted.getSlotCount(); i++) {
 					SingleSlotStorage<ItemVariant> slot = slotted.getSlot(i);
 					if (!slot.isResourceBlank()) {

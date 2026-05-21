@@ -258,7 +258,7 @@ public class Train {
 
 				CombinedSlottedStorage<ItemVariant, ? extends SlottedStorage<ItemVariant>> inv = carriage.storage.getAllItems();
 				MountedFluidStorageWrapper tank = carriage.storage.getFluids();
-				try (Transaction t = Transaction.openOuter()) {
+				try (Transaction t = TransferUtil.openNestedOrOuter()) {
 					shouldActivate = StorageUtil.findExtractableResource(inv, variant -> filter.test(level, variant.toStack()), t) != null
 						|| StorageUtil.findExtractableResource(tank, variant -> filter.test(level, new FluidStack(variant, 1)), t) != null;
 				}
@@ -1120,7 +1120,7 @@ public class Train {
 			if (fuelItems == null)
 				continue;
 
-			try (Transaction transaction = Transaction.openOuter()) {
+			try (Transaction transaction = TransferUtil.openNestedOrOuter()) {
 				ResourceAmount<ItemVariant> extracted = TransferUtil.extractMatching(
 					fuelItems,
 					variant -> FuelRegistry.INSTANCE.get(variant.getItem()) != null,

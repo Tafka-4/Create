@@ -164,7 +164,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity implements SidedSto
 			lastRecipe = recipe.get().value();
 		}
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			SingleSlotStorage<ItemVariant> slot = inputInv.getSlot(0);
 			slot.extract(slot.getResource(), 1, t);
 			lastRecipe.rollResults().forEach(stack -> outputInv.insert(ItemVariant.of(stack), stack.getCount(), t));

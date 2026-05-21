@@ -5,7 +5,6 @@ import com.simibubi.create.AllPackets;
 import net.createmod.catnip.codecs.stream.CatnipStreamCodecs;
 import net.createmod.catnip.net.base.ClientboundPacketPayload;
 import net.createmod.catnip.math.VecHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.ItemParticleOption;
@@ -33,7 +32,7 @@ public record PackageDestroyPacket(Vec3 location, ItemStack box) implements Clie
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void handle(LocalPlayer player) {
-		ClientLevel level = Minecraft.getInstance().level;
+		ClientLevel level = player.clientLevel;
 		Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, level.getRandom(), .125f);
 		Vec3 pos = location.add(motion.scale(4));
 		level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, box), pos.x, pos.y,

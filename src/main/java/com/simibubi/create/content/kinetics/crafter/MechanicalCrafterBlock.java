@@ -197,7 +197,7 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock
 				Storage<ItemVariant> capability = crafter.getItemStorage(null);
 				if (capability == null)
 					return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-				try (Transaction t = Transaction.openOuter()) {
+				try (Transaction t = TransferUtil.openNestedOrOuter()) {
 					long inserted = capability.insert(ItemVariant.of(stack), stack.getCount(), t);
 					if (inserted <= 0)
 						return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;

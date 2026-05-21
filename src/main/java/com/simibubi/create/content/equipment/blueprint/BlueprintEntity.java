@@ -1,5 +1,7 @@
 package com.simibubi.create.content.equipment.blueprint;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -366,7 +368,7 @@ public class BlueprintEntity extends HangingEntity
 			Optional<RecipeHolder<CraftingRecipe>> recipe = Optional.empty();
 
 			do {
-				try (Transaction t = Transaction.openOuter()) {
+				try (Transaction t = TransferUtil.openNestedOrOuter()) {
 					Map<Integer, ItemStack> craftingGrid = new HashMap<>();
 					boolean success = true;
 

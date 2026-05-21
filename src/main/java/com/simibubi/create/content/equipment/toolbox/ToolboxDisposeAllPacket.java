@@ -49,7 +49,7 @@ public record ToolboxDisposeAllPacket(BlockPos toolboxPos) implements Serverboun
 		MutableBoolean sendData = new MutableBoolean(false);
 
 			toolbox.inventory.inLimitedMode(inventory -> {
-				try (Transaction t = Transaction.openOuter()) {
+				try (Transaction t = TransferUtil.openNestedOrOuter()) {
 					PlayerInventoryStorage playerInv = PlayerInventoryStorage.of(player);
 					for (int i = 0; i < 36; i++) {
 						String key = String.valueOf(i);

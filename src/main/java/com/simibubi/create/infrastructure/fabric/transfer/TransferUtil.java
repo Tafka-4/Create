@@ -34,7 +34,9 @@ import java.util.function.Predicate;
 public class TransferUtil {
 	@SuppressWarnings("deprecation")
 	public static Transaction openNestedOrOuter() {
-		return Transaction.openNested(Transaction.getCurrentUnsafe());
+		if (Transaction.isOpen())
+			return Transaction.openNested(Transaction.getCurrentUnsafe());
+		return Transaction.openOuter();
 	}
 
 	public static long insert(Storage<FluidVariant> storage, FluidStack stack) {

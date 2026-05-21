@@ -1,5 +1,7 @@
 package com.simibubi.create.api.contraption.dispenser;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorage;
 import com.simibubi.create.api.registry.SimpleRegistry;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
@@ -70,7 +72,7 @@ public interface MountedDispenseBehavior {
 		ItemVariant variant = ItemVariant.of(stack);
 		long amount = stack.getCount();
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			// try inserting into own inventory first
 			MountedItemStorage storage = context.getItemStorage();
 			long inserted = storage == null ? 0 : storage.insert(variant, amount, t);

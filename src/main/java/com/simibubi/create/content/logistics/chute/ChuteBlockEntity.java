@@ -391,7 +391,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 			if (invVersionTracker.stillWaiting(inv))
 				return false;
 
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				long inserted = inv.insert(ItemVariant.of(item), item.getCount(), t);
 				if (inserted != 0 && !simulate) t.commit();
 				ItemStack held = getItem();
@@ -458,7 +458,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 				if (invVersionTracker.stillWaiting(inv))
 					return false;
 
-				try (Transaction t = Transaction.openOuter()) {
+				try (Transaction t = TransferUtil.openNestedOrOuter()) {
 					long inserted = inv.insert(ItemVariant.of(item), item.getCount(), t);
 					if (!simulate) {
 						item = item.copy();

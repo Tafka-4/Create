@@ -95,7 +95,7 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
 				continue;
 
 			if (!defragmenter.isFragmented(resource.toStack())) {
-				try (Transaction t = Transaction.openOuter()) {
+				try (Transaction t = TransferUtil.openNestedOrOuter()) {
 					if (view.extract(resource, 1, t) == 1) {
 						t.commit();
 						heldBox = resource.toStack();
@@ -118,7 +118,7 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
 
 		List<ItemStack> boxesToExport = defragmenter.repack(completedOrderId);
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (StorageView<ItemVariant> view : targetInv.nonEmptyViews()) {
 				ItemVariant resource = view.getResource();
 				if (!PackageItem.isPackage(resource))

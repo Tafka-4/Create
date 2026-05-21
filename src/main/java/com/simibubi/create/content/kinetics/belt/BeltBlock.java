@@ -222,7 +222,7 @@ public class BeltBlock extends HorizontalKineticBlock
 				if (handler == null)
 					return;
 				ItemStack inEntity = itemEntity.getItem();
-				try (Transaction t = Transaction.openOuter()) {
+				try (Transaction t = TransferUtil.openNestedOrOuter()) {
 					long inserted = handler.insert(ItemVariant.of(inEntity), inEntity.getCount(), t);
 					if (inserted == 0)
 						return;

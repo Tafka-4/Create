@@ -177,7 +177,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 					int amountToReplenish = targetAmount - count;
 
 					if (isOpenInContainer(player)) {
-						try (Transaction t = Transaction.openOuter()) {
+						try (Transaction t = TransferUtil.openNestedOrOuter()) {
 							ItemStack extracted = inventory.takeFromCompartment(amountToReplenish, slot, t);
 							if (!extracted.isEmpty()) {
 								ToolboxHandler.unequip(player, hotbarSlot, false);
@@ -187,7 +187,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 						}
 					}
 
-					try (Transaction t = Transaction.openOuter()) {
+					try (Transaction t = TransferUtil.openNestedOrOuter()) {
 						ItemStack extracted = inventory.takeFromCompartment(amountToReplenish, slot, t);
 						if (!extracted.isEmpty()) {
 							update = true;
@@ -204,7 +204,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 					ItemStack toDistribute = playerStack.copyWithCount(amountToDeposit);
 
 					if (isOpenInContainer(player)) {
-						try (Transaction t = Transaction.openOuter()) {
+						try (Transaction t = TransferUtil.openNestedOrOuter()) {
 							int deposited = amountToDeposit - inventory.distributeToCompartment(toDistribute, slot, t)
 									.getCount();
 							if (deposited > 0) {
@@ -216,7 +216,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 
 					}
 
-					try (Transaction t = Transaction.openOuter()) {
+					try (Transaction t = TransferUtil.openNestedOrOuter()) {
 						int deposited = amountToDeposit - inventory.distributeToCompartment(toDistribute, slot, t)
 								.getCount();
 						if (deposited > 0) {
@@ -284,7 +284,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
 		ItemVariant resource = storage.getResource();
 		int amount = (int) storage.getAmount();
 		ItemStack toInsert = ToolboxInventory.cleanItemNBT(resource.toStack(amount));
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			ItemStack remainder = inventory.distributeToCompartment(toInsert, slot, t);
 			int inserted = amount - remainder.getCount();
 			storage.extract(resource, inserted, t);

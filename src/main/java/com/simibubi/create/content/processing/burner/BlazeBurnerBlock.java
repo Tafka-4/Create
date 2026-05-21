@@ -1,5 +1,7 @@
 package com.simibubi.create.content.processing.burner;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -159,7 +161,7 @@ public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<
 
 		boolean doNotConsume = player.isCreative();
 		boolean forceOverflow = !(player instanceof FakePlayer);
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			InteractionResultHolder<ItemStack> res =
 				tryInsert(state, level, pos, stack, doNotConsume, forceOverflow, t);
 			t.commit();

@@ -417,7 +417,7 @@ public class CreateEmiPlugin implements EmiPlugin {
 					Storage<FluidVariant> storage = ctx.find(FluidStorage.ITEM);
 					if (storage != null && GenericItemFilling.isFluidHandlerValid(copy, storage)) {
 						long inserted = 0;
-						try (Transaction t = Transaction.openOuter()) {
+						try (Transaction t = TransferUtil.openNestedOrOuter()) {
 							inserted = storage.insert(fs.getVariant(), fs.getAmount(), t);
 							t.commit();
 						}

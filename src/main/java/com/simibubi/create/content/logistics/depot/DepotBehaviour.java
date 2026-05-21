@@ -447,7 +447,7 @@ public class DepotBehaviour extends BlockEntityBehaviour {
 				setCenteredHeldItem(added);
 				continue;
 			}
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				long inserted = processingOutputBuffer.insert(ItemVariant.of(added.stack), added.stack.getCount(), t);
 				t.commit();
 				ItemStack remainder = added.stack.copy();

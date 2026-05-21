@@ -159,7 +159,10 @@ public class ArmInteractionPointHandler {
 
 		BlockPos pos = result.getBlockPos();
 
-		BlockEntity be = Minecraft.getInstance().level.getBlockEntity(pos);
+		Level level = Minecraft.getInstance().level;
+		if (level == null)
+			return;
+		BlockEntity be = level.getBlockEntity(pos);
 		if (!(be instanceof ArmBlockEntity)) {
 			lastBlockPos = -1;
 			currentSelection.clear();

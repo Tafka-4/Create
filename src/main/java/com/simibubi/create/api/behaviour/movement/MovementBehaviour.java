@@ -84,7 +84,7 @@ public interface MovementBehaviour {
 	default void collectOrDropItem(MovementContext context, ItemStack stack) {
 		ItemStack remainder;
 		if (AllConfigs.server().kinetics.moveItemsToStorage.get()) {
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				long inserted = context.contraption.getStorage().getAllItems().insert(ItemVariant.of(stack), stack.getCount(), t);
 				remainder = stack.copy();
 				remainder.shrink((int) inserted);

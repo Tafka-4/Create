@@ -7,7 +7,6 @@ import com.simibubi.create.content.logistics.BigItemStack;
 
 import net.createmod.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import net.createmod.catnip.net.base.ClientboundPacketPayload;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -33,7 +32,7 @@ public record LogisticalStockResponsePacket(boolean lastPacket, BlockPos pos, Li
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void handle(LocalPlayer player) {
-		if (Minecraft.getInstance().level.getBlockEntity(pos) instanceof StockTickerBlockEntity stbe)
+		if (player.clientLevel.getBlockEntity(pos) instanceof StockTickerBlockEntity stbe)
 			stbe.receiveStockPacket(items, lastPacket);
 	}
 }

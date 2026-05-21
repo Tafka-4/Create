@@ -1,5 +1,7 @@
 package com.simibubi.create.impl.unpacking;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +32,7 @@ public enum DefaultUnpackingHandler implements UnpackingHandler {
 		if (targetInv == null)
 			return false;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (ItemStack stack : items) {
 				long inserted = targetInv.insert(ItemVariant.of(stack), stack.getCount(), t);
 				if (inserted != stack.getCount()) {

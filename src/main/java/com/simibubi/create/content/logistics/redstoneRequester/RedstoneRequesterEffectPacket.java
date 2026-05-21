@@ -4,7 +4,6 @@ import com.simibubi.create.AllPackets;
 
 import io.netty.buffer.ByteBuf;
 import net.createmod.catnip.net.base.ClientboundPacketPayload;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -28,7 +27,7 @@ public record RedstoneRequesterEffectPacket(BlockPos pos, boolean success) imple
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void handle(LocalPlayer player) {
-		if (Minecraft.getInstance().level.getBlockEntity(pos) instanceof RedstoneRequesterBlockEntity plbe)
+		if (player.clientLevel.getBlockEntity(pos) instanceof RedstoneRequesterBlockEntity plbe)
 			plbe.playEffect(success);
 	}
 }

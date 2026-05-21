@@ -218,7 +218,7 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
 			}
 
 			// Export to station
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				for (StorageView<ItemVariant> view : carriageInventory.nonEmptyViews()) {
 					ItemVariant resource = view.getResource();
 					if (!PackageItem.isPackage(resource))

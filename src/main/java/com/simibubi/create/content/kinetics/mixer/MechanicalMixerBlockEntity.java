@@ -244,7 +244,7 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
 		if (availableItems == null)
 			return matchingRecipes;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (StorageView<ItemVariant> view : availableItems.nonEmptyViews()) {
 				List<MixingRecipe> list = PotionMixingRecipes.sortRecipesByItem(level).get(view.getResource().getItem());
 				if (list == null)

@@ -4,6 +4,7 @@ import com.simibubi.create.AllFluids;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.fluids.potion.PotionFluidHandler;
 import com.simibubi.create.foundation.fluid.FluidHelper;
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 
 import com.simibubi.create.infrastructure.fabric.transfer.fluid.FluidStack;
 
@@ -89,7 +90,7 @@ public class GenericItemFilling {
 //			return FluidConstants.BUCKET;
 //		}
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			long filled = tank.insert(availableFluid.getVariant(), availableFluid.getAmount(), t);
 			return filled == 0 ? -1 : filled;
 		}
@@ -134,7 +135,7 @@ public class GenericItemFilling {
 		Storage<FluidVariant> tank = FluidStorage.ITEM.find(split, ctx);
 		if (tank == null)
 			return ItemStack.EMPTY;
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			tank.insert(toFill.getVariant(), toFill.getAmount(), t);
 			t.commit();
 

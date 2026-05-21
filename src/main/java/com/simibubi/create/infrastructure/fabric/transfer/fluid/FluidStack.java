@@ -204,6 +204,8 @@ public final class FluidStack implements DataComponentHolder {
 			return parseOptional(registries, tag.getCompound("Fluid"));
 		if (tag.contains("FluidName", Tag.TAG_STRING))
 			return loadFluidStackFromNBT(tag);
+		if (!tag.contains("fluid") && !tag.contains("amount"))
+			return EMPTY;
 		return parse(registries, tag).orElse(EMPTY);
 	}
 

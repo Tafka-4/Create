@@ -135,7 +135,7 @@ public class BasinBlock extends Block implements IBE<BasinBlockEntity>, IWrencha
 			// Tossed items bypass the quarter-stack limit
 			be.inputInventory.withMaxStackSize(64);
 			ItemStack stack = itemEntity.getItem().copy();
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				long inserted = be.inputInventory.insert(ItemVariant.of(stack), stack.getCount(), t);
 				t.commit();
 

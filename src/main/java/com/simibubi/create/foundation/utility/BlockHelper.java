@@ -128,7 +128,7 @@ public class BlockHelper {
 	}
 
 	public static int simulateFindAndRemoveInInventory(BlockState block, Player player, long amount) {
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			return findAndRemoveInInventory(block, player, amount);
 		}
 	}
@@ -158,7 +158,7 @@ public class BlockHelper {
 			amount += vineCount - 1;
 		}
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			PlayerInventoryStorage storage = PlayerInventoryStorage.of(player);
 			int amountFound = (int) storage.extract(required, amount, t);
 

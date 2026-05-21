@@ -6,7 +6,6 @@ import com.simibubi.create.AllPackets;
 
 import io.netty.buffer.ByteBuf;
 import net.createmod.catnip.net.base.ClientboundPacketPayload;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -32,7 +31,7 @@ public record FactoryPanelEffectPacket(FactoryPanelPosition fromPos, FactoryPane
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void handle(LocalPlayer player) {
-		ClientLevel level = Minecraft.getInstance().level;
+		ClientLevel level = player.clientLevel;
 		BlockState blockState = level.getBlockState(fromPos.pos());
 		if (!AllBlocks.FACTORY_GAUGE.has(blockState))
 			return;

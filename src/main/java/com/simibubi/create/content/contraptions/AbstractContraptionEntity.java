@@ -171,6 +171,12 @@ public abstract class AbstractContraptionEntity extends Entity implements IEntit
 	}
 
 	@Override
+	public void ejectPassengers() {
+		for (Entity passenger : List.copyOf(getPassengers()))
+			passenger.stopRiding();
+	}
+
+	@Override
 	protected void removePassenger(Entity passenger) {
 		// fabric: when a passenger is present, passengers are synced too early. Everything seems to behave fine anyway if this is ignored.
 		// This is not an issue on forge because extra data is directly part of the spawn packet.
@@ -746,19 +752,22 @@ public abstract class AbstractContraptionEntity extends Entity implements IEntit
 
 	@Environment(EnvType.CLIENT)
 	static void handleStallPacket(ContraptionStallPacket packet) {
-		if (Minecraft.getInstance().level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce)
+		var level = Minecraft.getInstance().level;
+		if (level != null && level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce)
 			ce.handleStallInformation(packet.x(), packet.y(), packet.z(), packet.angle());
 	}
 
 	@Environment(EnvType.CLIENT)
 	static void handleBlockChangedPacket(ContraptionBlockChangedPacket packet) {
-		if (Minecraft.getInstance().level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce)
+		var level = Minecraft.getInstance().level;
+		if (level != null && level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce)
 			ce.handleBlockChange(packet.localPos(), packet.newState());
 	}
 
 	@Environment(EnvType.CLIENT)
 	static void handleDisassemblyPacket(ContraptionDisassemblyPacket packet) {
-		if (Minecraft.getInstance().level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce)
+		var level = Minecraft.getInstance().level;
+		if (level != null && level.getEntity(packet.entityId()) instanceof AbstractContraptionEntity ce)
 			ce.moveCollidedEntitiesOnDisassembly(packet.transform());
 	}
 

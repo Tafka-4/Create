@@ -105,7 +105,7 @@ public class ToolboxHandlerClient {
 
 		for (ToolboxBlockEntity toolboxBlockEntity : toolboxes) {
 			ToolboxInventory inventory = toolboxBlockEntity.inventory;
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				for (int comp = 0; comp < 8; comp++) {
 					ItemStack inSlot = inventory.takeFromCompartment(1, comp, t);
 					if (inSlot.isEmpty())

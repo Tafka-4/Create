@@ -37,7 +37,7 @@ public abstract class FlowSource {
 		Storage<FluidVariant> tank = provideHandler();
 		if (tank == null)
 			return FluidStack.EMPTY;
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			Predicate<FluidVariant> test = v -> extractionPredicate.test(new FluidStack(v, 1), t);
 			ResourceAmount<FluidVariant> resource = TransferUtil.extractMatching(tank, test, 1, t);
 			return resource == null ? FluidStack.EMPTY : new FluidStack(resource.resource(), resource.amount());

@@ -1,5 +1,7 @@
 package com.simibubi.create.content.logistics.packager;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import com.simibubi.create.AllBlockEntityTypes;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
@@ -117,11 +119,11 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
 				if (PackageItem.isPackage(stack)) {
 					if (level.isClientSide())
 						return ItemInteractionResult.SUCCESS;
-					try (Transaction t = Transaction.openOuter()) {
+					try (Transaction t = TransferUtil.openNestedOrOuter()) {
 						if (!be.unwrapBox(stack.copy(), t))
 							return ItemInteractionResult.SUCCESS;
 					}
-					try (Transaction t = Transaction.openOuter()) {
+					try (Transaction t = TransferUtil.openNestedOrOuter()) {
 						be.unwrapBox(stack.copy(), t);
 						t.commit();
 					}

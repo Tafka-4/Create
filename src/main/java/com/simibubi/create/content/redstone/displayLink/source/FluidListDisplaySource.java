@@ -1,5 +1,7 @@
 package com.simibubi.create.content.redstone.displayLink.source;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +61,7 @@ public class FluidListDisplaySource extends ValueListDisplaySource {
 		Map<Fluid, Long> fluids = new HashMap<>();
 		Map<Fluid, FluidStack> fluidNames = new HashMap<>();
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (StorageView<FluidVariant> view : handler.nonEmptyViews()) {
 				FluidStack stack = new FluidStack(view);
 				if (!filteringBehaviour.test(stack))

@@ -1,5 +1,7 @@
 package com.simibubi.create.content.fluids.transfer;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -415,7 +417,7 @@ public class FluidDrainingBehaviour extends FluidManipulationBehaviour {
 	}
 
 	public FluidStack getDrainableFluid(BlockPos rootPos) {
-		try (Transaction t = Transaction.openOuter()) { // simulate pullNext
+		try (Transaction t = TransferUtil.openNestedOrOuter()) { // simulate pullNext
 			return getDrainableFluid(rootPos, t);
 		}
 	}

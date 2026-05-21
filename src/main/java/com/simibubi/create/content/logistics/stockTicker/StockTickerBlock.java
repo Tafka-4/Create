@@ -80,7 +80,7 @@ public class StockTickerBlock extends HorizontalDirectionalBlock implements IBE<
 				return ItemInteractionResult.SUCCESS;
 
 			if (!level.isClientSide() && !stbe.receivedPayments.isEmpty()) {
-				try (Transaction t = Transaction.openOuter()) {
+				try (Transaction t = TransferUtil.openNestedOrOuter()) {
 					for (StorageView<ItemVariant> view : stbe.receivedPayments.nonEmptyViews()) {
 						ItemVariant resource = view.getResource();
 						long extracted = view.extract(resource, view.getAmount(), t);

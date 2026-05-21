@@ -236,7 +236,10 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
 
 	@Environment(EnvType.CLIENT)
 	public static void handlePacket(GantryContraptionUpdatePacket packet) {
-		Entity entity = Minecraft.getInstance().level.getEntity(packet.entityID());
+		var level = Minecraft.getInstance().level;
+		if (level == null)
+			return;
+		Entity entity = level.getEntity(packet.entityID());
 		if (!(entity instanceof GantryContraptionEntity ce))
 			return;
 		if (ce.movementAxis == null)

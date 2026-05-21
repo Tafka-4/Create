@@ -57,7 +57,7 @@ public class BeltCrusherInteractionHandler {
 				return true;
 
             ItemStack toInsert = currentItem.stack.copy();
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				long inserted = crusherBE.inventory.insert(ItemVariant.of(toInsert), toInsert.getCount(), t);
 				t.commit();
 				ItemStack remainder = toInsert.copyWithCount(toInsert.getCount() - (int) inserted);

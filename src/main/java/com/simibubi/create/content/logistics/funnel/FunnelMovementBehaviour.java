@@ -9,8 +9,6 @@ import com.simibubi.create.foundation.item.ItemHelper;
 
 import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -22,8 +20,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-
-import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 
 public class FunnelMovementBehaviour implements MovementBehaviour {
 
@@ -105,7 +101,7 @@ public class FunnelMovementBehaviour implements MovementBehaviour {
 		List<ItemEntity> items = world.getEntitiesOfClass(ItemEntity.class, new AABB(pos));
 		FilterItemStack filter = context.getFilterFromBE();
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (ItemEntity item : items) {
 				if (!item.isAlive())
 					continue;

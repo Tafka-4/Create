@@ -281,7 +281,7 @@ public class EjectorBlockEntity extends KineticBlockEntity implements SidedStora
 		depotBehaviour.incoming.clear();
 
 		ItemStackHandler outputs = depotBehaviour.processingOutputBuffer;
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (StorageView<ItemVariant> view : outputs.nonEmptyViews()) {
 				ItemVariant var = view.getResource();
 				long extracted = view.extract(view.getResource(), 64, t);

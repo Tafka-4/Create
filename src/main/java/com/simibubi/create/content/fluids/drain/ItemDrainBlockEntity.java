@@ -249,7 +249,7 @@ public class ItemDrainBlockEntity extends SmartBlockEntity implements IHaveGoggl
 		if (fluidFromItem.isEmpty())
 			return false;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			if (processingTicks > 5) {
 				internalTank.allowInsertion();
 				try {

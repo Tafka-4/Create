@@ -304,7 +304,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
 		if (scanRange > outputs.size())
 			scanRange = outputs.size();
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (int i = startIndex; i < scanRange; i++) {
 				ArmInteractionPoint armInteractionPoint = outputs.get(i);
 				if (!armInteractionPoint.isValid())
@@ -345,7 +345,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
 	}
 
 	protected int getDistributableAmount(ArmInteractionPoint armInteractionPoint) {
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			ItemStack stack = armInteractionPoint.extract(t);
 
 			ItemStack remainder = stack.isEmpty() ? stack : simulateInsertion(stack, t);
@@ -371,7 +371,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
 		ArmInteractionPoint armInteractionPoint = getTargetedInteractionPoint();
 		if (armInteractionPoint != null && armInteractionPoint.isValid()) {
 			ItemStack toInsert = heldItem.copy();
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				ItemStack remainder = armInteractionPoint.insert(toInsert, t);
 				t.commit();
 				heldItem = remainder;
@@ -397,7 +397,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
 			int amountExtracted = getDistributableAmount(armInteractionPoint);
 			if (amountExtracted == 0)
 				return;
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				ItemStack prevHeld = heldItem;
 				heldItem = armInteractionPoint.extract(amountExtracted, t);
 				phase = Phase.SEARCH_OUTPUTS;

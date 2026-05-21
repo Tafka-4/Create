@@ -491,7 +491,7 @@ public class AllArmInteractionPointTypes {
 				return stack;
 
 			// fabric: this is already wrapped in a transaction, no need to simulate
-			ItemStack insert = inserter.insert(stack);
+			ItemStack insert = inserter.insert(stack, ctx);
 			if (insert.getCount() != stack.getCount()) {
 				BlockEntity blockEntity = level.getBlockEntity(pos);
 				if (blockEntity instanceof FunnelBlockEntity funnelBlockEntity) {

@@ -156,7 +156,7 @@ public class DeployerMovementBehaviour implements MovementBehaviour {
 
 		if (!context.contraption.hasUniversalCreativeCrate) {
 			Storage<ItemVariant> itemHandler = context.contraption.getStorage().getAllItems();
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				for (ItemRequirement.StackRequirement required : requiredItems) {
 					int count = required.stack.getCount();
 					ResourceAmount<ItemVariant> resource = TransferUtil.extractMatching(itemHandler, required::matches, count, t);

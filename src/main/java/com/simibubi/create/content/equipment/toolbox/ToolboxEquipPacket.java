@@ -1,5 +1,7 @@
 package com.simibubi.create.content.equipment.toolbox;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import com.simibubi.create.AllPackets;
 import net.createmod.catnip.net.base.ServerboundPacketPayload;
 
@@ -89,7 +91,7 @@ public record ToolboxEquipPacket(BlockPos toolboxPos, int slot, int hotbarSlot) 
 	private static ItemStack insertItemStacked(ToolboxInventory inventory, ItemStack stack) {
 		if (stack.isEmpty())
 			return ItemStack.EMPTY;
-		try (Transaction transaction = Transaction.openOuter()) {
+		try (Transaction transaction = TransferUtil.openNestedOrOuter()) {
 			long inserted = inventory.insert(ItemVariant.of(stack), stack.getCount(), transaction);
 			transaction.commit();
 			return stack.copyWithCount(stack.getCount() - (int) inserted);

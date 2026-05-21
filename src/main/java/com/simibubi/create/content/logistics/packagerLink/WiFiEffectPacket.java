@@ -6,7 +6,6 @@ import com.simibubi.create.content.logistics.stockTicker.StockTickerBlockEntity;
 import io.netty.buffer.ByteBuf;
 import net.createmod.catnip.net.base.ClientboundPacketPayload;
 import net.createmod.catnip.platform.CatnipServices;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.StreamCodec;
@@ -29,11 +28,11 @@ public record WiFiEffectPacket(BlockPos pos) implements ClientboundPacketPayload
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void handle(LocalPlayer player) {
-		BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
-			if (blockEntity instanceof PackagerLinkBlockEntity plbe)
-				plbe.playEffect();
-			if (blockEntity instanceof StockTickerBlockEntity plbe)
-				plbe.playEffect();
+		BlockEntity blockEntity = player.clientLevel.getBlockEntity(pos);
+		if (blockEntity instanceof PackagerLinkBlockEntity plbe)
+			plbe.playEffect();
+		if (blockEntity instanceof StockTickerBlockEntity plbe)
+			plbe.playEffect();
 	}
 
 	public static void send(Level level, BlockPos pos) {

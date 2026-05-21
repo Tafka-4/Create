@@ -35,7 +35,7 @@ public enum SpoutCasting implements BlockSpoutingBehaviour {
 
 		// Do not fill if it would only partially fill the table (unless > 1000mb)
 		long amount = availableFluid.getAmount();
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			long inserted = handler.insert(availableFluid.getVariant(), amount, t);
 			if (amount < FluidConstants.BUCKET) {
 				try (Transaction nested = t.openNested()) {

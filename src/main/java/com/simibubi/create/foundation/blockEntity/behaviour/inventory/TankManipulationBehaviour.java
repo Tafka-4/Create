@@ -43,7 +43,7 @@ public class TankManipulationBehaviour extends CapManipulationBehaviourBase<Flui
 		Storage<FluidVariant> inventory = getInventory();
 		Predicate<FluidStack> filterTest = getFilterTest(Predicates.alwaysTrue());
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (StorageView<FluidVariant> view : inventory) {
 				if (!view.isResourceBlank()) {
 					FluidStack stack = new FluidStack(view);

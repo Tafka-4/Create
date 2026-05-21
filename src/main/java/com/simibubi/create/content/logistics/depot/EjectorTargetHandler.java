@@ -228,7 +228,10 @@ public class EjectorTargetHandler {
 			return;
 		BlockPos pos = result.getBlockPos();
 
-		BlockEntity be = Minecraft.getInstance().level.getBlockEntity(pos);
+		Level level = Minecraft.getInstance().level;
+		if (level == null)
+			return;
+		BlockEntity be = level.getBlockEntity(pos);
 		if (!(be instanceof EjectorBlockEntity)) {
 			lastHoveredBlockPos = -1;
 			currentSelection = null;

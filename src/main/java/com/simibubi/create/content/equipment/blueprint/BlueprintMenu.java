@@ -126,7 +126,10 @@ public class BlueprintMenu extends GhostItemMenu<BlueprintSection> {
 	protected BlueprintSection createOnClient(RegistryFriendlyByteBuf extraData) {
 		int entityID = extraData.readVarInt();
 		int section = extraData.readVarInt();
-		Entity entityByID = Minecraft.getInstance().level.getEntity(entityID);
+		Level level = Minecraft.getInstance().level;
+		if (level == null)
+			return null;
+		Entity entityByID = level.getEntity(entityID);
 		if (!(entityByID instanceof BlueprintEntity blueprintEntity))
 			return null;
 		BlueprintSection blueprintSection = blueprintEntity.getSection(section);

@@ -1,5 +1,7 @@
 package com.simibubi.create.compat.rei.category;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -80,7 +82,7 @@ public class SpoutCategory extends CreateRecipeCategory<FillingRecipe> {
 						return;
 					FluidStack fluidCopy = fluidStack.copy();
 					fluidCopy.setAmount(FluidConstants.BUCKET);
-					try(Transaction t = Transaction.openOuter()) {
+					try(Transaction t = TransferUtil.openNestedOrOuter()) {
 						fhi.insert(fluidCopy.getVariant(), fluidCopy.getAmount(), t);
 						t.commit();
 					}

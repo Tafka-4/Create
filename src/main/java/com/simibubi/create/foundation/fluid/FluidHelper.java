@@ -123,7 +123,7 @@ public class FluidHelper {
 		if (worldIn.isClientSide)
 			return true;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			long inserted = tank.insert(fluidStack.getVariant(), fluidStack.getAmount(), t);
 			if (inserted != fluidStack.getAmount())
 				return false;
@@ -170,7 +170,7 @@ public class FluidHelper {
 				heldItem = heldItem.copy();
 			ItemStack out = GenericItemFilling.fillItem(world, requiredAmountForItem, heldItem, fluid.copy());
 
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				tank.extract(fluid.getVariant(), requiredAmountForItem, t);
 				t.commit();
 			}

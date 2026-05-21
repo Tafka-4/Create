@@ -1,5 +1,7 @@
 package com.simibubi.create.content.processing.basin;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -91,7 +93,7 @@ public class BasinRecipe extends StandardProcessingRecipe<RecipeInput> {
 
 		NonNullList<ItemStack> consumedItems = NonNullList.create();
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			Ingredients:
 			for (Ingredient ingredient : ingredients) {
 				for (StorageView<ItemVariant> view : availableItems.nonEmptyViews()) {

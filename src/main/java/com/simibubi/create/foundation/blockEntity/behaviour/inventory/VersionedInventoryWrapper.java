@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.infrastructure.fabric.ProcessingIterator;
 import com.simibubi.create.infrastructure.fabric.transfer.TransactionSuccessCallback;
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
 import com.simibubi.create.foundation.utility.fabric.ListeningStorageView;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -71,7 +72,7 @@ public class VersionedInventoryWrapper implements Storage<ItemVariant> {
 	}
 
 	public long simulateInsert(ItemVariant resource, long maxAmount, @Nullable TransactionContext transaction) {
-		try (Transaction nested = transaction == null ? Transaction.openOuter() : transaction.openNested()) {
+		try (Transaction nested = transaction == null ? TransferUtil.openNestedOrOuter() : transaction.openNested()) {
 			return inventory.insert(resource, maxAmount, nested);
 		}
 	}
@@ -83,7 +84,7 @@ public class VersionedInventoryWrapper implements Storage<ItemVariant> {
 	}
 
 	public long simulateExtract(ItemVariant resource, long maxAmount, @Nullable TransactionContext transaction) {
-		try (Transaction nested = transaction == null ? Transaction.openOuter() : transaction.openNested()) {
+		try (Transaction nested = transaction == null ? TransferUtil.openNestedOrOuter() : transaction.openNested()) {
 			return inventory.extract(resource, maxAmount, nested);
 		}
 	}

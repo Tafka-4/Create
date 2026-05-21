@@ -248,7 +248,7 @@ public class FrogportBlockEntity extends PackagePortBlockEntity implements IHave
 		if (handler == null)
 			return;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			boolean failed = false;
 			for (StorageView<ItemVariant> view : inventory.nonEmptyViews()) {
 				ItemVariant resource = view.getResource();

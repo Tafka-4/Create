@@ -1,5 +1,7 @@
 package com.simibubi.create.content.processing.basin;
 
+import com.simibubi.create.infrastructure.fabric.transfer.TransferUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -350,7 +352,7 @@ public class BasinBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 			.isVertical())
 			return;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (StorageView<ItemVariant> view : outputInventory.nonEmptyViews()) {
 				ItemVariant variant = view.getResource();
 				ItemStack stack = variant.toStack(ItemHelper.truncateLong(view.getAmount()));
@@ -433,7 +435,7 @@ public class BasinBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 
 		boolean update = false;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (Iterator<ItemStack> iterator = spoutputBuffer.iterator(); iterator.hasNext(); ) {
 				ItemStack itemStack = iterator.next();
 				// fabric: cleanup for #599

@@ -111,7 +111,7 @@ public class MillstoneBlock extends KineticBlock implements IBE<MillstoneBlockEn
 		if (handler == null)
 			return;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			ItemStack inEntity = itemEntity.getItem();
 			long inserted = handler.insert(ItemVariant.of(inEntity), inEntity.getCount(), t);
 			if (inserted == inEntity.getCount())

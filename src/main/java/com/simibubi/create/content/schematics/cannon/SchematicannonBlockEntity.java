@@ -419,7 +419,7 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
 		// Find item
 		List<ItemRequirement.StackRequirement> requiredItems = requirement.getRequiredItems();
 		if (!requirement.isEmpty()) {
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				for (ItemRequirement.StackRequirement required : requiredItems) {
 					if (!grabItemsFromAttachedInventories(required, t)) {
 						if (skipMissing) {
@@ -688,7 +688,7 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
 				.shrink(1);
 		else {
 			boolean externalGunpowderFound = false;
-			try (Transaction t = Transaction.openOuter()) {
+			try (Transaction t = TransferUtil.openNestedOrOuter()) {
 				for (Entry<Direction, StorageProvider<ItemVariant>> entry : storages.entrySet()) {
 					Storage<ItemVariant> storage = entry.getValue().get(entry.getKey().getOpposite());
 					if (storage == null)
@@ -872,7 +872,7 @@ if (printer.isErrored())
 		}
 
 		checklist.gathered.clear();
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.openNestedOrOuter()) {
 			for (Entry<Direction, StorageProvider<ItemVariant>> entry : storages.entrySet()) {
 				Storage<ItemVariant> storage = entry.getValue().get(entry.getKey().getOpposite());
 				if (storage == null)

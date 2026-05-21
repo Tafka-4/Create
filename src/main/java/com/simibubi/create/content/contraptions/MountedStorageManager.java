@@ -447,7 +447,7 @@ public class MountedStorageManager {
 
 			if (data.contains("Bottomless")) {
 				this.addStorage(CreativeFluidTankMountedStorage.fromLegacy(registries, data), pos);
-			} else {
+			} else if (data.contains("Capacity", Tag.TAG_ANY_NUMERIC)) {
 				this.addStorage(FluidTankMountedStorage.fromLegacy(registries, data), pos);
 			}
 		});
