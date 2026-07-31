@@ -490,7 +490,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 		// Render text input hints
 		if (addressBox.getValue()
 			.isBlank() && !addressBox.isFocused()) {
-			graphics.drawString(Minecraft.getInstance().font, CreateLang.translate("gui.stock_keeper.package_adress")
+			graphics.drawString(Minecraft.getInstance().font, CreateLang.translate("gui.stock_keeper.package_address")
 				.style(ChatFormatting.ITALIC)
 				.component(), addressBox.getX(), addressBox.getY(), 0xff_CDBCA8, false);
 		}
