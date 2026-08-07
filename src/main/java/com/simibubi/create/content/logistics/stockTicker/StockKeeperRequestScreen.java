@@ -77,7 +77,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.phys.AABB;
-import com.simibubi.create.infrastructure.fabric.transfer.item.ItemStackHandler;
 
 public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockKeeperRequestMenu>
 	implements ScreenWithStencils {
@@ -104,7 +103,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 	private static final AllGuiTextures FOOTER = AllGuiTextures.STOCK_KEEPER_REQUEST_FOOTER;
 
 	StockTickerBlockEntity blockEntity;
-	public LerpedFloat itemScroll;
+	public LerpedFloat itemScroll = LerpedFloat.linear()
+		.startWithValue(0);
 
 	final int rows = 9;
 	final int cols = 9;
@@ -120,7 +120,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 	int windowHeight;
 
 	public EditBox searchBox;
-	AddressEditBox addressBox;
+	public AddressEditBox addressBox;
 
 	int emptyTicks = 0;
 	int successTicks = 0;
@@ -164,8 +164,6 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 		blockEntity.ticksSinceLastUpdate = 15;
 		emptyTicks = 0;
 		successTicks = 0;
-		itemScroll = LerpedFloat.linear()
-			.startWithValue(0);
 		stockKeeper = new WeakReference<>(null);
 		blaze = new WeakReference<>(null);
 		refreshSearchNextTick = false;
@@ -624,9 +622,11 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 		int itemWindowY = y + 17;
 		int itemWindowY2 = y + windowHeight - 80;
 
-		UIRenderHelper.swapAndBlitColor(minecraft.getMainRenderTarget(), UIRenderHelper.framebuffer);
-		startStencil(graphics, itemWindowX - 5, itemWindowY, itemWindowX2 - itemWindowX + 10,
-			itemWindowY2 - itemWindowY);
+//		UIRenderHelper.swapAndBlitColor(minecraft.getMainRenderTarget(), UIRenderHelper.framebuffer);
+//		startStencil(graphics, itemWindowX - 5, itemWindowY, itemWindowX2 - itemWindowX + 10,
+//			itemWindowY2 - itemWindowY);
+
+		graphics.enableScissor(itemWindowX - 5, itemWindowY, itemWindowX2 + 10, itemWindowY2);
 
 		ms.pushPose();
 		ms.translate(0, -currentScroll * rowHeight, 0);
@@ -715,7 +715,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 				.render(graphics, lockX, lockY);
 
 		ms.popPose();
-		endStencil();
+//		endStencil();
+		graphics.disableScissor();
 
 		// Scroll bar
 		int windowH = windowHeight - 92;
@@ -763,7 +764,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 			ms.popPose();
 		}
 
-		UIRenderHelper.swapAndBlitColor(UIRenderHelper.framebuffer, minecraft.getMainRenderTarget());
+//		UIRenderHelper.swapAndBlitColor(UIRenderHelper.framebuffer, minecraft.getMainRenderTarget());
 	}
 
 	@Override
@@ -831,10 +832,12 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 								 boolean isRenderingOrders) {
 
 		int customCount = entry.count;
+		ItemStack stackWithCount = entry.stack.copyWithCount(customCount);
+
 		if (!isRenderingOrders) {
-			BigItemStack order = getOrderForItem(entry.stack);
+			BigItemStack order = getOrderForItem(stackWithCount);
 			if (entry.count < BigItemStack.INF) {
-				int forcedCount = forcedEntries.getCountOf(entry.stack);
+				int forcedCount = forcedEntries.getCountOf(stackWithCount);
 				if (forcedCount != 0)
 					customCount = Math.min(customCount, -forcedCount - 1);
 				if (order != null)
@@ -858,14 +861,14 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 		ms.scale(scaleFromHover, scaleFromHover, scaleFromHover);
 		ms.translate(-18 / 2.0, -18 / 2.0, 0);
 		if (customCount != 0 || craftable)
-			GuiGameElement.of(entry.stack)
+			GuiGameElement.of(stackWithCount)
 				.render(graphics);
 		ms.popPose();
 
 		ms.pushPose();
 		ms.translate(0, 0, 190);
 		if (customCount != 0 || craftable)
-			graphics.renderItemDecorations(font, entry.stack, 1, 1, "");
+			graphics.renderItemDecorations(font, stackWithCount, 1, 1, "");
 		ms.translate(0, 0, 10);
 		if (customCount > 1 || craftable)
 			drawItemCount(graphics, entry.count, customCount);
