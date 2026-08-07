@@ -622,10 +622,6 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 		int itemWindowY = y + 17;
 		int itemWindowY2 = y + windowHeight - 80;
 
-//		UIRenderHelper.swapAndBlitColor(minecraft.getMainRenderTarget(), UIRenderHelper.framebuffer);
-//		startStencil(graphics, itemWindowX - 5, itemWindowY, itemWindowX2 - itemWindowX + 10,
-//			itemWindowY2 - itemWindowY);
-
 		graphics.enableScissor(itemWindowX - 5, itemWindowY, itemWindowX2 + 10, itemWindowY2);
 
 		ms.pushPose();
@@ -715,7 +711,6 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 				.render(graphics, lockX, lockY);
 
 		ms.popPose();
-//		endStencil();
 		graphics.disableScissor();
 
 		// Scroll bar
@@ -763,8 +758,6 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
 			ms.popPose();
 		}
-
-//		UIRenderHelper.swapAndBlitColor(UIRenderHelper.framebuffer, minecraft.getMainRenderTarget());
 	}
 
 	@Override
